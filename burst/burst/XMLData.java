@@ -13,6 +13,7 @@ public class XMLData {
     public int frameWidth;
     public int frameHeight;
 
+    @Override
     public String toString() {
         return 
         "Name: " + name +

@@ -1,8 +1,11 @@
 package burst;
 
-import javax.swing.JFrame;
-
-public class Burst extends JFrame {
+/**
+ * This is just a preset JFrame
+ * <p>You can use it, or you can just use a standard JFrame. 
+ * <p>Either work the same.
+ */
+public class Burst extends javax.swing.JFrame {
     public Burst() {
         super();
         

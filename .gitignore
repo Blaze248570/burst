@@ -2,4 +2,4 @@
 bin/*
 
 assets/exclude/*
-source/Main.java
+src/burst/Main.java

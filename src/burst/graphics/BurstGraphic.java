@@ -1,16 +1,17 @@
 package burst.graphics;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
+import burst.graphics.frames.BurstFramesCollection;
+import burst.graphics.frames.BurstFramesCollection.BurstFrameCollectionType;
 
-public class BurstGraphic extends ImageIcon {
+public class BurstGraphic {
     public static BurstGraphic fromBuffImage(BufferedImage source, String key) {
         return new BurstGraphic(key, source);
     }
@@ -21,7 +22,7 @@ public class BurstGraphic extends ImageIcon {
 
     public static BufferedImage returnBuffImage(String path) {
         try {
-            return ImageIO.read(new FileInputStream(new File(path)));
+            return javax.imageio.ImageIO.read(new FileInputStream(new File(path)));
         } catch(IOException e) {
             System.out.println("Image not found: " + path);
             if(!path.endsWith(".png") && !path.endsWith(".gif"))
@@ -32,16 +33,35 @@ public class BurstGraphic extends ImageIcon {
 
     public String key;
 
-    public BufferedImage image;
+    public BufferedImage data;
 
-    public Graphics data;
+    public int width = 0;
 
-    public BurstGraphic(String key, BufferedImage image) {
-        super();
+    public int height = 0;
+
+    public HashMap<BurstFrameCollectionType, ArrayList<BurstFramesCollection>> frameCollections = new HashMap<>();
+
+    public BurstGraphic(String key, BufferedImage data) {
         this.key = key;
-        this.image = image;
+        this.data = data;
+    }
 
-        System.out.println("Made Graphic");
-        data = image.getGraphics();
+    public void addFramesCollection(BurstFramesCollection collection) {
+        if(collection.type == null)
+            return;
+
+        ArrayList<BurstFramesCollection> collections = getFramesCollection(collection.type);
+        collections.add(collection);
+    }
+
+    public ArrayList<BurstFramesCollection> getFramesCollection(BurstFrameCollectionType type) {
+        ArrayList<BurstFramesCollection> collections = frameCollections.get(type);
+        if (collections == null)
+		{
+			collections = new ArrayList<>();
+			frameCollections.put(type, collections);
+		}
+
+        return collections;
     }
 }

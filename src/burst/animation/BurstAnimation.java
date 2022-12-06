@@ -1,54 +1,127 @@
 package burst.animation;
 
-import java.awt.Rectangle;
-
 import java.util.ArrayList;
-
-import burst.XMLData;
-import burst.XMLSparrowParser;
-import burst.graphics.BurstGraphic;
 
 public class BurstAnimation {
     public BurstAnimationController parent;
-    public int framerate = 30;
-    public int numFrames = 0;
-    public boolean looped = false;
-    public ArrayList<BurstGraphic> frames = new ArrayList<>();
 
-    public BurstAnimation(BurstAnimationController parent, String prefix, int framerate, boolean looped) {
+    public String name;
+
+    public float frameRate;
+    public int curFrame;
+    public int numFrames;
+    public float delay;
+
+    public boolean finished = true;
+    public boolean paused;
+    public boolean looped;
+    public boolean reversed;
+
+    public ArrayList<Integer> frames;
+    public float frameTimer;
+
+    public BurstAnimation(BurstAnimationController parent, String name, ArrayList<Integer> frames, int frameRate, boolean looped) {
         this.parent = parent;
-        this.framerate = framerate;
+        this.name = name;
+
+        this.frameRate = frameRate;
+        this.frames = frames;
+        this.frameRate = frameRate;
         this.looped = looped;
 
-        ArrayList<XMLData> data = XMLSparrowParser.parseXML("parent.sprite.imagePath");
-        BurstGraphic toBeSliced = parent.sprite.frame;
-        for(XMLData x : data) {
-            if(x.name.contains(prefix)) {
-                Boolean trimmed = (x.frameX != 0);
-                
-                Rectangle rect = new Rectangle(x.x, x.y, x.width, x.height);
-                Rectangle size = (trimmed ? 
-                    new Rectangle(x.frameX, x.frameY, x.frameWidth, x.frameHeight) :
-                    new Rectangle(0, 0, rect.width, rect.height)
-                );
+        /*
+            ArrayList<XMLData> data = null;
+            BurstGraphic toBeSliced = parent.sprite.frame;
+            for(XMLData x : data) {
+                if(x.name.contains(prefix)) {
+                    Boolean trimmed = (x.frameX != 0);
+                    
+                    Rectangle rect = new Rectangle(x.x, x.y, x.width, x.height);
+                    Rectangle size = (trimmed ? 
+                        new Rectangle(x.frameX, x.frameY, x.frameWidth, x.frameHeight) :
+                        new Rectangle(0, 0, rect.width, rect.height)
+                    );
 
-                frames.add(BurstGraphic.fromBuffImage(toBeSliced.image.getSubimage(rect.x, rect.y, size.width + size.x, size.height + size.y), prefix));
+                    frames.add(BurstGraphic.fromBuffImage(toBeSliced.image.getSubimage(rect.x, rect.y, size.width + size.x, size.height + size.y), prefix));
 
-                numFrames++;
+                    numFrames++;
+                }
             }
-        }
+        */
     }
 
-    public BurstAnimation(BurstAnimationController parent, String prefix, int[] frames, int framerate, boolean looped) {
-        this.framerate = framerate;
-        this.looped = looped;
-        
-        for(int i : frames) {
-            String frameNum = i + "";
-            while(frameNum.length() < 4) frameNum = "0" + frameNum;
-            this.frames.add(BurstGraphic.fromBuffImage(prefix + frameNum, prefix));
+    public void play(boolean force, boolean reversed, int frame) {
+        if(!force && !finished && this.reversed == reversed) {
+            paused = false;
+            finished = false;
+            return;
+        }
 
-            numFrames++;
+        this.reversed = reversed;
+        paused = false;
+        frameTimer = 0;
+        finished = delay == 0;
+
+        int maxFrameIndex = numFrames - 1;
+        if(frame < 0) 
+            curFrame = (int) (Math.random() * maxFrameIndex);
+        else {
+            if(frame > maxFrameIndex)
+                frame = maxFrameIndex;
+            if(reversed)
+                frame = (maxFrameIndex - frame);
+            curFrame = frame;
+        }
+
+        // Call finished callback
+        // I'll need to figure out how to do that with Java
+    }
+
+    public void restart() {
+        play(true, reversed, 0);
+    }
+
+    public void stop() {
+        finished = true;
+        paused = true;
+    }
+
+    public void reset() {
+        stop();
+        curFrame = reversed ? (numFrames - 1) : 0;
+    }
+
+    public void finish() {
+        stop();
+        curFrame = reversed ? 0 : (numFrames - 1);
+    }
+
+    public void pause() {
+        paused = true;
+    }
+
+    public void resume() {
+        paused = false;
+    }
+
+    public void update(float elapsed) {
+        if(delay == 0 || finished || paused)
+            return;
+
+        frameTimer += elapsed;
+        while(frameTimer > delay && !finished) {
+            frameTimer -= delay;
+			if (reversed){
+				if (looped && curFrame == 0)
+					curFrame = numFrames - 1;
+				else
+					curFrame--;
+			} else {
+				if (looped && curFrame == numFrames - 1)
+					curFrame = 0;
+				else
+					curFrame++;
+			}
         }
     }
 }

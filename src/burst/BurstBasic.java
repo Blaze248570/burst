@@ -32,7 +32,7 @@ public class BurstBasic extends javax.swing.JComponent {
         exists = true;
     }
 
-    public void update(Float elapsed) {}
+    public void update(float elapsed) {}
 
     boolean set_visible(boolean value) {
         return visible = value;

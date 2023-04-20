@@ -1,13 +1,14 @@
 package burst.animation;
 
 import java.util.ArrayList;
+// import java.util.function.Consumer;
 import java.util.HashMap;
 
 import burst.BurstSprite;
 import burst.graphics.frames.BurstFrame;
 
 /**
- * <p>The BurstAnimationController is a class within a BurstSprite that holds 
+ * The BurstAnimationController is a class within a BurstSprite that holds 
  * and performs actions regarding animation.
  */
 public class BurstAnimationController {
@@ -27,31 +28,30 @@ public class BurstAnimationController {
 
     public int frames;
 
-    // public void -> void callback;
-    // TO-DO
+    // To-Do: Figure out Lambda junk for Java
+    // public Consumer<Void> callback;
 
-    private BurstSprite sprite;
+    public BurstSprite sprite;
 
-    private HashMap<String, BurstAnimation> animations;
+    public HashMap<String, BurstAnimation> animations;
 
-    public BurstAnimationController(BurstSprite sprite) {
+    public BurstAnimationController(BurstSprite sprite) 
+    {
         this.sprite = sprite;
 
         this.animations = new HashMap<>();
     }
 
-    public void update(float elapsed) {
+    public void update(float elapsed) 
+    {
         if(curAnim != null)
+        {
             curAnim.update(elapsed);
+        }
     }
 
-    public void destroy() {
-        // destroyAnimations();
-
-        animations = null;
-    }
-
-    public void addByPrefix(String name, String prefix, int framerate, boolean looped) {
+    public void addByPrefix(String name, String prefix, int framerate, boolean looped) 
+    {
         if(sprite.frames == null)
             return;
 
@@ -64,50 +64,46 @@ public class BurstAnimationController {
         ArrayList<Integer> frameIndices = new ArrayList<>();
         byPrefixHelper(frameIndices, animFrames, prefix);
 
-        if(frameIndices.size() >= 0)
+        if(frameIndices.size() <= 0)
             return;
 
         animations.put(name, new BurstAnimation(this, name, frameIndices, framerate, looped));
     }
 
-    public void byPrefixHelper(ArrayList<Integer> addTo, ArrayList<BurstFrame> animFrames, String prefix) {
+    public void byPrefixHelper(ArrayList<Integer> addTo, ArrayList<BurstFrame> animFrames, String prefix) 
+    {
         String name = animFrames.get(0).name;
         int postIndex = name.indexOf(".", prefix.length());
         String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
 
         // BurstFrame.sort(animFrames, prefix.length(), postFix.length());
         // Not sure how to handle this just yet. I'll make an algo at some point
-        // Burrent goal is to make it work
+        // Current goal is to make it work
 
-        for(BurstFrame frame : animFrames) {
+        for(BurstFrame frame : animFrames) 
+        {
             addTo.add(getFrameIndex(frame));
         }
     }
 
-    public void findByPrefix(ArrayList<BurstFrame> animFrames, String prefix) {
-        for(BurstFrame frame : sprite.frames.frames) {
-            if(frame.name != null && frame.name.startsWith(prefix, 0)) {
+    public void findByPrefix(ArrayList<BurstFrame> animFrames, String prefix) 
+    {
+        for(BurstFrame frame : sprite.frames) 
+        {
+            if(frame.name != null && frame.name.startsWith(prefix, 0)) 
+            {
                 animFrames.add(frame);
             }
         }
     }
-
-    private int set_frameIndex(int frame)
-    {
-        if(sprite.frames != null && frames > 0) {
-            frame = frame % frames;
-            sprite.frame = sprite.frames.frame.get(frame);
-            frameIndex = frame;
-        }
-
-        return frameIndex;
-    }
     
-    public int getFrameIndex(BurstFrame frame) {
-        return sprite.frames.frames.indexOf(frame);
+    public int getFrameIndex(BurstFrame frame) 
+    {
+        return sprite.frames.indexOf(frame);
     }
 
-    public void play(String animname, boolean force, boolean reversed, int frame) {
+    public void play(String animname, boolean force, boolean reversed, int frame) 
+    {
         if(animname == null) {
             if(curAnim != null) {
                 curAnim.stop();
@@ -120,9 +116,8 @@ public class BurstAnimationController {
             return;
         }
 
-        if(curAnim != null && animname != curAnim.name) {
+        if(curAnim != null && animname != curAnim.name)
             curAnim.stop();
-        }
 
         curAnim = animations.get(animname);
         curAnim.play(force, reversed, frame);
@@ -133,19 +128,33 @@ public class BurstAnimationController {
             curAnim.reset();
     }
 
-    public void finish() {
+    public void finish() 
+    {
         if(curAnim != null)
             curAnim.finish();
     }
 
-    public void stop() {
+    public void stop() 
+    {
         if(curAnim != null)
             curAnim.stop();
     }
 
-    public void pause() {
+    public void pause() 
+    {
         if(curAnim != null)
             curAnim.pause();
+    }
+
+    public ArrayList<String> getNamesList()
+    {
+        ArrayList<String> list = new ArrayList<>();
+        for(BurstAnimation anim : animations.values())
+        {
+            list.add(anim.name);
+        }
+
+        return list;
     }
 
     /*

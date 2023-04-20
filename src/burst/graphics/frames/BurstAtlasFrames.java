@@ -1,7 +1,6 @@
 package burst.graphics.frames;
 
 import burst.graphics.BurstGraphic;
-import burst.Xml;
 
 import java.awt.Rectangle;
 import java.awt.Point;
@@ -10,15 +9,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class BurstAtlasFrames extends BurstFramesCollection {
-    public static BurstFramesCollection fromSparrow(BurstGraphic graphic, String description) {
+public class BurstAtlasFrames extends BurstFramesCollection 
+{
+    public static BurstFramesCollection fromSparrow(String graphic, String description)
+    {
+        return fromSparrow(BurstGraphic.fromBuffImage(graphic, graphic), description);
+    }
+
+    public static BurstFramesCollection fromSparrow(BurstGraphic graphic, String description) 
+    {
         if(graphic == null || description == null || !new java.io.File(description).exists())
             return null;
 
         BurstAtlasFrames frames = new BurstAtlasFrames(graphic);
         
-        NodeList data = Xml.parse(description).getElementsByTagName("SubTexture");
-        for(int i = 0; i < data.getLength(); i++) {
+        NodeList data = burst.Xml.parse(description).getElementsByTagName("SubTexture");
+        for(int i = 0; i < data.getLength(); i++) 
+        {
             Node item = data.item(i);
 
             if(item.getNodeType() != Node.ELEMENT_NODE)
@@ -62,7 +69,8 @@ public class BurstAtlasFrames extends BurstFramesCollection {
         return frames;
     }
 
-    public BurstAtlasFrames(BurstGraphic parent) {
-        super(parent, BurstFrameCollectionType.ATLAS);
+    public BurstAtlasFrames(BurstGraphic graphic)
+    {
+        super(graphic);
     }
 }

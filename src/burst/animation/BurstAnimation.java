@@ -1,8 +1,7 @@
 package burst.animation;
 
-import java.util.ArrayList;
-
-public class BurstAnimation {
+public class BurstAnimation 
+{
     public BurstAnimationController controller;
 
     public String name;
@@ -21,23 +20,25 @@ public class BurstAnimation {
     public boolean looped;
     public boolean reversed;
 
-    public ArrayList<Integer> frames;
+    public int[] frames;
     public float frameTimer;
 
-    public BurstAnimation(BurstAnimationController controller, String name, ArrayList<Integer> frames, int frameRate, boolean looped) 
+    public BurstAnimation(BurstAnimationController controller, String name, int[] frames, int frameRate, boolean looped) 
     {
         this.controller = controller;
         this.name = name;
 
         this.frameRate = frameRate;
         this.frames = frames;
+        this.numFrames = frames.length;
         this.frameRate = frameRate;
         this.looped = looped;
     }
 
     public void play(boolean force, boolean reversed, int frame) 
     {
-        if(!force && !finished && this.reversed == reversed) {
+        if(!force && !finished && this.reversed == reversed) 
+        {
             paused = false;
             finished = false;
             return;
@@ -59,6 +60,7 @@ public class BurstAnimation {
                 frame = maxFrameIndex;
             if(reversed)
                 frame = (maxFrameIndex - frame);
+                
             curFrame = frame;
         }
 
@@ -109,31 +111,35 @@ public class BurstAnimation {
             frameTimer -= delay;
 			if (reversed)
             {
-				if (looped && curFrame == 0)
+                curFrame--;
+				if (looped && curFrame <= 0)
                     controller.sprite.setFrame(controller.sprite.frames.get(numFrames - 1));
 				else
-                    controller.sprite.setFrame(controller.sprite.frames.get(--curFrame));
+                    controller.sprite.setFrame(controller.sprite.frames.get(curFrame));
 
 			}
             else 
             {
-                /*
-                    if (looped && curFrame == numFrames - 1)
-                        controller.sprite.setFrame(controller.sprite.frames.get(0));
-                    else
-                        controller.sprite.setFrame(controller.sprite.frames.get(++curFrame));
-                */
+                curFrame++;
+                if (looped && curFrame >= numFrames - 1)
+                    controller.sprite.setFrame(controller.sprite.frames.get(0));
+                else
+                    controller.sprite.setFrame(controller.sprite.frames.get(curFrame));
 			}
 
-            finished = (reversed ? curFrame < 0 : curFrame > frames.size());
+            finished = (reversed ? curFrame < 0 : curFrame >= numFrames);
 
             if(finished && looped)
             {
-                curFrame = (reversed ? frames.size() - 1 : 0);
+                curFrame = (reversed ? frames.length - 1 : 0);
                 finished = false;
             }
-
-            // System.out.println(curFrame);
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "BurstAnimation ~ {name: " + name + ", framerate: " + frameRate + ", looped: " + looped + ", reversed: " + reversed + "}";
     }
 }

@@ -69,6 +69,11 @@ public class BurstAtlasFrames extends BurstFramesCollection
         return frames;
     }
 
+    public BurstFramesCollection fromPacker(BurstGraphic graphic, String description)
+    {
+        return new BurstFramesCollection(graphic);
+    }
+
     public BurstAtlasFrames(BurstGraphic graphic)
     {
         super(graphic);

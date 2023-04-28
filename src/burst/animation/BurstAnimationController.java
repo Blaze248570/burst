@@ -50,6 +50,23 @@ public class BurstAnimationController {
         }
     }
 
+    public void add(String name, int[] frames)
+    {
+        add(name, frames, 24);
+    }
+
+    public void add(String name, int[] frames, int framerate)
+    {
+        add(name, frames, framerate, true);
+    }
+
+    public void add(String name, int[] frames, int framerate, boolean looped)
+    {
+        BurstAnimation anim = new BurstAnimation(this, name, frames, framerate, looped);
+
+        animations.put(name, anim);
+    }
+
     public void addByPrefix(String name, String prefix, int framerate, boolean looped) 
     {
         if(sprite.frames == null)
@@ -67,14 +84,18 @@ public class BurstAnimationController {
         if(frameIndices.size() <= 0)
             return;
 
-        animations.put(name, new BurstAnimation(this, name, frameIndices, framerate, looped));
+        int[] arrIndices = new int[frameIndices.size()];
+        for(int i = 0; i < frameIndices.size(); i++) arrIndices[i] = frameIndices.get(i);
+
+        BurstAnimation anim = new BurstAnimation(this, name, arrIndices, framerate, looped);
+        animations.put(name, anim);
     }
 
     public void byPrefixHelper(ArrayList<Integer> addTo, ArrayList<BurstFrame> animFrames, String prefix) 
     {
-        String name = animFrames.get(0).name;
-        int postIndex = name.indexOf(".", prefix.length());
-        String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
+        // String name = animFrames.get(0).name;
+        // int postIndex = name.indexOf(".", prefix.length());
+        // String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
 
         // BurstFrame.sort(animFrames, prefix.length(), postFix.length());
         // Not sure how to handle this just yet. I'll make an algo at some point
@@ -102,6 +123,21 @@ public class BurstAnimationController {
         return sprite.frames.indexOf(frame);
     }
 
+    public void play(String animname)
+    {
+        play(animname, true);
+    }
+
+    public void play(String animname, boolean force)
+    {
+        play(animname, force, false);
+    }
+
+    public void play(String animname, boolean force, boolean reversed)
+    {
+        play(animname, force, reversed, 0);
+    }
+
     public void play(String animname, boolean force, boolean reversed, int frame) 
     {
         if(animname == null) {
@@ -111,7 +147,8 @@ public class BurstAnimationController {
             curAnim = null;
         }
 
-        if(animname == null || animations.get(animname) == null) {
+        if(animname == null || animations.get(animname) == null) 
+        {
             System.out.println("No such animation \"" + animname + "\"");
             return;
         }
@@ -157,57 +194,14 @@ public class BurstAnimationController {
         return list;
     }
 
-    /*
-        public void addEnMasse(String name, String prefix, int[] frames) {
-            addEnMasse(name, prefix, frames, 30, true);
+    public ArrayList<BurstAnimation> getAnimationsList()
+    {
+        ArrayList<BurstAnimation> list = new ArrayList<>();
+        for(BurstAnimation anim : animations.values())
+        {
+            list.add(anim);
         }
 
-        public void addEnMasse(String name, String prefix, int[] frames, int framerate) {
-            addEnMasse(name, prefix, frames, framerate, true);
-        }
-
-        public void addEnMasse(String name, String prefix, int[] frames, int framerate, boolean looped) {
-            animations.put(name, new BurstAnimation(this, prefix, frames, framerate, looped));
-
-            System.out.println("Added animation: \"" + name + "\" en masse with " + frames.length + " frames");
-        }
-
-        public synchronized void play(String animname) {
-            play(animname, true, false, 0);
-        }
-
-        public synchronized void play(String animname, boolean forced) {
-            play(animname, forced, false, 0);
-        }
-
-        public synchronized void play(String animname, boolean forced, boolean reversed) {
-            play(animname, forced, reversed, 0);
-        }
-
-        public synchronized void play(String animname, boolean forced, boolean reversed, int startframe) {
-            BurstAnimation animation = animations.get(animname);
-            if(!forced && animname == curAnim.name) return;
-            
-            if(startframe < 0 || startframe > animation.numFrames)
-                startframe = reversed ? animation.numFrames - 1 : 0;
-
-            curAnim.name = animname;
-            for(int frame = startframe; frame >= 0 && frame <= animation.numFrames - 1; frame += (reversed ? -1 : 1)) {
-                //sprite.setSize(animation.frames.get(frame).getWidth(), animation.frames.get(frame).getHeight());
-                sprite.frame = animation.frames.get(frame);
-                try 
-                {
-                    Thread.sleep(10);
-                } 
-                catch (InterruptedException e) 
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            if(animations.get(animname).looped) {
-                play(animname, true, reversed, startframe);
-            }
-        }
-    */
+        return list;
+    }
 }

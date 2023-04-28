@@ -5,23 +5,32 @@ import java.awt.Image;
 import java.awt.image.ImageObserver;
 
 import burst.animation.BurstAnimationController;
+import burst.graphics.frames.BurstAtlasFrames;
 import burst.graphics.frames.BurstFrame;
 import burst.graphics.frames.BurstFramesCollection;
 import burst.graphics.BurstGraphic;
 
+
+/**
+ * <h3>
+ * A sprite class extension for the Java Swing package
+ * </h3>
+ * 
+ * <p>
+ * Allows for the use of static <i>and</i> animated sprites.
+ */
 public class BurstSprite extends BurstBasic 
 {
-    public int x = 0;
-    public int y = 0;
-    public int width;
-    public int height;
     public float alpha = 1.0f;
 
     public BurstAnimationController animation;
-    public BurstFrame frame;
-    public int numFrames;
-    public BurstFramesCollection frames;
+
     public BurstGraphic graphic;
+
+    public BurstFrame frame;
+    public BurstFramesCollection frames;
+    public int numFrames;
+
     public ImageObserver watcher;
 
     public BurstSprite() 
@@ -33,12 +42,7 @@ public class BurstSprite extends BurstBasic
     {
         super();
 
-        this.x = x;
-        this.y = y;
-        setLocation(x, y);
-
-        this.width = 0;
-        this.height = 0;
+        setBounds(x, y, 0, 0);
 
         animation = new BurstAnimationController(this);
 
@@ -65,31 +69,81 @@ public class BurstSprite extends BurstBasic
         };
     }
 
-    public BurstSprite loadGraphic(BurstGraphic graphic, boolean animated, int width, int height) 
+    public BurstSprite loadGraphic(BurstGraphic graphic) 
+    {
+        this.graphic = graphic;
+        this.frames = new BurstFramesCollection(graphic);
+
+        BurstFrame frame = new BurstFrame(this.graphic, "Frame", 0, 0, graphic.width, graphic.height);
+        this.frame = frame;
+        this.frames.pushFrame(frame);
+        this.setSize(frame.width, frame.height);
+
+        return this;
+    }
+
+    public BurstSprite loadAnimatedGraphic(BurstGraphic graphic, int width, int height)
     {
         if(width == 0) 
         {
-            width = animated ? graphic.height : graphic.width;
+            width = graphic.height;
 			width = (width > graphic.width) ? graphic.width : width;
         }
 
         if (height == 0)
 		{
-			height = animated ? width : graphic.height;
+			height = graphic.width;
 			height = (height > graphic.height) ? graphic.height : height;
 		}
 
         this.graphic = graphic;
+        this.frames = new BurstFramesCollection(graphic);
 
-        if(!animated) 
+        int x = 0;
+        int y = 0;
+        int inc = 0;
+        while(y < graphic.height)
         {
-            this.frame = new BurstFrame(this.graphic);
-            this.setSize(frame.width, frame.height);
+            String frameNum = "" + inc;
+            while(frameNum.length() < 4) frameNum = "0" + frameNum;
+            
+            BurstFrame frame = new BurstFrame(graphic, "frame" + frameNum, x, y, width, height);
+            frame.checkFrame();
+            frames.pushFrame(frame);
 
-            return this;
+            x += width;
+            if(x >= graphic.width)
+            {
+                x = 0;
+                y += height;
+            }
+
+            inc++;
         }
 
+        frame = frames.get(0);
+        this.setSize(frame.width, frame.height);
+
         return this;
+    }
+
+    public BurstFramesCollection loadFrames(String graphic, String description)
+    {
+        return loadFrames(BurstGraphic.fromBuffImage(graphic, description), description);
+    }
+
+    public BurstFramesCollection loadFrames(BurstGraphic graphic, String description)
+    {
+        BurstFramesCollection frames = new BurstFramesCollection(graphic);
+        
+        if(description.toLowerCase().endsWith(".xml"))
+            BurstAtlasFrames.fromSparrow(graphic, description);
+
+        // Need to figure out json junk...
+        // if(description.endsWith(".json"))
+        //     BurstAtlasFrames.fromPacker(graphic, description);
+
+        return frames;
     }
 
     @Override
@@ -122,14 +176,12 @@ public class BurstSprite extends BurstBasic
         if(!visible || alpha == 0)
             return;
 
-        System.out.println("I'm drawing!\n" + graphic);
-
-        graphics.drawImage(frame.graphic.data/*.getSubimage(frame.x, frame.y, frame.width, frame.height)*/, 0, 0, watcher);
+        graphics.drawImage(frame.graphic.data.getSubimage(frame.x, frame.y, frame.width, frame.height), 0, 0, watcher);
     }
 
     @Override
     public String toString()
     {
-        return "BurstSprite ~ {x: " + this.x + ", y: " + this.y + ", width: " + this.width + ", height: " + this.height + "}";
+        return "BurstSprite ~ {x: " + getX() + ", y: " + getY() + ", width: " + getWidth() + ", height: " + this.getHeight() + "}";
     }
 }

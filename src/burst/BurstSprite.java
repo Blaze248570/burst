@@ -1,7 +1,6 @@
 package burst;
 
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.ImageObserver;
 
 import burst.animation.BurstAnimationController;
@@ -49,7 +48,7 @@ public class BurstSprite extends BurstBasic
         this.watcher = new ImageObserver()
         {
             @Override
-            public boolean imageUpdate(Image img, int flags, int x, int y, int width, int height) 
+            public boolean imageUpdate(java.awt.Image img, int flags, int x, int y, int width, int height) 
             {
                 if ((flags & HEIGHT) != 0)
                     System.out.println("Height: " + height );
@@ -108,6 +107,7 @@ public class BurstSprite extends BurstBasic
             while(frameNum.length() < 4) frameNum = "0" + frameNum;
             
             BurstFrame frame = new BurstFrame(graphic, "frame" + frameNum, x, y, width, height);
+            frame.sourceSize.setLocation(width, height);
             frame.checkFrame();
             frames.pushFrame(frame);
 
@@ -122,7 +122,7 @@ public class BurstSprite extends BurstBasic
         }
 
         frame = frames.get(0);
-        this.setSize(frame.width, frame.height);
+        setBounds(getX(), getY(), getX() + frame.width, getY() + frame.height);
 
         return this;
     }
@@ -137,11 +137,16 @@ public class BurstSprite extends BurstBasic
         BurstFramesCollection frames = new BurstFramesCollection(graphic);
         
         if(description.toLowerCase().endsWith(".xml"))
-            BurstAtlasFrames.fromSparrow(graphic, description);
+        {
+            frames = BurstAtlasFrames.fromSparrow(graphic, description);
+        }
 
-        // Need to figure out json junk...
-        // if(description.endsWith(".json"))
+        // Need to figure out jsons with java..
+        // else if(description.toLowerCase().endsWith(".json"))
         //     BurstAtlasFrames.fromPacker(graphic, description);
+
+        this.frames = frames;
+        this.animation.clearFrames();
 
         return frames;
     }
@@ -163,7 +168,7 @@ public class BurstSprite extends BurstBasic
 
         if(frame.width != oldFrame.width && frame.height != oldFrame.height)
         {
-            setSize(frame.width, frame.height);
+            setBounds(getX(), getY(), getX() + frame.sourceSize.x, getY() + frame.sourceSize.y);
             revalidate();
         }
         
@@ -171,17 +176,19 @@ public class BurstSprite extends BurstBasic
     }
     
     @Override 
-    public void paint(Graphics graphics)
+    public void paint(java.awt.Graphics graphics)
     {
         if(!visible || alpha == 0)
             return;
 
-        graphics.drawImage(frame.graphic.data.getSubimage(frame.x, frame.y, frame.width, frame.height), 0, 0, watcher);
+        Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
+
+        graphics.drawImage(frame.graphic.data.getSubimage(drawBox.x, drawBox.y, drawBox.width, drawBox.height), getX() + frame.offset.x, getY() + frame.offset.y, watcher);
     }
 
     @Override
     public String toString()
     {
-        return "BurstSprite ~ {x: " + getX() + ", y: " + getY() + ", width: " + getWidth() + ", height: " + this.getHeight() + "}";
+        return "BurstSprite ~ {x: " + getX() + ", y: " + getY() + ", width: " + getWidth() + ", height: " + getHeight() + "}";
     }
 }

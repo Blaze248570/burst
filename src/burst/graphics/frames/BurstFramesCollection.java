@@ -25,8 +25,7 @@ public class BurstFramesCollection extends java.util.ArrayList<BurstFrame>
         if(framesHash.containsKey(name))
             return framesHash.get(name);
 
-        BurstFrame texFrame = new BurstFrame(graphic, name);
-        texFrame.name = name;
+        BurstFrame texFrame = new BurstFrame(graphic, name, frame.x, frame.y, frame.width, frame.height);
         texFrame.sourceSize.setLocation(sourceSize.x, sourceSize.y);
         texFrame.offset.setLocation(offset.x, offset.y);
         texFrame.checkFrame();
@@ -40,7 +39,7 @@ public class BurstFramesCollection extends java.util.ArrayList<BurstFrame>
         if(framesHash.containsKey(name))
             return framesHash.get(name);
 
-        this.add(frame);
+        add(frame);
         framesHash.put(name, frame);
 
         return frame;

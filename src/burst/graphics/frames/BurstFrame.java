@@ -32,7 +32,7 @@ public class BurstFrame extends Rectangle
     /**
      * Ensures the frame isn't outside the images boundaries
      * 
-     * @return      Checked and trimmed frame rectangle
+     * @return  Checked and trimmed frame rectangle
      */
     public BurstFrame checkFrame() 
     {

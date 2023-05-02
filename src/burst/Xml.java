@@ -1,6 +1,5 @@
 package burst;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
@@ -11,16 +10,20 @@ public class Xml
     {
         try 
         {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new java.io.File(path + (path.endsWith(".xml") ? "" : ".xml")));
-            doc.getDocumentElement().normalize();
+            Document doc = DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .parse(new java.io.File(path));
+
+            doc
+                .getDocumentElement()
+                .normalize();
 
             return doc;
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            System.out.println("Error parsing XML document: " + path);
         }
 
         return null;

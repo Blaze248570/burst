@@ -11,29 +11,23 @@ import burst.graphics.frames.BurstFrame;
  * The BurstAnimationController is a class within a BurstSprite that holds 
  * and performs actions regarding animation.
  */
-public class BurstAnimationController {
+public class BurstAnimationController 
+{
+    public BurstSprite sprite;
     public BurstAnimation curAnim;
+    public HashMap<String, BurstAnimation> animations;
 
+    public int frames;
     public int curFrame;
 
-    public int frameIndex;
-
     public String frameName;
-
     public String name;
 
     public boolean paused;
-
     public boolean finished;
-
-    public int frames;
 
     // To-Do: Figure out Lambda junk for Java
     // public Consumer<Void> callback;
-
-    public BurstSprite sprite;
-
-    public HashMap<String, BurstAnimation> animations;
 
     public BurstAnimationController(BurstSprite sprite) 
     {
@@ -140,8 +134,10 @@ public class BurstAnimationController {
 
     public void play(String animname, boolean force, boolean reversed, int frame) 
     {
-        if(animname == null) {
-            if(curAnim != null) {
+        if(animname == null) 
+        {
+            if(curAnim != null) 
+            {
                 curAnim.stop();
             }
             curAnim = null;
@@ -203,5 +199,13 @@ public class BurstAnimationController {
         }
 
         return list;
+    }
+
+    public void clearFrames()
+    {
+        this.animations.clear();
+        this.curAnim = null;
+        this.frames = 0;
+        this.curFrame = 0;
     }
 }

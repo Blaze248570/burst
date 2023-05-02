@@ -112,26 +112,32 @@ public class BurstAnimation
 			if (reversed)
             {
                 curFrame--;
-				if (looped && curFrame <= 0)
-                    controller.sprite.setFrame(controller.sprite.frames.get(numFrames - 1));
-				else
-                    controller.sprite.setFrame(controller.sprite.frames.get(curFrame));
+                if(curFrame > 0)
+                {
+                    if (looped && curFrame <= 0)
+                        controller.sprite.setFrame(controller.sprite.frames.get(frames[numFrames - 1]));
+                    else
+                        controller.sprite.setFrame(controller.sprite.frames.get(frames[curFrame]));
+                }
 
 			}
             else 
             {
                 curFrame++;
-                if (looped && curFrame >= numFrames - 1)
-                    controller.sprite.setFrame(controller.sprite.frames.get(0));
-                else
-                    controller.sprite.setFrame(controller.sprite.frames.get(curFrame));
+                if(curFrame < numFrames)
+                {
+                    if (looped && curFrame >= numFrames - 1)
+                        controller.sprite.setFrame(controller.sprite.frames.get(frames[0]));
+                    else
+                        controller.sprite.setFrame(controller.sprite.frames.get(frames[curFrame]));
+                }
 			}
 
             finished = (reversed ? curFrame < 0 : curFrame >= numFrames);
 
             if(finished && looped)
             {
-                curFrame = (reversed ? frames.length - 1 : 0);
+                curFrame = (reversed ? numFrames - 1 : 0);
                 finished = false;
             }
         }

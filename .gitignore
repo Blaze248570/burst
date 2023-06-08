@@ -1,5 +1,5 @@
 .vscode/*
+assets/*
 bin/*
 
-assets/exclude/*
-src/burst/Main.java
+src/Main.java

@@ -3,23 +3,23 @@ package burst.graphics.frames;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import burst.graphics.BurstGraphic;
+import burst.graphics.JBurstGraphic;
 
-public class BurstFrame extends Rectangle
+public class JBurstFrame extends Rectangle
 {
     public String name;
 
-    public BurstGraphic graphic;
+    public JBurstGraphic graphic;
 
     public Point sourceSize;
     public Point offset;
 
-    public BurstFrame(BurstGraphic graphic, String name) 
+    public JBurstFrame(JBurstGraphic graphic, String name) 
     {
         this(graphic, name, 0, 0, graphic.width, graphic.height);
     }
 
-    public BurstFrame(BurstGraphic graphic, String name, int x, int y, int width, int height)
+    public JBurstFrame(JBurstGraphic graphic, String name, int x, int y, int width, int height)
     {
         super(x, y, width, height);
         this.graphic = graphic;
@@ -34,7 +34,7 @@ public class BurstFrame extends Rectangle
      * 
      * @return  Checked and trimmed frame rectangle
      */
-    public BurstFrame checkFrame() 
+    public JBurstFrame checkFrame() 
     {
         int x = this.x;
         if(x > graphic.data.getWidth())

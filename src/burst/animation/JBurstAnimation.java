@@ -1,8 +1,8 @@
 package burst.animation;
 
-public class BurstAnimation 
+public class JBurstAnimation 
 {
-    public BurstAnimationController controller;
+    public JBurstAnimationController controller;
 
     public String name;
 
@@ -23,7 +23,7 @@ public class BurstAnimation
     public int[] frames;
     public float frameTimer;
 
-    public BurstAnimation(BurstAnimationController controller, String name, int[] frames, int frameRate, boolean looped) 
+    public JBurstAnimation(JBurstAnimationController controller, String name, int[] frames, int frameRate, boolean looped) 
     {
         this.controller = controller;
         this.name = name;

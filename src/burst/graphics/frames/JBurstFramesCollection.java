@@ -1,31 +1,31 @@
 package burst.graphics.frames;
 
-import burst.graphics.BurstGraphic;
+import burst.graphics.JBurstGraphic;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 
 import java.util.HashMap;
 
-public class BurstFramesCollection extends java.util.ArrayList<BurstFrame> 
+public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame> 
 {
-    public HashMap<String, BurstFrame> framesHash = new HashMap<>();
+    public HashMap<String, JBurstFrame> framesHash = new HashMap<>();
 
-    public BurstGraphic graphic;
+    public JBurstGraphic graphic;
 
-    public BurstFramesCollection(BurstGraphic graphic) 
+    public JBurstFramesCollection(JBurstGraphic graphic) 
     {
         super();
         this.graphic = graphic;
         this.clear();
     }
 
-    public BurstFrame addAtlasFrame(Rectangle frame, Point sourceSize, Point offset, String name) 
+    public JBurstFrame addAtlasFrame(Rectangle frame, Point sourceSize, Point offset, String name) 
     {
         if(framesHash.containsKey(name))
             return framesHash.get(name);
 
-        BurstFrame texFrame = new BurstFrame(graphic, name, frame.x, frame.y, frame.width, frame.height);
+        JBurstFrame texFrame = new JBurstFrame(graphic, name, frame.x, frame.y, frame.width, frame.height);
         texFrame.sourceSize.setLocation(sourceSize.x, sourceSize.y);
         texFrame.offset.setLocation(offset.x, offset.y);
         texFrame.checkFrame();
@@ -33,7 +33,7 @@ public class BurstFramesCollection extends java.util.ArrayList<BurstFrame>
         return pushFrame(texFrame);
     }
 
-    public BurstFrame pushFrame(BurstFrame frame) 
+    public JBurstFrame pushFrame(JBurstFrame frame) 
     {
         String name = frame.name;
         if(framesHash.containsKey(name))
@@ -50,7 +50,7 @@ public class BurstFramesCollection extends java.util.ArrayList<BurstFrame>
     {
         String print = "BurstFrameCollection ~ [\n";
 
-        for(BurstFrame frame : this)
+        for(JBurstFrame frame : this)
         {
             print += "\t" + frame.toString() + ",\n";
         }

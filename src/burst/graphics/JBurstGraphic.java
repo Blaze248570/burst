@@ -2,16 +2,28 @@ package burst.graphics;
 
 import java.awt.image.BufferedImage;
 
-public class BurstGraphic 
+public class JBurstGraphic 
 {
-    public static BurstGraphic fromBuffImage(BufferedImage source, String key) 
+    /**
+     * Returns a JBurstGraphic using the BufferedImage, <code>source</code>.
+     * 
+     * @param source Image to be used in returned JBurstGraphic.
+     * @param key Unique title for this JBurstGraphic.
+     */
+    public static JBurstGraphic fromBuffImage(BufferedImage source, String key) 
     {
-        return new BurstGraphic(key, source);
+        return new JBurstGraphic(key, source);
     }
 
-    public static BurstGraphic fromBuffImage(String source, String key) 
+    /**
+     * Returns a JBurstGraphic using the image file specified at <code>source</code>.
+     * 
+     * @param source Path of image asset to be used in returned JBurstGraphic.
+     * @param key Unique title for this JBurstGraphic.
+     */
+    public static JBurstGraphic fromFile(String source, String key) 
     {
-        return new BurstGraphic(key, returnBuffImage(source));
+        return new JBurstGraphic(key, returnBuffImage(source));
     }
 
     public static BufferedImage returnBuffImage(String path) 
@@ -21,7 +33,7 @@ public class BurstGraphic
         {
             img = javax.imageio.ImageIO.read(new java.io.File(path));
         } 
-        catch(java.io.IOException exception) 
+        catch(java.io.IOException e) 
         {
             System.out.print("Image not found: " + path);
             if(!path.endsWith(".png") && !path.endsWith(".gif"))
@@ -38,7 +50,7 @@ public class BurstGraphic
     public int height = 0;
     public BufferedImage data;
 
-    public BurstGraphic(String key, BufferedImage data) 
+    public JBurstGraphic(String key, BufferedImage data) 
     {
         this.key = key;
         this.data = data;

@@ -16,6 +16,12 @@ If it does, report it! I'll look into it.
 ## How do I use it?
 The template folder provides an example program using JBurst.
 
+# Helping
+I am a novice programmer. I will admit that. I know that a lot of this is really bad.\
+I am of course hoping to improve it, but there are things that I do not know.\
+So, if you have any advice or suggestions that may help me further my knowledge of programming or even just Java in general,\
+I would *love* to hear them!
+
 # [HaxeFlixel](https://haxeflixel.com/)
 If you enjoy using this, give HaxeFlixel a shot.\
 They're very similar on a basic level, but you'll find Flixel can get very interesting very fast.\

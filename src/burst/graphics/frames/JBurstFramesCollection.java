@@ -1,10 +1,8 @@
 package burst.graphics.frames;
 
 import burst.graphics.JBurstGraphic;
-
 import java.awt.Point;
 import java.awt.Rectangle;
-
 import java.util.HashMap;
 
 public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame> 

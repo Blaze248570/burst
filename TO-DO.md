@@ -5,7 +5,8 @@
     Flixel regarding animation properties have become invaluable to me.
 
 - **Implement other animation file parsing methods.**\
-    Json would likely be handy.
+    Maybe seperate images with a common file name
+    EX. walk0000.png, walk0001.png, walk0002.png...
 
 - **Get rid of the necessity of a `while(true)` loop.**\
     It's embarrassing...

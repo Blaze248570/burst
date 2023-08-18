@@ -5,10 +5,19 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashMap;
 
+/**
+ * Base class for frame collections.
+ */
 public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame> 
 {
+    /**
+     * Hash of frames for this frame collection.
+     */
     public HashMap<String, JBurstFrame> framesHash = new HashMap<>();
 
+    /**
+     * Graphic object this collection belongs to.
+     */
     public JBurstGraphic graphic;
 
     public JBurstFramesCollection(JBurstGraphic graphic) 

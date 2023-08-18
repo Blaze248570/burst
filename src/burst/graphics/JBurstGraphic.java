@@ -7,8 +7,8 @@ public class JBurstGraphic
     /**
      * Returns a JBurstGraphic using the BufferedImage, <code>source</code>.
      * 
-     * @param source Image to be used in returned JBurstGraphic.
-     * @param key Unique title for this JBurstGraphic.
+     * @param source    Image to be used in returned JBurstGraphic.
+     * @param key       Unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromBuffImage(BufferedImage source, String key) 
     {
@@ -18,8 +18,8 @@ public class JBurstGraphic
     /**
      * Returns a JBurstGraphic using the image file specified at <code>source</code>.
      * 
-     * @param source Path of image asset to be used in returned JBurstGraphic.
-     * @param key Unique title for this JBurstGraphic.
+     * @param source    Path of image asset to be used in returned JBurstGraphic.
+     * @param key       Unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {

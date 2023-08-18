@@ -22,7 +22,6 @@ public class JBurst extends javax.swing.JFrame
      * Measured time between update() calls in milliseconds
      */
     public float elapsed;
-    private Instant startTime;
 
     /**
      * The default camera that objects are sent to.
@@ -33,6 +32,8 @@ public class JBurst extends javax.swing.JFrame
      * A list of all objects added to this JBurst.
      */
     public ArrayList<JBurstBasic> members;
+
+    private Instant startTime;
 
     /**
      * Creates a new JBurst window object.
@@ -61,12 +62,12 @@ public class JBurst extends javax.swing.JFrame
 
     /**
      * Used to update Burst objects added this JBurst.
-     * 
+     * <p>
      * For now, this should be placed within a while loop
      * so that it is perpetually called.
      * <p>
-     * Bad practice probably, 
-     * but it'll do for my silly little school project.
+     * Bad practice most likely, 
+     * but it'll do for the time being.
      */
     public void update()
     {

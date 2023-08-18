@@ -7,14 +7,27 @@ import burst.graphics.JBurstGraphic;
 
 public class JBurstFrame extends Rectangle
 {
+    /**
+     * The name of this frame.
+     */
     public String name;
 
+    /**
+     * The parent graphic of this frame.
+     */
     public JBurstGraphic graphic;
 
+    /**
+     * Original (uncropped) image size.
+     */
     public Point sourceSize;
+
+    /**
+     * Frame offset from the top left corner of original image.
+     */
     public Point offset;
 
-    public JBurstFrame(JBurstGraphic graphic, String name) 
+    public JBurstFrame(JBurstGraphic graphic, String name)
     {
         this(graphic, name, 0, 0, graphic.width, graphic.height);
     }

@@ -15,19 +15,15 @@ import org.w3c.dom.NodeList;
 
 /**
  * A collection of frames stored as an atlas. 
- * <p>
- * Also includes texture atlas parsing methods.
+ * <p> Also includes texture atlas parsing methods.
  */
 public class JBurstAtlasFrames extends JBurstFramesCollection 
 {
     /**
      * Parsing method for sparrow texture atlases.
-     * <p> (These can be generated with <a href="http://renderhjs.net/shoebox/">ShoeBox</a> for example.)
      * 
      * @param path          File location of desired spritesheet to be loaded and parsed.
      * @param description   Parsing instructions file location (Should be .xml)
-     * 
-     * @see <a href="https://doc.starling-framework.org/current/starling/textures/TextureAtlas.html">Sparrow Format</a>
      */
     public static JBurstAtlasFrames fromSparrow(String graphic, String description)
     {
@@ -36,8 +32,6 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
     /**
      * Parsing method for sparrow texture atlases.
-     * <p> 
-     * (These can be generated with <a href="http://renderhjs.net/shoebox/">ShoeBox</a> for example.)
      * 
      * @param graphic       Spritesheet to be parsed.
      * @param description   Parsing instructions file location (Should be .xml)
@@ -216,8 +210,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
     /**
      * JSONs will sometimes have weird data at the beginning and ends. 
-     * <p>
-     * Of course, we don't want this.
+     * <p> Of course, we don't want this.
      * 
      * @param content   JSON data to be checked.
      */
@@ -232,7 +225,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
     /**
      * Constructs a new JBurstAtlasFrames.
      * <p> 
-     * For engine purposes, please use <code>fromSparrow()</code> or <code>fromPacker()</code> instead.
+     * For engine purposes, please use {@code fromSparrow()} or {@code fromPacker()} instead.
      * 
      * @param graphic   Parent graphic to be used by this frame collection.
      */

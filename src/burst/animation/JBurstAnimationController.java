@@ -1,11 +1,11 @@
 package burst.animation;
 
-import java.util.ArrayList;
-// import java.util.function.Consumer;
-import java.util.HashMap;
-
 import burst.JBurstSprite;
 import burst.graphics.frames.JBurstFrame;
+// import burst.util.TriConsumer;
+import java.util.ArrayList;
+import java.util.HashMap;
+// import java.util.function.Consumer;
 
 /**
  * The BurstAnimationController is a class within a JBurstSprite that holds 
@@ -13,27 +13,54 @@ import burst.graphics.frames.JBurstFrame;
  */
 public class JBurstAnimationController 
 {
-    public JBurstSprite sprite;
+    /**
+     * The currently playing animation (Warning: may be {@code null}).
+     */
     public JBurstAnimation curAnim;
-    public HashMap<String, JBurstAnimation> animations;
 
-    public int frames;
-    public int curFrame;
+    /**
+     * The total number of frames.
+     */
+    public int numFrames;
 
-    public String frameName;
-    public String name;
+    /**
+     * The frame index of the current animation.
+     */
+    public int frameIndex = -1;
 
+    /**
+     * Used to pause and resume the current animation.
+     */
     public boolean paused;
+
+    /**
+     * Whether or not the animation has finished.
+     */
     public boolean finished;
 
-    // To-Do: Figure out Lambda junk for Java
-    // public Consumer<Void> callback;
+    /*
+        public TriConsumer<String, Integer, Integer> callback = (String name, Integer frameNumber, Integer frameIndex) -> {
+
+        };
+
+        public Consumer<String> finishedCallBack;
+    */
+
+    /**
+     * Internal, reference to owner sprite.
+     */
+    protected JBurstSprite _sprite;
+
+    /**
+     * Internal, storage of animations added to this sprite.
+     */
+    private HashMap<String, JBurstAnimation> _animations;
 
     public JBurstAnimationController(JBurstSprite sprite) 
     {
-        this.sprite = sprite;
+        this._sprite = sprite;
 
-        this.animations = new HashMap<>();
+        this._animations = new HashMap<>();
     }
 
     public void update(float elapsed) 
@@ -46,33 +73,89 @@ public class JBurstAnimationController
 
     /**
      * Adds an animation to the parent sprite.
-     * To be used after <code>loadAnimatedSprite</code>.
+     * <i>To be used after {@code loadAnimatedSprite}.</i>
      * <p>
-     * The <code>frames</code> object required will be which indices to use to animate with.
+     * The {@code frames} object required will be which indices to use to animate with.
      * <p>
-     * For example, providing <p><code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code></p>
-     * will create an animation named "Dance" using the first, second, third, fifth, 
-     * and seventh frames that does loop updating at 30 fps.
+     * For example, providing 
+     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
+     * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
+     */
+    public void add(String name, int[] frames)
+    {
+        add(name, frames, 30);
+    }
+
+    /**
+     * Adds an animation to the parent sprite.
+     * <i>To be used after {@code loadAnimatedSprite}.</i>
+     * <p>
+     * The {@code frames} object required will be which indices to use to animate with.
+     * <p>
+     * For example, providing 
+     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
+     * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
+     */
+    public void add(String name, int[] frames, int framerate)
+    {
+        add(name, frames, framerate, true);
+    }
+
+    /**
+     * Adds an animation to the parent sprite.
+     * <i>To be used after {@code loadAnimatedSprite}.</i>
+     * <p>
+     * The {@code frames} object required will be which indices to use to animate with.
+     * <p>
+     * For example, providing 
+     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
+     * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
      */
     public void add(String name, int[] frames, int framerate, boolean looped)
     {
         JBurstAnimation anim = new JBurstAnimation(this, name, frames, framerate, looped);
 
-        animations.put(name, anim);
+        _animations.put(name, anim);
     }
 
     /**
      * Adds an animation to the parent sprite.
-     * To be used after <code>loadFrames()</code>.
+     * To be used after {@code loadFrames()}.
      * 
-     * @param name What to name the animation.
-     * @param prefix Name of the animation on the animation file.
-     * @param framerate How fat or slow this animation should play.
-     * @param looped Whether or not this animation should play again once it is finished.
+     * @param name      What to name the animation.
+     * @param prefix    Name of the animation on the animation file.
      */
-    public void addByPrefix(String name, String prefix, int framerate, boolean looped) 
+    public void addByPrefix(String name, String prefix)
     {
-        if(sprite.frames == null)
+        addByPrefix(name, prefix, 30);
+    }
+
+    /**
+     * Adds an animation to the parent sprite.
+     * To be used after {@code loadFrames()}.
+     * 
+     * @param name          What to name the animation.
+     * @param prefix        Name of the animation on the animation file.
+     * @param framerate     How fat or slow this animation should play.
+     */
+    public void addByPrefix(String name, String prefix, int framerate)
+    {
+        addByPrefix(name, prefix, framerate, true);
+    }
+
+
+    /**
+     * Adds an animation to the parent sprite.
+     * To be used after {@code loadFrames()}.
+     * 
+     * @param name          What to name the animation.
+     * @param prefix        Name of the animation on the animation file.
+     * @param framerate     How fat or slow this animation should play.
+     * @param looped        Whether or not this animation should play again once it is finished.
+     */
+    public void addByPrefix(String name, String prefix, int framerate, boolean looped)
+    {
+        if(_sprite.frames == null)
             return;
 
         ArrayList<JBurstFrame> animFrames = new ArrayList<>();
@@ -91,18 +174,20 @@ public class JBurstAnimationController
         for(int i = 0; i < frameIndices.size(); i++) arrIndices[i] = frameIndices.get(i);
 
         JBurstAnimation anim = new JBurstAnimation(this, name, arrIndices, framerate, looped);
-        animations.put(name, anim);
+        _animations.put(name, anim);
     }
 
     private void byPrefixHelper(ArrayList<Integer> addTo, ArrayList<JBurstFrame> animFrames, String prefix) 
     {
-        // String name = animFrames.get(0).name;
-        // int postIndex = name.indexOf(".", prefix.length());
-        // String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
+        // Not sure how to handle this just yet. I'll make an algo at some point.
+        // Current goal is to make it work.
+        /*
+            String name = animFrames.get(0).name;
+            int postIndex = name.indexOf(".", prefix.length());
+            String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
 
-        // BurstFrame.sort(animFrames, prefix.length(), postFix.length());
-        // Not sure how to handle this just yet. I'll make an algo at some point
-        // Current goal is to make it work
+            BurstFrame.sort(animFrames, prefix.length(), postFix.length());
+        */
 
         for(JBurstFrame frame : animFrames) 
         {
@@ -112,7 +197,7 @@ public class JBurstAnimationController
 
     private void findByPrefix(ArrayList<JBurstFrame> animFrames, String prefix) 
     {
-        for(JBurstFrame frame : sprite.frames) 
+        for(JBurstFrame frame : _sprite.frames) 
         {
             if(frame.name != null && frame.name.startsWith(prefix, 0)) 
             {
@@ -123,11 +208,13 @@ public class JBurstAnimationController
     
     private int getFrameIndex(JBurstFrame frame) 
     {
-        return sprite.frames.indexOf(frame);
+        return _sprite.frames.indexOf(frame);
     }
 
     /**
-     * Plays the animation under the name <code>animname</code>.
+     * Plays the animation under the name {@code animname}.
+     * 
+     * @param animname what animation to play
      */
     public void play(String animname)
     {
@@ -135,11 +222,10 @@ public class JBurstAnimationController
     }
 
     /**
-     * Plays the animation under the name <code>animname</code>.
+     * Plays the animation under the name {@code animname}.
      * 
-     * @param animname What animation to play.
-     * @param force If the current animation is the same as the one provided, 
-     *              it will not be replayed unless <code>force</code> is true.
+     * @param animname  what animation to play
+     * @param force     whether to force the animation to restart or not
      */
     public void play(String animname, boolean force)
     {
@@ -147,12 +233,11 @@ public class JBurstAnimationController
     }
 
     /**
-     * Plays the animation under the name <code>animname</code>.
+     * Plays the animation under the name {@code animname}.
      * 
-     * @param animname What animation to play.
-     * @param force If the current animation is the same as the one provided, 
-     *              it will not be replayed unless <code>force</code> is true.
-     * @param reversed Whether or not the animation should play backwards.
+     * @param animname  what animation to play
+     * @param force     whether to force the animation to restart or not
+     * @param reversed  whether or not the animation should play backwards
      */
     public void play(String animname, boolean force, boolean reversed)
     {
@@ -160,13 +245,12 @@ public class JBurstAnimationController
     }
 
     /**
-     * Plays the animation under the name <code>animname</code>.
+     * Plays the animation under the name {@code animname}.
      * 
-     * @param animname What animation to play.
-     * @param force If the current animation is the same as the one provided, 
-     *              it will not be replayed unless <code>force</code> is true.
-     * @param reversed Whether or not the animation should play backwards.
-     * @param frame What frame to begin the animation at.
+     * @param animname  what animation to play
+     * @param force     whether to force the animation to restart or not
+     * @param reversed  whether or not the animation should play backwards
+     * @param frame     what frame to begin the animation at
      */
     public void play(String animname, boolean force, boolean reversed, int frame) 
     {
@@ -179,7 +263,7 @@ public class JBurstAnimationController
             curAnim = null;
         }
 
-        if(animname == null || animations.get(animname) == null) 
+        if(animname == null || _animations.get(animname) == null) 
         {
             System.out.println("No such animation \"" + animname + "\"");
             return;
@@ -188,14 +272,15 @@ public class JBurstAnimationController
         if(curAnim != null && animname != curAnim.name)
             curAnim.stop();
 
-        curAnim = animations.get(animname);
+        curAnim = _animations.get(animname);
         curAnim.play(force, reversed, frame);
     }
 
     /**
      * Resets the current animation.
      */
-    public void reset() {
+    public void reset() 
+    {
         if(curAnim != null)
             curAnim.reset();
     }
@@ -228,14 +313,13 @@ public class JBurstAnimationController
     }
 
     /**
-     * Returns a list of all the animations <i>names</i>.
-     * <p>
-     * This does not return the animation objects themselves!
+     * Returns a list of all the animations *names*.
+     * <p> This does not return the animation objects themselves!
      */
     public ArrayList<String> getNamesList()
     {
         ArrayList<String> list = new ArrayList<>();
-        for(JBurstAnimation anim : animations.values())
+        for(JBurstAnimation anim : _animations.values())
         {
             list.add(anim.name);
         }
@@ -245,13 +329,12 @@ public class JBurstAnimationController
 
     /**
      * Returns a list of all the animations.
-     * <p>
-     * This does not return the animation objects' names!
+     * <p> This does not return the animation objects' names!
      */
     public ArrayList<JBurstAnimation> getAnimationsList()
     {
         ArrayList<JBurstAnimation> list = new ArrayList<>();
-        for(JBurstAnimation anim : animations.values())
+        for(JBurstAnimation anim : _animations.values())
         {
             list.add(anim);
         }
@@ -262,11 +345,32 @@ public class JBurstAnimationController
     /**
      * Clears all animations added to the parent sprite.
      */
-    public void clearFrames()
+    public void clearAnimations()
     {
-        this.animations.clear();
+        this._animations.clear();
         this.curAnim = null;
-        this.frames = 0;
-        this.curFrame = 0;
+        this.numFrames = 0;
+        this.frameIndex = -1;
     }
+
+    /*
+        public void fireCallback()
+        {
+            if(callback != null)
+            {
+                String name = curAnim != null ? curAnim.name : null;
+                int number = curAnim != null ? curAnim.curFrame : frameIndex;
+
+                callback.accept(name, number, frameIndex);
+            }
+        }
+
+        public void fireFinishedCallback(String name)
+        {
+            if(finishedCallBack != null)
+            {
+                finishedCallBack.accept(name);
+            }
+        }
+    */
 }

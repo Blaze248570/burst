@@ -9,8 +9,7 @@ public class JBurstCamera extends java.awt.Container
 
     /**
      * Constructs a new JBurstCamera object.
-     * <p>
-     * There's no need to make anymore of these, though.
+     * <p> There's no need to make anymore of these, though.
      * Not yet anyway...
      * 
      * @param parent The JBurst object to be managing this JBurstCamera

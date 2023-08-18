@@ -2,53 +2,46 @@ package burst;
 
 import java.awt.Rectangle;
 import java.awt.image.ImageObserver;
-
 import burst.animation.JBurstAnimationController;
 import burst.graphics.frames.JBurstAtlasFrames;
 import burst.graphics.frames.JBurstFrame;
 import burst.graphics.frames.JBurstFramesCollection;
 import burst.graphics.JBurstGraphic;
 
-
 /**
- * <h3>
- * A sprite class extension for the Java Swing package
- * </h3>
+ * A sprite class extension for the Java Swing package.
  * 
- * <p>
- * Allows for the use of static <i>and</i> animated sprites.
+ * <p> Allows for the use of static <i>and</i> animated sprites.
  */
 public class JBurstSprite extends JBurstBasic 
 {
     /**
      * The transparency of this sprite.
-     * <p>
-     * Currently not in use.
+     * <p> Currently not in use.
      */
     public float alpha = 1.0f;
 
     /**
      * The manager to control animation property's of this sprite.
-     * <p>
-     * Use functions from this to add and play animations.
+     * <p> Use functions from this to add and play animations.
      */
     public JBurstAnimationController animation;
 
     /**
      * Graphic used by drawing.
-     * <p>
-     * However, I feel it may be better to remove this with
-     * due to the system I've implemented since creating this.
      */
     public JBurstGraphic graphic;
 
     /**
-     * The current frame being used to process drawing.
+     * The current frame being used in the drawing process.
      */
     public JBurstFrame frame;
 
     /**
      * A collection of all the frames used by this sprite.
+     * <p>
+     * Public access is provided for the sake of the animation classes, 
+     * but it is stringly suggested that it be treated as <strong>read-only</strong>.
      */
     public JBurstFramesCollection frames;
 
@@ -56,9 +49,9 @@ public class JBurstSprite extends JBurstBasic
      * Manager of the image.
      * <p>
      * I frankly don't know what it does, but it's necessary to use 
-     * <code>drawImage()</code> in the <code>paint()</code> function.
+     * {@code drawImage()} in the {@code paint()} function.
      */
-    public ImageObserver watcher;
+    private ImageObserver watcher;
 
     /**
      * Constructs a new JBurstSprite at coordinates (0, 0);
@@ -69,8 +62,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Constructs a new JBurstSprite at coordinates 
-     * (<code>x</code>, <code>y</code>).
+     * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}).
      */
     public JBurstSprite(int x, int y) 
     {
@@ -107,7 +99,7 @@ public class JBurstSprite extends JBurstBasic
      * Loads a graphic onto this sprite to be used at drawing time.
      * <p>
      * To get a JBurstGraphic from a file, use 
-     * <code>JBurstGraphic.fromBuffImage()</code>.
+     * {@code JBurstGraphic.fromBuffImage()}.
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
@@ -124,13 +116,13 @@ public class JBurstSprite extends JBurstBasic
 
     /**
      * Loads a graphic onto this sprite. 
-     * However, unlike <code>loadGraphic()</code>, this will give it animation properties.
+     * However, unlike {@code loadGraphic()}, this will give it animation properties.
      * <p>
      * This version will take the provided graphic and split it into as many frames as it can
-     * with the dimensions of <code>width</code> and <code>height</code>, adding each one to the
-     * list <code>frames</code>.
+     * with the dimensions of {@code width} and {@code height}, adding each one to the
+     * list {@code frames}.
      * <p>
-     * To use these, call <code>animation.add()</code>.
+     * To use these, call {@code animation.add()}.
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int width, int height)
     {
@@ -180,34 +172,11 @@ public class JBurstSprite extends JBurstBasic
 
     /**
      * Loads a frame collection from a spritesheet and designated animation file.
-     * <p>
-     * Note: Currently only supports Sparrow encoding.
      */
-    public JBurstFramesCollection loadFrames(String graphic, String animFile)
+    public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
     {
-        return loadFrames(JBurstGraphic.fromFile(graphic, animFile), animFile);
-    }
-
-    /**
-     * Loads a frame collection from a spritesheet and designated animation file.
-     * <p>
-     * Note: Currently only supports Sparrow encoding.
-     */
-    public JBurstFramesCollection loadFrames(JBurstGraphic graphic, String animFile)
-    {
-        JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
-        
-        if(animFile.toLowerCase().endsWith(".xml"))
-        {
-            frames = JBurstAtlasFrames.fromSparrow(graphic, animFile);
-        }
-
-        // Need to figure out jsons with java..
-        // else if(description.toLowerCase().endsWith(".json"))
-        //     BurstAtlasFrames.fromPacker(graphic, description);
-
         this.frames = frames;
-        this.animation.clearFrames();
+        this.animation.clearAnimations();
 
         this.frame = frames.get(0);
 

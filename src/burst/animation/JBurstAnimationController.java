@@ -2,10 +2,10 @@ package burst.animation;
 
 import burst.JBurstSprite;
 import burst.graphics.frames.JBurstFrame;
-// import burst.util.TriConsumer;
+import burst.util.TriConsumer;
 import java.util.ArrayList;
 import java.util.HashMap;
-// import java.util.function.Consumer;
+import java.util.function.Consumer;
 
 /**
  * The BurstAnimationController is a class within a JBurstSprite that holds 
@@ -17,11 +17,6 @@ public class JBurstAnimationController
      * The currently playing animation (Warning: may be {@code null}).
      */
     public JBurstAnimation curAnim;
-
-    /**
-     * The total number of frames.
-     */
-    public int numFrames;
 
     /**
      * The frame index of the current animation.
@@ -38,13 +33,9 @@ public class JBurstAnimationController
      */
     public boolean finished;
 
-    /*
-        public TriConsumer<String, Integer, Integer> callback = (String name, Integer frameNumber, Integer frameIndex) -> {
+    public TriConsumer<String, Integer, Integer> callback;
 
-        };
-
-        public Consumer<String> finishedCallBack;
-    */
+    public Consumer<String> finishedCallBack;
 
     /**
      * Internal, reference to owner sprite.
@@ -349,28 +340,42 @@ public class JBurstAnimationController
     {
         this._animations.clear();
         this.curAnim = null;
-        this.numFrames = 0;
         this.frameIndex = -1;
     }
 
-    /*
-        public void fireCallback()
+    protected void fireCallback()
+    {
+        if(callback != null)
         {
-            if(callback != null)
-            {
-                String name = curAnim != null ? curAnim.name : null;
-                int number = curAnim != null ? curAnim.curFrame : frameIndex;
+            String name = curAnim != null ? curAnim.name : null;
+            int number = curAnim != null ? curAnim.curFrame : frameIndex;
 
-                callback.accept(name, number, frameIndex);
-            }
+            callback.accept(name, number, frameIndex);
         }
+    }
 
-        public void fireFinishedCallback(String name)
+    protected void fireFinishedCallback(String name)
+    {
+        if(finishedCallBack != null)
         {
-            if(finishedCallBack != null)
-            {
-                finishedCallBack.accept(name);
-            }
+            finishedCallBack.accept(name);
         }
-    */
+    }
+
+    public void setFrameIndex(int frame)
+    {
+        frameIndex = frame;
+
+        if(_sprite.frames != null && getNumFrames() > 0)
+        {
+            _sprite.setFrame(_sprite.frames.get(frameIndex));
+
+            fireCallback();
+        }
+    }
+
+    public int getNumFrames()
+    {
+        return _sprite.getNumFrames();
+    }
 }

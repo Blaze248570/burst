@@ -1,6 +1,7 @@
 package burst;
 
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import burst.animation.JBurstAnimationController;
 import burst.graphics.frames.JBurstAtlasFrames;
@@ -45,6 +46,8 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstFramesCollection frames;
 
+    public boolean showBounds = false;
+
     /**
      * Manager of the image.
      * <p>
@@ -68,7 +71,7 @@ public class JBurstSprite extends JBurstBasic
     {
         super();
 
-        setBounds(x, y, 0, 0);
+        setLocation(x, y);
 
         animation = new JBurstAnimationController(this);
 
@@ -143,10 +146,9 @@ public class JBurstSprite extends JBurstBasic
 
         int x = 0;
         int y = 0;
-        int inc = 0;
-        while(y < graphic.height)
+        for(int i = 0; y < graphic.height; i++)
         {
-            String frameNum = "" + inc;
+            String frameNum = "" + i;
             while(frameNum.length() < 4) frameNum = "0" + frameNum;
             
             JBurstFrame frame = new JBurstFrame(graphic, "frame" + frameNum, x, y, width, height);
@@ -160,12 +162,10 @@ public class JBurstSprite extends JBurstBasic
                 x = 0;
                 y += height;
             }
-
-            inc++;
         }
 
         frame = frames.get(0);
-        setBounds(getX(), getY(), getX() + frame.width, getY() + frame.height);
+        updateBounds();
 
         return this;
     }
@@ -179,6 +179,7 @@ public class JBurstSprite extends JBurstBasic
         this.animation.clearAnimations();
 
         this.frame = frames.get(0);
+        updateBounds();
 
         return frames;
     }
@@ -194,11 +195,14 @@ public class JBurstSprite extends JBurstBasic
 
         if(frame.width != oldFrame.width && frame.height != oldFrame.height)
         {
-            setBounds(getX(), getY(), getX() + frame.sourceSize.x, getY() + frame.sourceSize.y);
-            revalidate();
+            updateBounds();
         }
-        
-        repaint();
+    }
+
+    private void updateBounds()
+    {
+        setBounds(getX(), getY(), frame.sourceSize.x, frame.sourceSize.y);
+        revalidate();
     }
 
     @Override
@@ -213,19 +217,29 @@ public class JBurstSprite extends JBurstBasic
         if(!visible || alpha == 0)
             return;
 
+        if(showBounds)
+            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+
         Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
 
+        BufferedImage pixels = frame.graphic.data.getSubimage(
+            drawBox.x, 
+            drawBox.y, 
+            drawBox.width, 
+            drawBox.height
+        );
+
         graphics.drawImage(
-            frame.graphic.data.getSubimage(
-                drawBox.x, 
-                drawBox.y, 
-                drawBox.width, 
-                drawBox.height
-            ), 
-            getX() + frame.offset.x, 
-            getY() + frame.offset.y, 
+            pixels, 
+            frame.offset.x, 
+            frame.offset.y, 
             watcher
         );
+    }
+
+    public int getNumFrames()
+    {
+        return frames.size();
     }
 
     @Override

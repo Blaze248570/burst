@@ -2,10 +2,9 @@ package burst;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 
 /**
- * An extended version of the <code>javax.swing.JFrame</code> 
+ * An extended version of the {@code javax.swing.JFrame}
  * that allows basic animation animation through Burst objects.
  * <p>
  * It functions identically to JFrame, so objects like JPanel, 
@@ -28,19 +27,14 @@ public class JBurst extends javax.swing.JFrame
      */
     public JBurstCamera defaultCam;
 
-    /**
-     * A list of all objects added to this JBurst.
-     */
-    public ArrayList<JBurstBasic> members;
-
     private Instant startTime;
 
     /**
      * Creates a new JBurst window object.
-     * To make the window visible, call <code>setVisible(true)</code>
+     * To make the window visible, call {@code setVisible(true)}.
      * 
-     * @param frameWidth  The width of the newly created window.
-     * @param frameHeight The height of the newly created window.
+     * @param frameWidth    The width of the newly created window.
+     * @param frameHeight   The height of the newly created window.
      */
     public JBurst(int frameWidth, int frameHeight) 
     {
@@ -56,8 +50,6 @@ public class JBurst extends javax.swing.JFrame
         
         defaultCam = new JBurstCamera(this);
         add(defaultCam);
-
-        members = new ArrayList<>();
     }
 
     /**
@@ -74,29 +66,7 @@ public class JBurst extends javax.swing.JFrame
         elapsed = getTime() - total;
         total = getTime();
 
-        for(JBurstBasic basic : members) 
-        {
-            if(basic != null && basic.exists)
-            {
-                basic.update(elapsed);
-            }
-        }
-
-        defaultCam.repaint();
-    }
-
-    /**
-     * Adds an object to the list of objects being updated.
-     * 
-     * @param basic The object to be added.
-     * @return The JBurstBasic that was added.
-     */
-    public JBurstBasic add(JBurstBasic basic)
-    {
-        members.add(basic);
-        defaultCam.add(basic);
-
-        return basic;
+        defaultCam.update(elapsed);
     }
 
     private long getTime()

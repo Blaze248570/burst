@@ -8,6 +8,11 @@ public class JBurstAnimation
     public String name;
 
     /**
+     * The current index in regards to the tilesheet.
+     */
+    public int curIndex;
+
+    /**
      * The speed in frames per second of the animation.
      */
     public float frameRate;
@@ -172,27 +177,18 @@ public class JBurstAnimation
             _frameTimer -= delay;
 			if (reversed)
             {
-                curFrame--;
-                if(curFrame > 0)
-                {
-                    if (looped && curFrame <= 0)
-                        _controller._sprite.setFrame(_controller._sprite.frames.get(frames[numFrames - 1]));
-                    else
-                        _controller._sprite.setFrame(_controller._sprite.frames.get(frames[curFrame]));
-                }
-
-			}
+                if(looped && curFrame - 1 < 0)
+                    setCurFrame(numFrames - 1);
+                else
+                    setCurFrame(curFrame - 1);
+            }
             else 
             {
-                curFrame++;
-                if(curFrame < numFrames)
-                {
-                    if (looped && curFrame >= numFrames - 1)
-                        _controller._sprite.setFrame(_controller._sprite.frames.get(frames[0]));
-                    else
-                        _controller._sprite.setFrame(_controller._sprite.frames.get(frames[curFrame]));
-                }
-			}
+                if(looped && curFrame + 1 >= numFrames)
+                    setCurFrame(0);
+                else
+                    setCurFrame(curFrame + 1);
+            }
 
             finished = (reversed ? curFrame < 0 : curFrame >= numFrames);
 
@@ -202,6 +198,39 @@ public class JBurstAnimation
                 finished = false;
             }
         }
+    }
+
+    public void setCurFrame(int frame)
+    {
+        int maxFrameIndex = numFrames -1;
+        int tempFrame = reversed ? maxFrameIndex - frame : frame;
+
+        if(tempFrame >= 0)
+        {
+            if(!looped && frame > maxFrameIndex)
+            {
+                finished = true;
+                curFrame = reversed ? 0 : maxFrameIndex;
+
+                System.out.println("Setting curFrame: " + curFrame);
+            }
+            else
+                curFrame = frame;
+        }
+
+        setCurIndex(frames[curFrame]);
+
+        if(finished && _controller != null)
+        {
+            _controller.fireFinishedCallback(name);
+        }
+    }
+
+    public void setCurIndex(int value)
+    {
+        curIndex = value;
+        
+        _controller.setFrameIndex(curIndex);
     }
 
     @Override

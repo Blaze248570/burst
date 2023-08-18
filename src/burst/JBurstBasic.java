@@ -20,12 +20,6 @@ public class JBurstBasic extends javax.swing.JComponent
 
     public JBurstBasic() { }
 
-    /**
-     * To be overrided by child classes to clean up
-     * memory upon destruction.
-     */
-    public void destroy() { }
-
     public void kill() 
     {
         alive = false;

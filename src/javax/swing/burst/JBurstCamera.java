@@ -1,4 +1,4 @@
-package burst;
+package javax.swing.burst;
 
 import java.util.ArrayList;
 import javax.swing.JComponent;

@@ -1,4 +1,4 @@
-package burst.graphics;
+package javax.swing.burst.graphics;
 
 import java.awt.image.BufferedImage;
 

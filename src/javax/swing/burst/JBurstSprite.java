@@ -1,13 +1,14 @@
-package burst;
+package javax.swing.burst;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import burst.animation.JBurstAnimationController;
-import burst.graphics.frames.JBurstAtlasFrames;
-import burst.graphics.frames.JBurstFrame;
-import burst.graphics.frames.JBurstFramesCollection;
-import burst.graphics.JBurstGraphic;
+
+import javax.swing.burst.animation.JBurstAnimationController;
+import javax.swing.burst.graphics.JBurstGraphic;
+import javax.swing.burst.graphics.frames.JBurstAtlasFrames;
+import javax.swing.burst.graphics.frames.JBurstFrame;
+import javax.swing.burst.graphics.frames.JBurstFramesCollection;
 
 /**
  * A sprite class extension for the Java Swing package.

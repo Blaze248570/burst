@@ -1,7 +1,6 @@
-package burst;
+package javax.swing.burst;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 
 public class Xml 

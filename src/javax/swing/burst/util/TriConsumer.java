@@ -1,4 +1,4 @@
-package burst.util;
+package javax.swing.burst.util;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;

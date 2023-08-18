@@ -1,4 +1,4 @@
-package burst;
+package javax.swing.burst;
 
 import java.time.Duration;
 import java.time.Instant;

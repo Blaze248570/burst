@@ -1,4 +1,4 @@
-package burst;
+package javax.swing.burst;
 
 /**
  * The JBurstBasic class is sort of the basic building block

@@ -1,9 +1,9 @@
-package burst.graphics.frames;
+package javax.swing.burst.graphics.frames;
 
-import burst.graphics.JBurstGraphic;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashMap;
+import javax.swing.burst.graphics.JBurstGraphic;
 
 /**
  * Base class for frame collections.

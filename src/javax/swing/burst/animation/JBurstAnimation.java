@@ -1,4 +1,4 @@
-package burst.animation;
+package javax.swing.burst.animation;
 
 public class JBurstAnimation 
 {

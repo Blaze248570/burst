@@ -1,9 +1,8 @@
-package burst.graphics.frames;
+package javax.swing.burst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-
-import burst.graphics.JBurstGraphic;
+import javax.swing.burst.graphics.JBurstGraphic;
 
 public class JBurstFrame extends Rectangle
 {

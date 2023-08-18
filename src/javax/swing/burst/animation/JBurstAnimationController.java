@@ -1,11 +1,11 @@
-package burst.animation;
+package javax.swing.burst.animation;
 
-import burst.JBurstSprite;
-import burst.graphics.frames.JBurstFrame;
-import burst.util.TriConsumer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
+import javax.swing.burst.JBurstSprite;
+import javax.swing.burst.graphics.frames.JBurstFrame;
+import javax.swing.burst.util.TriConsumer;
 
 /**
  * The BurstAnimationController is a class within a JBurstSprite that holds 

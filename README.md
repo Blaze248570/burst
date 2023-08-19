@@ -14,7 +14,8 @@ Do keep in mind I worked on this in my free time during class so it may crash in
 If it does, report it! I'll look into it.
 
 ## How do I use it?
-The template folder provides an example program using JBurst.
+The template folder provides an example program using JBurst, and a Swing tutorial can be found here:
+[Java Swing Tutorial](https://docs.oracle.com/javase/tutorial/uiswing/)
 
 # Helping
 I am a novice programmer. I will admit that. I know that a lot of this is really bad.\

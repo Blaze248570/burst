@@ -101,16 +101,19 @@ public class JBurstSprite extends JBurstBasic
 
     /**
      * Loads a graphic onto this sprite to be used at drawing time.
-     * <p>
-     * To get a JBurstGraphic from a file, use 
+     * <p> To get a JBurstGraphic from a file, use 
      * {@code JBurstGraphic.fromBuffImage()}.
+     * 
+     * @param graphic   Image to be loaded onto this sprite.
+     * 
+     * @return  This JBurstSprite. Useful for chaining.
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
         this.graphic = graphic;
         this.frames = new JBurstFramesCollection(graphic);
 
-        JBurstFrame frame = new JBurstFrame(this.graphic, "Frame", 0, 0, graphic.width, graphic.height);
+        JBurstFrame frame = new JBurstFrame(graphic, "Frame", 0, 0, graphic.width, graphic.height);
         this.frame = frame;
         this.frames.pushFrame(frame);
         this.setSize(frame.width, frame.height);
@@ -123,10 +126,14 @@ public class JBurstSprite extends JBurstBasic
      * However, unlike {@code loadGraphic()}, this will give it animation properties.
      * <p>
      * This version will take the provided graphic and split it into as many frames as it can
-     * with the dimensions of {@code width} and {@code height}, adding each one to the
-     * list {@code frames}.
-     * <p>
-     * To use these, call {@code animation.add()}.
+     * with the dimensions of {@code width} and {@code height}, adding each one to the sprite's
+     * list of frames.
+     * 
+     * @param graphic   Image to be sliced and displayed
+     * @param width     Width of frame used to slice
+     * @param height    Height of frame used to slice
+     * 
+     * @return  This JBurstSprite. Useful for chaining.
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int width, int height)
     {
@@ -173,6 +180,8 @@ public class JBurstSprite extends JBurstBasic
 
     /**
      * Loads a frame collection from a spritesheet and designated animation file.
+     * 
+     * @param frames    Frame collection to be loaded
      */
     public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
     {
@@ -229,6 +238,10 @@ public class JBurstSprite extends JBurstBasic
             drawBox.width, 
             drawBox.height
         );
+
+        /*
+         * Post-process image manipulation would go here.
+         */
 
         graphics.drawImage(
             pixels, 

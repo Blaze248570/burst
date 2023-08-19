@@ -53,12 +53,7 @@ public class JBurstCamera extends JPanel
         for(JBurstSprite sprite : members)
         {
             if(sprite != null && sprite.exists)
-            {
-                if(sprite.active)
-                    sprite.update(elapsed);
-                    
                 sprite.repaint();
-            }
         }
     }
 }

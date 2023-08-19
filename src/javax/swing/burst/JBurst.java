@@ -1,7 +1,9 @@
 package javax.swing.burst;
 
+import java.awt.Component;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 /**
  * An extended version of the {@code javax.swing.JFrame}
@@ -27,6 +29,8 @@ public class JBurst extends javax.swing.JFrame
      */
     public JBurstCamera defaultCam;
 
+    public ArrayList<JBurstBasic> members;
+
     private Instant startTime;
 
     /**
@@ -48,8 +52,43 @@ public class JBurst extends javax.swing.JFrame
 
         startTime = Instant.now();
         
+        members = new ArrayList<>();
         defaultCam = new JBurstCamera(this);
-        add(defaultCam);
+        addImpl(defaultCam, null, -1);
+
+        // setVisible(true);
+    }
+
+    /**
+     * Adds the given Component to the default camera, <strong>not the JBurst object</strong>.
+     * 
+     * @param comp  The component to be added
+     * 
+     * @return  The component that was added
+     */
+    public Component add(Component comp)
+    {
+        if(comp instanceof JBurstBasic)
+            return add((JBurstBasic) comp);
+        
+        return defaultCam.add(comp);
+    }
+
+    /**
+     * Adds the given basic to the default camera, <strong>not the JBurst object</strong>.
+     * 
+     * @param basic The basic to be added
+     * 
+     * @return  The basic that was added
+     */
+    public JBurstBasic add(JBurstBasic basic)
+    {
+        if(basic instanceof JBurstSprite)
+            defaultCam.add((JBurstSprite) basic);
+
+        members.add(basic);
+
+        return basic;
     }
 
     /**
@@ -65,6 +104,12 @@ public class JBurst extends javax.swing.JFrame
     {
         elapsed = getTime() - total;
         total = getTime();
+
+        for(JBurstBasic basic : members)
+        {
+            if(basic != null && basic.exists && basic.active)
+                basic.update(elapsed);
+        }
 
         defaultCam.update(elapsed);
     }

@@ -1,5 +1,6 @@
 package javax.swing.burst.graphics;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -59,10 +60,6 @@ public class JBurstGraphic
         catch(IOException e) 
         {
             System.out.print("Image not found: " + path);
-            if(!path.endsWith(".png") && !path.endsWith(".gif"))
-            {
-                System.out.println(" (You may need to specify the file type [.png or .gif preferably])");
-            }
         }
 
         return img;
@@ -81,22 +78,39 @@ public class JBurstGraphic
     /**
      * Pixel data about this graphic
      */
-    public BufferedImage data;
+    public BufferedImage image;
 
-    public JBurstGraphic(String key, BufferedImage data) 
+    public JBurstGraphic(String key, BufferedImage image) 
     {
         this.key = key;
-        this.data = data;
+        this.image = image;
+    }
+
+    public Graphics2D getPixels()
+    {
+        Graphics2D pixels = null;
+        if(image != null)
+            pixels = image.createGraphics();
+
+        return pixels;
     }
 
     public int getWidth()
     {
-        return data.getWidth();
+        int width = 0;
+        if(image != null)
+            width = image.getWidth();
+
+        return width;
     }
 
     public int getHeight()
     {
-        return data.getHeight();
+        int height = 0;
+        if(image != null)
+            height = image.getHeight();
+
+        return height;
     }
 
     @Override public String toString()

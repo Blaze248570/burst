@@ -3,6 +3,8 @@ package javax.swing.burst;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.swing.burst.animation.JBurstAnimationController;
@@ -34,6 +36,10 @@ public class JBurstSprite extends JBurstBasic
      * Graphic used by drawing.
      */
     public JBurstGraphic graphic;
+
+    private float widthMult = 0.0f;
+    private float heightMult = 0.0f;
+    private int resizeHint = Image.SCALE_DEFAULT;
 
     /**
      * The current frame being used in the drawing process.
@@ -212,6 +218,45 @@ public class JBurstSprite extends JBurstBasic
         }
     }
 
+    public void setSizeMultiplier(float multiplier)
+    {
+        setSizeMultiplier(multiplier, multiplier);
+    }
+
+    public void setSizeMultiplier(float widthMult, float heightMult)
+    {
+        setSizeMultiplier(widthMult, heightMult, Image.SCALE_DEFAULT);
+    }
+
+    /**
+     * Sets the size that this sprite's graphic should be drawn at, in pixels.
+     * <p>
+     * If either parameter is given a negateive number, 
+     * the default size is returned to the graphic.
+     * 
+     * @param width     New width of graphic
+     * @param height    New height of graphic
+     * @param hint      The scaling algorithm to be used
+     * 
+     * @see  java.awt.Image#SCALE_DEFAULT
+     * @see  java.awt.Image#SCALE_FAST
+     * @see  java.awt.Image#SCALE_SMOOTH
+     * @see  java.awt.Image#SCALE_REPLICATE
+     * @see  java.awt.Image#SCALE_AREA_AVERAGING 
+     */
+    public void setSizeMultiplier(float widthMult, float heightMult, int hint)
+    {
+        if(widthMult < 0)
+            this.widthMult = 1;
+        else
+            this.widthMult = widthMult;
+
+        if(heightMult < 0)
+            this.heightMult = 1;
+        else
+            this.heightMult = heightMult;
+    }
+
     private void updateBounds()
     {
         int width = getWidth(), height = getHeight();
@@ -231,7 +276,7 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public void paint(Graphics graphics)
     {
-        if(!visible || alpha == 0)
+        if(!exists || !visible || alpha == 0)
             return;
 
         if(showBounds)
@@ -239,21 +284,31 @@ public class JBurstSprite extends JBurstBasic
 
         Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
 
-        BufferedImage pixels = frame.graphic.data.getSubimage(
+        BufferedImage buffImage = frame.graphic.image.getSubimage(
             drawBox.x, 
             drawBox.y, 
             drawBox.width, 
             drawBox.height
         );
 
-        /*
-         * Post-process image manipulation would go here.
-         */
+        /* Post-process image manipulation goes here. */
+         
+        Image image = buffImage;
+        Point offset = (Point) frame.offset.clone();
+
+        if(widthMult > 0 || heightMult > 0)
+        {
+            image = buffImage.getScaledInstance((int)(drawBox.width * widthMult), (int)(drawBox.height * heightMult), resizeHint);
+            offset.x *= widthMult;
+            offset.y *= heightMult;
+        }
+
+        /**********************************************/
 
         graphics.drawImage(
-            pixels, 
-            frame.offset.x, 
-            frame.offset.y,
+            image, 
+            offset.x, 
+            offset.y,
             null
         );
     }

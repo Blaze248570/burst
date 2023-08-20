@@ -18,7 +18,8 @@ public class JBurstCamera extends JPanel
 
     /**
      * Constructs a new JBurstCamera object.
-     * <p> There's no need to make anymore of these, though.
+     * <p> 
+     * There's no need to make anymore of these, though.
      * Not yet anyway...
      * 
      * @param parent The JBurst object to be managing this JBurstCamera
@@ -26,19 +27,18 @@ public class JBurstCamera extends JPanel
     public JBurstCamera(JBurst parent)
     {
         this.parent = parent;
+        this.members = new ArrayList<>();
 
         setLayout(null);
-        // setBackground(java.awt.Color.GREEN);
-
         setBounds(0, 0, parent.getWidth(), parent.getHeight());
-        members = new ArrayList<>();
     }
 
     /**
      * Adds an object to the list of sprites being drawn.
      * 
      * @param sprite    The sprite to be added.
-     * @return          The JBurstBasic that was added.
+     * 
+     * @return  The JBurstBasic that was added.
      */
     public JBurstSprite add(JBurstSprite sprite)
     {
@@ -52,7 +52,7 @@ public class JBurstCamera extends JPanel
     {
         for(JBurstSprite sprite : members)
         {
-            if(sprite != null && sprite.exists)
+            if(sprite != null)
                 sprite.repaint();
         }
     }

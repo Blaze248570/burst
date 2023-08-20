@@ -9,14 +9,15 @@ package javax.swing.burst;
  */
 public class JBurstBasic extends javax.swing.JComponent 
 {
+    private static int idEnumerator = 0;
     public final int ID = idEnumerator++;
 
-    static int idEnumerator = 0;
-
     public boolean active = true;
-    public boolean visible = true;
     public boolean alive = true;
     public boolean exists = true;
+    public boolean visible = true;
+
+    public JBurstCamera camera;
 
     public JBurstBasic() { }
 
@@ -33,6 +34,4 @@ public class JBurstBasic extends javax.swing.JComponent
     }
 
     public void update(float elapsed) { }
-
-    public void draw() { }
 }

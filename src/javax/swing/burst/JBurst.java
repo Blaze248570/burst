@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
 /**
  * An extended version of the {@code javax.swing.JFrame}
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  * It functions identically to JFrame, so objects like JPanel, 
  * JLabel, JButton, etc. can still be added to Burst.
  */
-public class JBurst extends javax.swing.JFrame 
+public class JBurst extends JFrame
 {
     /**
      * Time in milliseconds since program began
@@ -48,7 +49,7 @@ public class JBurst extends javax.swing.JFrame
         setTitle("Burst");
         setSize(frameWidth, frameHeight);
         setLocation(525, 200);
-        setDefaultCloseOperation(3);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         _startTime = Instant.now();
         

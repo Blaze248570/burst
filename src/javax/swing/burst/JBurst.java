@@ -31,7 +31,7 @@ public class JBurst extends javax.swing.JFrame
 
     public ArrayList<JBurstBasic> members;
 
-    private Instant startTime;
+    private final Instant _startTime;
 
     /**
      * Creates a new JBurst window object.
@@ -50,7 +50,7 @@ public class JBurst extends javax.swing.JFrame
         setLocation(525, 200);
         setDefaultCloseOperation(3);
 
-        startTime = Instant.now();
+        _startTime = Instant.now();
         
         members = new ArrayList<>();
         defaultCam = new JBurstCamera(this);
@@ -116,6 +116,6 @@ public class JBurst extends javax.swing.JFrame
 
     private long getTime()
     {
-        return Duration.between(startTime, Instant.now()).toMillis();
+        return Duration.between(_startTime, Instant.now()).toMillis();
     }
 }

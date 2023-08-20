@@ -1,9 +1,10 @@
 package javax.swing.burst;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-
 import javax.swing.burst.animation.JBurstAnimationController;
 import javax.swing.burst.graphics.JBurstGraphic;
 import javax.swing.burst.graphics.frames.JBurstAtlasFrames;
@@ -47,15 +48,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstFramesCollection frames;
 
-    public boolean showBounds = false;
-
     /**
-     * Manager of the image.
-     * <p>
-     * I frankly don't know what it does, but it's necessary to use 
-     * {@code drawImage()} in the {@code paint()} function.
+     * Whether or not the sprite's bounding box outline should be drawn or not.
      */
-    private ImageObserver watcher;
+    public boolean showBounds = false;
 
     /**
      * Constructs a new JBurstSprite at coordinates (0, 0);
@@ -75,49 +71,47 @@ public class JBurstSprite extends JBurstBasic
         setLocation(x, y);
 
         animation = new JBurstAnimationController(this);
-
-        this.watcher = new ImageObserver()
-        {
-            @Override
-            public boolean imageUpdate(java.awt.Image img, int flags, int x, int y, int width, int height) 
-            {
-                if ((flags & HEIGHT) != 0)
-                    System.out.println("Height: " + height );
-                if ((flags & WIDTH) != 0)
-                    System.out.println("Width: " + width );
-                if ((flags & FRAMEBITS) != 0)
-                    System.out.println("Another frame finished.");
-                if ((flags & SOMEBITS) != 0)
-                    System.out.println("Image section :" + new java.awt.Rectangle(x, y, width, height));
-                if ((flags & ALLBITS) != 0)
-                    System.out.println("Image finished!");
-                if ((flags & ABORT) != 0)
-                    System.out.println("Image load aborted...");
-                
-                return true;
-            }
-        };
     }
 
     /**
-     * Loads a graphic onto this sprite to be used at drawing time.
-     * <p> To get a JBurstGraphic from a file, use 
-     * {@code JBurstGraphic.fromBuffImage()}.
+     * Loads this sprite as a rectangle of one solid color.
+     * 
+     * @param width     Width of rectangle
+     * @param height    Height of rectangle
+     * @param color     Color of rectangle
+     * 
+     * @return  This JBurstSprite. Useful for chaining.
+     */
+    public JBurstSprite makeGraphic(int width, int height, Color color)
+    {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, width - 1, height - 1);
+
+        return loadGraphic(JBurstGraphic.fromImage(image));
+    }
+
+    /**
+     * Loads a graphic onto this sprite.
      * 
      * @param graphic   Image to be loaded onto this sprite.
      * 
      * @return  This JBurstSprite. Useful for chaining.
+     * @see {@link JBurstGraphic}
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
         this.graphic = graphic;
+        this.frame = new JBurstFrame(graphic, "Frame", 0, 0, graphic.getWidth(), graphic.getHeight());
+        this.frame.sourceSize.setLocation(frame.width, frame.height);
+
         this.frames = new JBurstFramesCollection(graphic);
-
-        JBurstFrame frame = new JBurstFrame(graphic, "Frame", 0, 0, graphic.width, graphic.height);
-        this.frame = frame;
         this.frames.pushFrame(frame);
-        this.setSize(frame.width, frame.height);
 
+        updateBounds();;
+        
         return this;
     }
 
@@ -134,19 +128,23 @@ public class JBurstSprite extends JBurstBasic
      * @param height    Height of frame used to slice
      * 
      * @return  This JBurstSprite. Useful for chaining.
+     * @see {@link JBurstGraphic}
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int width, int height)
     {
+        int graphWidth = graphic.getWidth();
+        int graphHeight = graphic.getHeight();
+
         if(width == 0) 
         {
-            width = graphic.height;
-			width = (width > graphic.width) ? graphic.width : width;
+            width = graphHeight;
+			width = (width > graphWidth) ? graphWidth : width;
         }
 
         if (height == 0)
 		{
-			height = graphic.width;
-			height = (height > graphic.height) ? graphic.height : height;
+			height = graphWidth;
+			height = (height > graphHeight) ? graphHeight : height;
 		}
 
         this.graphic = graphic;
@@ -154,7 +152,7 @@ public class JBurstSprite extends JBurstBasic
 
         int x = 0;
         int y = 0;
-        for(int i = 0; y < graphic.height; i++)
+        for(int i = 0; y < graphHeight; i++)
         {
             String frameNum = "" + i;
             while(frameNum.length() < 4) frameNum = "0" + frameNum;
@@ -165,7 +163,7 @@ public class JBurstSprite extends JBurstBasic
             frames.pushFrame(frame);
 
             x += width;
-            if(x >= graphic.width)
+            if(x >= graphWidth)
             {
                 x = 0;
                 y += height;
@@ -194,6 +192,11 @@ public class JBurstSprite extends JBurstBasic
         return frames;
     }
 
+    /**
+     * Sets the current frame of the sprite.
+     * 
+     * @param frame Frame to be set
+     */
     public void setFrame(JBurstFrame frame)
     {
         JBurstFrame oldFrame = this.frame;
@@ -211,8 +214,12 @@ public class JBurstSprite extends JBurstBasic
 
     private void updateBounds()
     {
+        int width = getWidth(), height = getHeight();
+
         setBounds(getX(), getY(), frame.sourceSize.x, frame.sourceSize.y);
-        revalidate();
+
+        if(width != getWidth() || height != getHeight())
+            revalidate();
     }
 
     @Override
@@ -222,7 +229,7 @@ public class JBurstSprite extends JBurstBasic
     }
     
     @Override 
-    public void paint(java.awt.Graphics graphics)
+    public void paint(Graphics graphics)
     {
         if(!visible || alpha == 0)
             return;
@@ -246,8 +253,8 @@ public class JBurstSprite extends JBurstBasic
         graphics.drawImage(
             pixels, 
             frame.offset.x, 
-            frame.offset.y, 
-            watcher
+            frame.offset.y,
+            null
         );
     }
 

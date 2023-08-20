@@ -1,22 +1,24 @@
 package javax.swing.burst.graphics;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class JBurstGraphic 
 {
     /**
-     * Returns a JBurstGraphic using the BufferedImage, <code>source</code>.
+     * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    Image to be used in returned JBurstGraphic.
-     * @param key       Unique title for this JBurstGraphic.
+     * @param source    Path of image asset to be used in returned JBurstGraphic.
      */
-    public static JBurstGraphic fromBuffImage(BufferedImage source, String key) 
+    public static JBurstGraphic fromFile(String source) 
     {
-        return new JBurstGraphic(key, source);
+        return fromFile(source, generateKey());
     }
 
     /**
-     * Returns a JBurstGraphic using the image file specified at <code>source</code>.
+     * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
      * @param source    Path of image asset to be used in returned JBurstGraphic.
      * @param key       Unique title for this JBurstGraphic.
@@ -26,14 +28,35 @@ public class JBurstGraphic
         return new JBurstGraphic(key, returnBuffImage(source));
     }
 
+    /**
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * 
+     * @param source    Image to be used in returned JBurstGraphic.
+     */
+    public static JBurstGraphic fromImage(BufferedImage source) 
+    {
+        return fromImage(source, generateKey());
+    }
+
+    /**
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * 
+     * @param source    Image to be used in returned JBurstGraphic.
+     * @param key       Unique title for this JBurstGraphic.
+     */
+    public static JBurstGraphic fromImage(BufferedImage source, String key) 
+    {
+        return new JBurstGraphic(key, source);
+    }
+
     public static BufferedImage returnBuffImage(String path) 
     {
         BufferedImage img = null;
         try 
         {
-            img = javax.imageio.ImageIO.read(new java.io.File(path));
+            img = ImageIO.read(new File(path));
         } 
-        catch(java.io.IOException e) 
+        catch(IOException e) 
         {
             System.out.print("Image not found: " + path);
             if(!path.endsWith(".png") && !path.endsWith(".gif"))
@@ -45,22 +68,39 @@ public class JBurstGraphic
         return img;
     }
 
+    private static String generateKey()
+    {
+        return "";
+    }
+
+    /**
+     * Unique label to be used in future caching system
+     */
     public String key;
-    public int width = 0;
-    public int height = 0;
+
+    /**
+     * Pixel data about this graphic
+     */
     public BufferedImage data;
 
     public JBurstGraphic(String key, BufferedImage data) 
     {
         this.key = key;
         this.data = data;
-        
-        this.width = data.getWidth();
-        this.height = data.getHeight();
+    }
+
+    public int getWidth()
+    {
+        return data.getWidth();
+    }
+
+    public int getHeight()
+    {
+        return data.getHeight();
     }
 
     @Override public String toString()
     {
-        return "BurstGraphic ~ {key: " + this.key + ", width: " + this.width + ", height: " + this.height + "}";
+        return "BurstGraphic ~ {key: " + key + ", width: " + getWidth() + ", height: " + getHeight() + "}";
     }
 }

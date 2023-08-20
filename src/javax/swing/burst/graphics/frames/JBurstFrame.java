@@ -28,7 +28,7 @@ public class JBurstFrame extends Rectangle
 
     public JBurstFrame(JBurstGraphic graphic, String name)
     {
-        this(graphic, name, 0, 0, graphic.width, graphic.height);
+        this(graphic, name, 0, 0, graphic.getWidth(), graphic.getHeight());
     }
 
     public JBurstFrame(JBurstGraphic graphic, String name, int x, int y, int width, int height)

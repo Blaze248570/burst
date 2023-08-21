@@ -16,8 +16,8 @@ import javax.swing.burst.graphics.frames.JBurstFramesCollection;
 
 /**
  * A sprite class extension for the Java Swing package.
- * 
- * <p> Allows for the use of static <i>and</i> animated sprites.
+ * <p>
+ * Allows for the use of static <i>and</i> animated sprites.
  */
 public class JBurstSprite extends JBurstBasic 
 {
@@ -54,10 +54,6 @@ public class JBurstSprite extends JBurstBasic
      * The current frame being used in the drawing process.
      */
     public JBurstFrame frame;
-
-    private int frameWidth;
-
-    private int frameHeight;
 
     /**
      * Whether or not the sprite's bounding box outline should be drawn.
@@ -113,7 +109,7 @@ public class JBurstSprite extends JBurstBasic
 
         if(scale != null && (scale.x != 1.0f || scale.y != 1.0f))
         {
-            image = buffImage.getScaledInstance((int)(frameWidth * scale.x), (int)(frameHeight * scale.y), scalingHint);
+            image = buffImage.getScaledInstance((int)(getFrameWidth() * scale.x), (int)(getFrameHeight() * scale.y), scalingHint);
 
             offset.setLocation(offset.x * scale.x, offset.y * scale.y);
         }
@@ -262,8 +258,6 @@ public class JBurstSprite extends JBurstBasic
         JBurstFrame oldFrame = this.frame;
 
         this.frame = frame;
-        this.frameWidth = frame.width;
-        this.frameHeight = frame.height;
 
         firePropertyChange("frame", oldFrame, frame);
 
@@ -319,8 +313,8 @@ public class JBurstSprite extends JBurstBasic
     {
         if(width <= 0 && height <= 0) return;
 
-        float scaleX = ((float) width) / frameWidth;
-        float scaleY = ((float) height) / frameHeight;
+        float scaleX = ((float) width) / getFrameWidth();
+        float scaleY = ((float) height) / getFrameHeight();
 
         if(width <= 0)
             scaleX = scaleY;
@@ -376,6 +370,24 @@ public class JBurstSprite extends JBurstBasic
         return (int) (frame.sourceSize.y * scale.y);
     }
 
+    private int getFrameWidth()
+    {
+        int width = 0;
+        if(frame != null)
+            width = frame.width;
+        
+        return width;
+    }
+
+    private int getFrameHeight()
+    {
+        int height = 0;
+        if(frame != null)
+            height = frame.height;
+
+        return height;
+    }
+
     /**
      * Returns the width of the current frame with scaling calculations.
      * 
@@ -383,7 +395,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public float getSpriteWidth()
     {
-        return frameWidth * scale.x;
+        return getFrameWidth() * scale.x;
     }
 
     /**
@@ -393,7 +405,21 @@ public class JBurstSprite extends JBurstBasic
      */
     public float getSpriteHeight()
     {
-        return frameHeight * scale.y;
+        return getFrameHeight() * scale.y;
+    }
+
+    /**
+     * Returns a writable graphics object from this sprite's graphic.
+     * 
+     * @return a writable graphic object
+     */
+    public Graphics2D getPixels()
+    {
+        Graphics2D pixels = null;
+        if(graphic != null)
+            pixels = graphic.getPixels();
+        
+        return pixels;
     }
 
     public int getNumFrames()

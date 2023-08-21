@@ -86,6 +86,11 @@ public class JBurstGraphic
         this.image = image;
     }
 
+    /**
+     * Returns writable graphics object from this graphic's image.
+     * 
+     * @return  a writeable graphics object
+     */
     public Graphics2D getPixels()
     {
         Graphics2D pixels = null;

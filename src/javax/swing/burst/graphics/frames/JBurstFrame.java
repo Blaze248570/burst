@@ -28,7 +28,7 @@ public class JBurstFrame extends Rectangle
 
     public JBurstFrame(JBurstGraphic graphic, String name)
     {
-        this(graphic, name, 0, 0, graphic.width, graphic.height);
+        this(graphic, name, 0, 0, graphic.getWidth(), graphic.getHeight());
     }
 
     public JBurstFrame(JBurstGraphic graphic, String name, int x, int y, int width, int height)
@@ -49,20 +49,20 @@ public class JBurstFrame extends Rectangle
     public JBurstFrame checkFrame() 
     {
         int x = this.x;
-        if(x > graphic.data.getWidth())
-            x -= (x - graphic.data.getWidth());
+        if(x > graphic.image.getWidth())
+            x -= (x - graphic.image.getWidth());
 
         int y = this.y;
-        if(y > graphic.data.getHeight())
-            y -= (y - graphic.data.getHeight());
+        if(y > graphic.image.getHeight())
+            y -= (y - graphic.image.getHeight());
 
         int right = (this.x + this.width);
-        if(right > graphic.data.getWidth())
-            right -= (right - graphic.data.getWidth());
+        if(right > graphic.image.getWidth())
+            right -= (right - graphic.image.getWidth());
 
         int bottom = (this.y + this.height);
-        if(bottom > graphic.data.getHeight())
-            bottom -= (bottom - graphic.data.getHeight());
+        if(bottom > graphic.image.getHeight())
+            bottom -= (bottom - graphic.image.getHeight());
 
         this.setFrame(x, y, right - x, bottom - y);
 

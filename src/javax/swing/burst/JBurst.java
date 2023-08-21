@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
 /**
  * An extended version of the {@code javax.swing.JFrame}
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  * It functions identically to JFrame, so objects like JPanel, 
  * JLabel, JButton, etc. can still be added to Burst.
  */
-public class JBurst extends javax.swing.JFrame 
+public class JBurst extends JFrame
 {
     /**
      * Time in milliseconds since program began
@@ -31,7 +32,7 @@ public class JBurst extends javax.swing.JFrame
 
     public ArrayList<JBurstBasic> members;
 
-    private Instant startTime;
+    private final Instant _startTime;
 
     /**
      * Creates a new JBurst window object.
@@ -47,10 +48,10 @@ public class JBurst extends javax.swing.JFrame
         setLayout(null);
         setTitle("Burst");
         setSize(frameWidth, frameHeight);
-        setLocation(525, 200);
-        setDefaultCloseOperation(3);
+        setLocation(100, 100);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        startTime = Instant.now();
+        _startTime = Instant.now();
         
         members = new ArrayList<>();
         defaultCam = new JBurstCamera(this);
@@ -116,6 +117,6 @@ public class JBurst extends javax.swing.JFrame
 
     private long getTime()
     {
-        return Duration.between(startTime, Instant.now()).toMillis();
+        return Duration.between(_startTime, Instant.now()).toMillis();
     }
 }

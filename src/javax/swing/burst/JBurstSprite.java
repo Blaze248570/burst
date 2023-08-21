@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.burst.animation.JBurstAnimationController;
 import javax.swing.burst.graphics.JBurstGraphic;
@@ -22,7 +23,7 @@ public class JBurstSprite extends JBurstBasic
 {
     /**
      * The transparency of this sprite.
-     * <p> Currently not in use.
+     * <p> <i>Currently unused</i>
      */
     public float alpha = 1.0f;
 
@@ -30,32 +31,36 @@ public class JBurstSprite extends JBurstBasic
      * The manager to control animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
-    public JBurstAnimationController animation;
+    public final JBurstAnimationController animation;
 
     /**
      * Graphic used by drawing.
      */
     public JBurstGraphic graphic;
 
-    private float widthMult = 0.0f;
-    private float heightMult = 0.0f;
-    private int resizeHint = Image.SCALE_DEFAULT;
+    private Point2D.Float scale;
+
+    private int scalingHint = Image.SCALE_DEFAULT;
+
+    /**
+     * A collection of all the frames used by this sprite.
+     * <p>
+     * Public access is provided for the sake of the animation classes, 
+     * but it is strongly suggested that it be treated as <strong>read-only</strong>.
+     */
+    public JBurstFramesCollection frames;
 
     /**
      * The current frame being used in the drawing process.
      */
     public JBurstFrame frame;
 
-    /**
-     * A collection of all the frames used by this sprite.
-     * <p>
-     * Public access is provided for the sake of the animation classes, 
-     * but it is stringly suggested that it be treated as <strong>read-only</strong>.
-     */
-    public JBurstFramesCollection frames;
+    private int frameWidth;
+
+    private int frameHeight;
 
     /**
-     * Whether or not the sprite's bounding box outline should be drawn or not.
+     * Whether or not the sprite's bounding box outline should be drawn.
      */
     public boolean showBounds = false;
 
@@ -76,7 +81,54 @@ public class JBurstSprite extends JBurstBasic
 
         setLocation(x, y);
 
+        scale = new Point2D.Float(1.0f, 1.0f);
         animation = new JBurstAnimationController(this);
+    }
+
+    @Override
+    public void update(float elapsed)
+    {
+        animation.update(elapsed);
+    }
+    
+    @Override 
+    public void paint(Graphics graphics)
+    {
+        if(!exists || !visible || alpha == 0)
+            return;
+
+        Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
+
+        BufferedImage buffImage = frame.graphic.image.getSubimage(
+            drawBox.x, 
+            drawBox.y, 
+            drawBox.width, 
+            drawBox.height
+        );
+
+        /* Post-process image manipulation goes here. */
+         
+        Image image = buffImage;
+        Point offset = new Point(frame.offset);
+
+        if(scale != null && (scale.x != 1.0f || scale.y != 1.0f))
+        {
+            image = buffImage.getScaledInstance((int)(frameWidth * scale.x), (int)(frameHeight * scale.y), scalingHint);
+
+            offset.setLocation(offset.x * scale.x, offset.y * scale.y);
+        }
+
+        /**********************************************/
+
+        if(showBounds)
+            graphics.drawRect(0, 0, (int) getWidth() - 1, (int) getHeight() - 1);
+
+        graphics.drawImage(
+            image, 
+            offset.x, 
+            offset.y,
+            null
+        );
     }
 
     /**
@@ -110,13 +162,14 @@ public class JBurstSprite extends JBurstBasic
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
         this.graphic = graphic;
-        this.frame = new JBurstFrame(graphic, "Frame", 0, 0, graphic.getWidth(), graphic.getHeight());
-        this.frame.sourceSize.setLocation(frame.width, frame.height);
+
+        setFrame(new JBurstFrame(graphic, "Frame", 0, 0, graphic.getWidth(), graphic.getHeight()));
+        frame.sourceSize.setLocation(frame.width, frame.height);
 
         this.frames = new JBurstFramesCollection(graphic);
         this.frames.pushFrame(frame);
 
-        updateBounds();;
+        updateBounds();
         
         return this;
     }
@@ -176,7 +229,7 @@ public class JBurstSprite extends JBurstBasic
             }
         }
 
-        frame = frames.get(0);
+        setFrame(frames.get(0));
         updateBounds();
 
         return this;
@@ -189,10 +242,11 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
     {
+        this.graphic = frames.graphic;
         this.frames = frames;
         this.animation.clearAnimations();
 
-        this.frame = frames.get(0);
+        setFrame(frames.get(0));
         updateBounds();
 
         return frames;
@@ -206,11 +260,14 @@ public class JBurstSprite extends JBurstBasic
     public void setFrame(JBurstFrame frame)
     {
         JBurstFrame oldFrame = this.frame;
+
         this.frame = frame;
+        this.frameWidth = frame.width;
+        this.frameHeight = frame.height;
 
         firePropertyChange("frame", oldFrame, frame);
 
-        if(oldFrame == frame) return;
+        if(oldFrame == null || oldFrame == frame) return;
 
         if(frame.width != oldFrame.width && frame.height != oldFrame.height)
         {
@@ -218,25 +275,73 @@ public class JBurstSprite extends JBurstBasic
         }
     }
 
-    public void setSizeMultiplier(float multiplier)
+    /**
+     * Sets the sizing scale of this sprite.
+     * <p>
+     * For example: providing 0.5 would halve the sprite in size.
+     * <p>
+     * <i>A value less then or equal to zero will be ignored.</i>
+     * 
+     * @param scale How big or small to make this sprite.
+     */
+    public void setScale(float scale)
     {
-        setSizeMultiplier(multiplier, multiplier);
+        setScale(scale, scale);
     }
 
-    public void setSizeMultiplier(float widthMult, float heightMult)
+    /**
+     * Sets the sizing scale of this sprite.
+     * <p>
+     * For example: providing 0.5 to {@code scaleX} would halve the sprite in size, horizontally.
+     * <p>
+     * <i>Values less then or equal to zero will be ignored.</i>
+     * 
+     * @param scaleX    How big or small to make this sprite, horizontally.     
+     * @param scaleY    How big or small to make this sprite, vertically.
+     */
+    public void setScale(float scaleX, float scaleY)
     {
-        setSizeMultiplier(widthMult, heightMult, Image.SCALE_DEFAULT);
+        if(scaleX <= 0 && scaleY <= 0) return;
+
+        scale.setLocation(scaleX, scaleY);
+        updateBounds();
     }
 
     /**
      * Sets the size that this sprite's graphic should be drawn at, in pixels.
      * <p>
-     * If either parameter is given a negateive number, 
-     * the default size is returned to the graphic.
+     * <i>Values less than or equal to zero will be ignored.</i>
      * 
      * @param width     New width of graphic
      * @param height    New height of graphic
-     * @param hint      The scaling algorithm to be used
+     */
+    public void setGraphicSize(int width, int height)
+    {
+        if(width <= 0 && height <= 0) return;
+
+        float scaleX = ((float) width) / frameWidth;
+        float scaleY = ((float) height) / frameHeight;
+
+        if(width <= 0)
+            scaleX = scaleY;
+        else if(height <= 0)
+            scaleY = scaleX;
+
+        setScale(scaleX, scaleY);
+    }
+
+    private void updateBounds()
+    {
+        setBounds(getX(), getY(), getWidth(), getHeight());
+        revalidate();
+    }
+
+    /**
+     * Sets the method that swing uses to resize the graphic.
+     * <p>
+     * <i>This won't affect the sprite unless its scale has been altered.</i>
+     * 
+     * @param hint  Scaling method to use
      * 
      * @see  java.awt.Image#SCALE_DEFAULT
      * @see  java.awt.Image#SCALE_FAST
@@ -244,73 +349,51 @@ public class JBurstSprite extends JBurstBasic
      * @see  java.awt.Image#SCALE_REPLICATE
      * @see  java.awt.Image#SCALE_AREA_AVERAGING 
      */
-    public void setSizeMultiplier(float widthMult, float heightMult, int hint)
+    public void setScalingHint(int hint)
     {
-        if(widthMult < 0)
-            this.widthMult = 1;
-        else
-            this.widthMult = widthMult;
-
-        if(heightMult < 0)
-            this.heightMult = 1;
-        else
-            this.heightMult = heightMult;
+        this.scalingHint = hint;
     }
 
-    private void updateBounds()
-    {
-        int width = getWidth(), height = getHeight();
-
-        setBounds(getX(), getY(), frame.sourceSize.x, frame.sourceSize.y);
-
-        if(width != getWidth() || height != getHeight())
-            revalidate();
-    }
-
-    @Override
-    public void update(float elapsed) 
-    {
-        animation.update(elapsed);
-    }
-    
+    /**
+     * Returns the width of this compnent with scaling calculations.
+     * 
+     * @return  the current width of this component
+     */
     @Override 
-    public void paint(Graphics graphics)
+    public int getWidth()
     {
-        if(!exists || !visible || alpha == 0)
-            return;
+        return (int) (frame.sourceSize.x * scale.x);
+    }
 
-        if(showBounds)
-            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+    /**
+     * Returns the height of this compnent with scaling calculations.
+     * 
+     * @return  the current height of this component
+     */
+    @Override 
+    public int getHeight()
+    {
+        return (int) (frame.sourceSize.y * scale.y);
+    }
 
-        Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
+    /**
+     * Returns the width of the current frame with scaling calculations.
+     * 
+     * @return the current width of this frame
+     */
+    public float getSpriteWidth()
+    {
+        return frameWidth * scale.x;
+    }
 
-        BufferedImage buffImage = frame.graphic.image.getSubimage(
-            drawBox.x, 
-            drawBox.y, 
-            drawBox.width, 
-            drawBox.height
-        );
-
-        /* Post-process image manipulation goes here. */
-         
-        Image image = buffImage;
-        Point offset = (Point) frame.offset.clone();
-
-        if(widthMult > 0 || heightMult > 0)
-        {
-            image = buffImage.getScaledInstance((int)(drawBox.width * widthMult), (int)(drawBox.height * heightMult), resizeHint);
-            offset.x *= widthMult;
-            offset.y *= heightMult;
-        }
-
-        /**********************************************/
-
-        graphics.drawImage(
-            image, 
-            offset.x, 
-            offset.y,
-            null
-        );
+    /**
+     * Returns the height of the current frame with scaling calculations.
+     * 
+     * @return the current height of this frame
+     */
+    public float getSpriteHeight()
+    {
+        return frameHeight * scale.y;
     }
 
     public int getNumFrames()

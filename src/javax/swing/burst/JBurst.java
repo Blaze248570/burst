@@ -48,7 +48,7 @@ public class JBurst extends JFrame
         setLayout(null);
         setTitle("Burst");
         setSize(frameWidth, frameHeight);
-        setLocation(525, 200);
+        setLocation(100, 100);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         _startTime = Instant.now();

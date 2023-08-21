@@ -211,8 +211,6 @@ public class JBurstAnimation
             {
                 finished = true;
                 curFrame = reversed ? 0 : maxFrameIndex;
-
-                System.out.println("Setting curFrame: " + curFrame);
             }
             else
                 curFrame = frame;

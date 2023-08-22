@@ -48,7 +48,7 @@ public class JBurstCamera extends JPanel
         return sprite;
     }
 
-    public void update(float elapsed)
+    public void update(double elapsed)
     {
         for(JBurstSprite sprite : members)
         {

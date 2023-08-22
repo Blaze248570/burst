@@ -25,7 +25,7 @@ public class JBurstSprite extends JBurstBasic
      * The transparency of this sprite.
      * <p> <i>Currently unused</i>
      */
-    public float alpha = 1.0f;
+    public double alpha = 1.0f;
 
     /**
      * The manager to control animation property's of this sprite.
@@ -38,7 +38,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstGraphic graphic;
 
-    private Point2D.Float scale;
+    private Point2D.Double scale;
 
     private int scalingHint = Image.SCALE_DEFAULT;
 
@@ -77,12 +77,12 @@ public class JBurstSprite extends JBurstBasic
 
         setLocation(x, y);
 
-        scale = new Point2D.Float(1.0f, 1.0f);
+        scale = new Point2D.Double(1.0, 1.0);
         animation = new JBurstAnimationController(this);
     }
 
     @Override
-    public void update(float elapsed)
+    public void update(double elapsed)
     {
         animation.update(elapsed);
     }
@@ -278,7 +278,7 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @param scale How big or small to make this sprite.
      */
-    public void setScale(float scale)
+    public void setScale(double scale)
     {
         setScale(scale, scale);
     }
@@ -293,7 +293,7 @@ public class JBurstSprite extends JBurstBasic
      * @param scaleX    How big or small to make this sprite, horizontally.     
      * @param scaleY    How big or small to make this sprite, vertically.
      */
-    public void setScale(float scaleX, float scaleY)
+    public void setScale(double scaleX, double scaleY)
     {
         if(scaleX <= 0 && scaleY <= 0) return;
 
@@ -313,8 +313,8 @@ public class JBurstSprite extends JBurstBasic
     {
         if(width <= 0 && height <= 0) return;
 
-        float scaleX = ((float) width) / getFrameWidth();
-        float scaleY = ((float) height) / getFrameHeight();
+        double scaleX = ((double) width) / getFrameWidth();
+        double scaleY = ((double) height) / getFrameHeight();
 
         if(width <= 0)
             scaleX = scaleY;
@@ -356,7 +356,11 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public int getWidth()
     {
-        return (int) (frame.sourceSize.x * scale.x);
+        int width = 0;
+        if(frame != null)
+            width = (int) (frame.sourceSize.x * scale.x);
+
+        return width;
     }
 
     /**
@@ -367,7 +371,11 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public int getHeight()
     {
-        return (int) (frame.sourceSize.y * scale.y);
+        int height = 0;
+        if(frame != null)
+            height = (int) (frame.sourceSize.y * scale.y);
+
+        return height;
     }
 
     private int getFrameWidth()
@@ -393,7 +401,7 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return the current width of this frame
      */
-    public float getSpriteWidth()
+    public double getSpriteWidth()
     {
         return getFrameWidth() * scale.x;
     }
@@ -403,7 +411,7 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return the current height of this frame
      */
-    public float getSpriteHeight()
+    public double getSpriteHeight()
     {
         return getFrameHeight() * scale.y;
     }

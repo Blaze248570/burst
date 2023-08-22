@@ -18,12 +18,12 @@ public class JBurst extends JFrame
     /**
      * Time in milliseconds since program began
      */
-    public float total;
+    public double total;
 
     /**
      * Measured time between update() calls in milliseconds
      */
-    public float elapsed;
+    public double elapsed;
 
     /**
      * The default camera that objects are sent to.

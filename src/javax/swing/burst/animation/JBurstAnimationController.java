@@ -54,7 +54,7 @@ public class JBurstAnimationController
         this._animations = new HashMap<>();
     }
 
-    public void update(float elapsed) 
+    public void update(double elapsed) 
     {
         if(curAnim != null)
         {

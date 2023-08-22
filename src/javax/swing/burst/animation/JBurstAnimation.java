@@ -15,7 +15,7 @@ public class JBurstAnimation
     /**
      * The speed in frames per second of the animation.
      */
-    public float frameRate;
+    public double frameRate;
 
     /**
      * The current frame of the animation.
@@ -30,7 +30,7 @@ public class JBurstAnimation
     /**
      * The delay between frames in milliseconds
      */
-    public float delay;
+    public double delay;
 
     /**
      * Whether the animation has finsihed playing or not.
@@ -60,7 +60,7 @@ public class JBurstAnimation
     /**
      * Internal, used to time each frame of animation.
      */
-    private float _frameTimer;
+    private double _frameTimer;
 
     /**
      * Internal, reference to owner controller.
@@ -167,7 +167,7 @@ public class JBurstAnimation
         paused = false;
     }
 
-    public void update(float elapsed) 
+    public void update(double elapsed) 
     {
         if(delay == 0 || finished || paused) return;
 

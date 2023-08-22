@@ -33,5 +33,5 @@ public class JBurstBasic extends javax.swing.JComponent
         exists = true;
     }
 
-    public void update(float elapsed) { }
+    public void update(double elapsed) { }
 }

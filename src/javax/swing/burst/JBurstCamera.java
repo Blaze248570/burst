@@ -9,12 +9,12 @@ import javax.swing.JPanel;
  */
 public class JBurstCamera extends JPanel
 {
-    public JBurst parent;
+    public final JBurst parent;
 
      /**
      * A list of all objects added to this JBurstCamera.
      */
-    public ArrayList<JBurstSprite> members;
+    public final ArrayList<JBurstSprite> members;
 
     /**
      * Constructs a new JBurstCamera object.

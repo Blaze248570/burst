@@ -13,12 +13,12 @@ public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame>
     /**
      * Hash of frames for this frame collection.
      */
-    public HashMap<String, JBurstFrame> framesHash = new HashMap<>();
+    public final HashMap<String, JBurstFrame> framesHash = new HashMap<>();
 
     /**
      * Graphic object this collection belongs to.
      */
-    public JBurstGraphic graphic;
+    public final JBurstGraphic graphic;
 
     public JBurstFramesCollection(JBurstGraphic graphic) 
     {

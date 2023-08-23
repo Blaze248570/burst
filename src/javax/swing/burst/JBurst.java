@@ -1,6 +1,8 @@
 package javax.swing.burst;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -45,19 +47,32 @@ public class JBurst extends JFrame
     {
         super();
 
-        setLayout(null);
-        setTitle("Burst");
-        setSize(frameWidth, frameHeight);
-        setLocation(100, 100);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        /*
+         * Format the window.
+         */
+        Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
+        int windowX = (int)(resolution.getWidth() / 2 - frameWidth / 2);
+        int windowY = (int)(resolution.getHeight() / 2 - frameHeight / 2);
 
-        _startTime = Instant.now();
+        setTitle("JBurst Project");
+        setLocation(windowX, windowY); // Centers the window on the screen
+        setSize(frameWidth, frameHeight);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Ensures the program ends upon termination
         
+        /*
+         * Instantiate variables and setup engine.
+         */
         members = new ArrayList<>();
         defaultCam = new JBurstCamera(this);
         addImpl(defaultCam, null, -1);
+        setLayout(null);
 
         // setVisible(true);
+
+        /*
+         * Initialize update system. 
+         */
+        _startTime = Instant.now();
     }
 
     /**

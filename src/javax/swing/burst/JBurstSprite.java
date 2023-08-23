@@ -36,9 +36,9 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Graphic used by drawing.
      */
-    public JBurstGraphic graphic;
+    private JBurstGraphic graphic;
 
-    private Point2D.Double scale;
+    private final Point2D.Double scale;
 
     private int scalingHint = Image.SCALE_DEFAULT;
 
@@ -48,12 +48,12 @@ public class JBurstSprite extends JBurstBasic
      * Public access is provided for the sake of the animation classes, 
      * but it is strongly suggested that it be treated as <strong>read-only</strong>.
      */
-    public JBurstFramesCollection frames;
+    private JBurstFramesCollection frames;
 
     /**
      * The current frame being used in the drawing process.
      */
-    public JBurstFrame frame;
+    private JBurstFrame frame;
 
     /**
      * Whether or not the sprite's bounding box outline should be drawn.
@@ -95,26 +95,27 @@ public class JBurstSprite extends JBurstBasic
 
         Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
 
-        BufferedImage buffImage = frame.graphic.image.getSubimage(
+        BufferedImage image = frame.graphic.image.getSubimage(
             drawBox.x, 
             drawBox.y, 
             drawBox.width, 
             drawBox.height
         );
 
-        /* Post-process image manipulation goes here. */
+        /* Post-process image manipulation */
          
-        Image image = buffImage;
         Point offset = new Point(frame.offset);
 
-        if(scale != null && (scale.x != 1.0f || scale.y != 1.0f))
+        if(scale != null && (scale.x != 1.0 || scale.y != 1.0))
         {
-            image = buffImage.getScaledInstance((int)(getFrameWidth() * scale.x), (int)(getFrameHeight() * scale.y), scalingHint);
+            image = toBufferedImage(image.getScaledInstance((int)(getFrameWidth() * scale.x), (int)(getFrameHeight() * scale.y), scalingHint));
 
             offset.setLocation(offset.x * scale.x, offset.y * scale.y);
         }
 
-        /**********************************************/
+        // reverse(image.createGraphics(), flipX, flipY);
+
+        /************************************/
 
         if(showBounds)
             graphics.drawRect(0, 0, (int) getWidth() - 1, (int) getHeight() - 1);
@@ -126,6 +127,33 @@ public class JBurstSprite extends JBurstBasic
             null
         );
     }
+
+    /**
+     * Converts an Image into a BufferedImage.
+     * 
+     * @param image Image to be converted
+     * 
+     * @return  Converted image
+     */
+    private BufferedImage toBufferedImage(Image image)
+    {
+        if(image instanceof BufferedImage)
+            return (BufferedImage) image;
+
+        BufferedImage bImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D bGr = bImage.createGraphics();
+        bGr.drawImage(image, 0, 0, null);
+        bGr.dispose();
+
+        return bImage;
+    }
+
+    /*
+        private void reverse(Graphics2D pixels, boolean flipX, boolean flipY)
+        {
+            
+        }
+    */
 
     /**
      * Loads this sprite as a rectangle of one solid color.
@@ -143,6 +171,7 @@ public class JBurstSprite extends JBurstBasic
         
         graphics.setColor(color);
         graphics.fillRect(0, 0, width - 1, height - 1);
+        graphics.dispose();
 
         return loadGraphic(JBurstGraphic.fromImage(image));
     }
@@ -267,6 +296,16 @@ public class JBurstSprite extends JBurstBasic
         {
             updateBounds();
         }
+    }
+
+    /**
+     * Returns a collection of all the frames used by this sprite, which may be {@code null}.
+     * 
+     * @return  a collection of this sprite's frames
+     */
+    public JBurstFramesCollection getFrames()
+    {
+        return frames;
     }
 
     /**
@@ -414,6 +453,17 @@ public class JBurstSprite extends JBurstBasic
     public double getSpriteHeight()
     {
         return getFrameHeight() * scale.y;
+    }
+
+    /**
+     * Returns this sprite's graphic object, 
+     * which may be {@code null}.
+     * 
+     * @return  this sprite's graphic object
+     */
+    public JBurstGraphic getGraphic()
+    {
+        return graphic;
     }
 
     /**

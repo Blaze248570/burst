@@ -1,9 +1,9 @@
-package javax.swing.burst;
+package javax.swing.burst.util;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
-public class Xml 
+public class XmlParser
 {
     public static Document parse(String path) 
     {

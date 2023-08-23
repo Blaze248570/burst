@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import javax.swing.burst.JBurstSprite;
 import javax.swing.burst.graphics.frames.JBurstFrame;
+import javax.swing.burst.graphics.frames.JBurstFramesCollection;
 import javax.swing.burst.util.TriConsumer;
 
 /**
@@ -14,7 +15,7 @@ import javax.swing.burst.util.TriConsumer;
 public class JBurstAnimationController 
 {
     /**
-     * The currently playing animation (Warning: may be {@code null}).
+     * The currently playing animation, which may be {@code null}.
      */
     public JBurstAnimation curAnim;
 
@@ -40,12 +41,12 @@ public class JBurstAnimationController
     /**
      * Internal, reference to owner sprite.
      */
-    protected JBurstSprite _sprite;
+    private final JBurstSprite _sprite;
 
     /**
      * Internal, storage of animations added to this sprite.
      */
-    private HashMap<String, JBurstAnimation> _animations;
+    private final HashMap<String, JBurstAnimation> _animations;
 
     public JBurstAnimationController(JBurstSprite sprite) 
     {
@@ -146,7 +147,7 @@ public class JBurstAnimationController
      */
     public void addByPrefix(String name, String prefix, int framerate, boolean looped)
     {
-        if(_sprite.frames == null)
+        if(_sprite.getFrames() == null)
             return;
 
         ArrayList<JBurstFrame> animFrames = new ArrayList<>();
@@ -188,7 +189,8 @@ public class JBurstAnimationController
 
     private void findByPrefix(ArrayList<JBurstFrame> animFrames, String prefix) 
     {
-        for(JBurstFrame frame : _sprite.frames) 
+        JBurstFramesCollection frames = _sprite.getFrames();
+        for(JBurstFrame frame : frames) 
         {
             if(frame.name != null && frame.name.startsWith(prefix, 0)) 
             {
@@ -199,7 +201,7 @@ public class JBurstAnimationController
     
     private int getFrameIndex(JBurstFrame frame) 
     {
-        return _sprite.frames.indexOf(frame);
+        return _sprite.getFrames().indexOf(frame);
     }
 
     /**
@@ -366,9 +368,11 @@ public class JBurstAnimationController
     {
         frameIndex = frame;
 
-        if(_sprite.frames != null && getNumFrames() > 0)
+        JBurstFramesCollection frames = _sprite.getFrames();
+
+        if(frames != null && getNumFrames() > 0)
         {
-            _sprite.setFrame(_sprite.frames.get(frameIndex));
+            _sprite.setFrame(frames.get(frameIndex));
 
             fireCallback();
         }

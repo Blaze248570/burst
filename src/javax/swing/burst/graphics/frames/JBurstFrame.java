@@ -14,7 +14,7 @@ public class JBurstFrame extends Rectangle
     /**
      * The parent graphic of this frame.
      */
-    public JBurstGraphic graphic;
+    public final JBurstGraphic graphic;
 
     /**
      * Original (uncropped) image size.

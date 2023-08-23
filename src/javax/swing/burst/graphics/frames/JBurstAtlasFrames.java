@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.Comparator;
 import java.util.Scanner;
 import javax.swing.burst.graphics.JBurstGraphic;
+import javax.swing.burst.util.XmlParser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,7 +45,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
         JBurstAtlasFrames frames = new JBurstAtlasFrames(graphic);
         
-        NodeList data = javax.swing.burst.Xml.parse(description).getElementsByTagName("SubTexture");
+        NodeList data = XmlParser.parse(description).getElementsByTagName("SubTexture");
         for(int i = 0; i < data.getLength(); i++) 
         {
             Node item = data.item(i);

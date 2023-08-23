@@ -1,11 +1,12 @@
 package javax.swing.burst;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.burst.animation.JBurstAnimationController;
@@ -27,6 +28,8 @@ public class JBurstSprite extends JBurstBasic
      */
     public double alpha = 1.0f;
 
+    public double angle = 0.0;
+
     /**
      * The manager to control animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
@@ -41,6 +44,8 @@ public class JBurstSprite extends JBurstBasic
     private final Point2D.Double scale;
 
     private int scalingHint = Image.SCALE_DEFAULT;
+
+    public boolean antialiasing = false;
 
     /**
      * A collection of all the frames used by this sprite.
@@ -88,10 +93,12 @@ public class JBurstSprite extends JBurstBasic
     }
     
     @Override 
-    public void paint(Graphics graphics)
+    public void paint(Graphics g)
     {
         if(!exists || !visible || alpha == 0)
             return;
+
+        Graphics2D graphics = (Graphics2D) g;
 
         Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
 
@@ -109,7 +116,6 @@ public class JBurstSprite extends JBurstBasic
         if(scale != null && (scale.x != 1.0 || scale.y != 1.0))
         {
             image = toBufferedImage(image.getScaledInstance((int)(getFrameWidth() * scale.x), (int)(getFrameHeight() * scale.y), scalingHint));
-
             offset.setLocation(offset.x * scale.x, offset.y * scale.y);
         }
 
@@ -119,6 +125,13 @@ public class JBurstSprite extends JBurstBasic
 
         if(showBounds)
             graphics.drawRect(0, 0, (int) getWidth() - 1, (int) getHeight() - 1);
+
+        AffineTransform transform = AffineTransform.getRotateInstance(angle, angle, image.getWidth() / 2, image.getHeight() / 2);
+
+        graphics.transform(transform);
+
+        if(antialiasing)
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         graphics.drawImage(
             image, 

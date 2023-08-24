@@ -2,11 +2,9 @@ package javax.swing.burst;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.burst.animation.JBurstAnimationController;
@@ -28,7 +26,11 @@ public class JBurstSprite extends JBurstBasic
      */
     public double alpha = 1.0f;
 
-    public double angle = 0.0;
+    public boolean antialiasing = false;
+
+    private double angle = 0.0;
+
+    public final Point2D.Double origin;
 
     /**
      * The manager to control animation property's of this sprite.
@@ -42,10 +44,6 @@ public class JBurstSprite extends JBurstBasic
     private JBurstGraphic graphic;
 
     private final Point2D.Double scale;
-
-    private int scalingHint = Image.SCALE_DEFAULT;
-
-    public boolean antialiasing = false;
 
     /**
      * A collection of all the frames used by this sprite.
@@ -82,6 +80,7 @@ public class JBurstSprite extends JBurstBasic
 
         setLocation(x, y);
 
+        origin = new Point2D.Double();
         scale = new Point2D.Double(1.0, 1.0);
         animation = new JBurstAnimationController(this);
     }
@@ -93,80 +92,47 @@ public class JBurstSprite extends JBurstBasic
     }
     
     @Override 
-    public void paint(Graphics g)
+    public void paint(Graphics graphics)
     {
         if(!exists || !visible || alpha == 0)
             return;
 
-        Graphics2D graphics = (Graphics2D) g;
-
         Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
 
-        BufferedImage image = frame.graphic.image.getSubimage(
+        BufferedImage frameImage = frame.graphic.image.getSubimage(
             drawBox.x, 
             drawBox.y, 
             drawBox.width, 
             drawBox.height
         );
 
-        /* Post-process image manipulation */
-         
         Point offset = new Point(frame.offset);
 
-        if(scale != null && (scale.x != 1.0 || scale.y != 1.0))
-        {
-            image = toBufferedImage(image.getScaledInstance((int)(getFrameWidth() * scale.x), (int)(getFrameHeight() * scale.y), scalingHint));
-            offset.setLocation(offset.x * scale.x, offset.y * scale.y);
-        }
+        BufferedImage image = new BufferedImage(frameImage.getWidth() + offset.x, frameImage.getHeight() + offset.y, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D pixels = image.createGraphics();
 
-        // reverse(image.createGraphics(), flipX, flipY);
+        /* Image Manipulation */
 
-        /************************************/
+        if(scale != null && (scale.x > 0 || scale.y > 0))
+            pixels.scale(scale.x, scale.y);
+
+        if(angle != 0)
+            pixels.rotate(angle, image.getWidth() / 2, image.getHeight() / 2);
+
+        if(antialiasing)
+            pixels.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw with offsets pre-applied to dilated/rotated image
+        pixels.drawImage(frameImage, offset.x, offset.y, null);
+        pixels.dispose();
+
+        /**********************/
 
         if(showBounds)
             graphics.drawRect(0, 0, (int) getWidth() - 1, (int) getHeight() - 1);
 
-        AffineTransform transform = AffineTransform.getRotateInstance(angle, angle, image.getWidth() / 2, image.getHeight() / 2);
-
-        graphics.transform(transform);
-
-        if(antialiasing)
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        graphics.drawImage(
-            image, 
-            offset.x, 
-            offset.y,
-            null
-        );
+        graphics.drawImage(image, 0, 0,null);
     }
-
-    /**
-     * Converts an Image into a BufferedImage.
-     * 
-     * @param image Image to be converted
-     * 
-     * @return  Converted image
-     */
-    private BufferedImage toBufferedImage(Image image)
-    {
-        if(image instanceof BufferedImage)
-            return (BufferedImage) image;
-
-        BufferedImage bImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D bGr = bImage.createGraphics();
-        bGr.drawImage(image, 0, 0, null);
-        bGr.dispose();
-
-        return bImage;
-    }
-
-    /*
-        private void reverse(Graphics2D pixels, boolean flipX, boolean flipY)
-        {
-            
-        }
-    */
 
     /**
      * Loads this sprite as a rectangle of one solid color.
@@ -321,6 +287,16 @@ public class JBurstSprite extends JBurstBasic
         return frames;
     }
 
+    public void setAngleViaDegrees(double theta)
+    {
+        setAngleViaRadians(theta * (Math.PI / 180));
+    }
+
+    public void setAngleViaRadians(double theta)
+    {
+        this.angle = theta;
+    }
+
     /**
      * Sets the sizing scale of this sprite.
      * <p>
@@ -380,24 +356,6 @@ public class JBurstSprite extends JBurstBasic
     {
         setBounds(getX(), getY(), getWidth(), getHeight());
         revalidate();
-    }
-
-    /**
-     * Sets the method that swing uses to resize the graphic.
-     * <p>
-     * <i>This won't affect the sprite unless its scale has been altered.</i>
-     * 
-     * @param hint  Scaling method to use
-     * 
-     * @see  java.awt.Image#SCALE_DEFAULT
-     * @see  java.awt.Image#SCALE_FAST
-     * @see  java.awt.Image#SCALE_SMOOTH
-     * @see  java.awt.Image#SCALE_REPLICATE
-     * @see  java.awt.Image#SCALE_AREA_AVERAGING 
-     */
-    public void setScalingHint(int hint)
-    {
-        this.scalingHint = hint;
     }
 
     /**

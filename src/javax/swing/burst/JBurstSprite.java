@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -112,39 +111,44 @@ public class JBurstSprite extends JBurstBasic
 
         if(angle != 0)
         {
-            int frameWidth = getSpriteWidth();
-            int frameHeight = getSpriteHeight();
+            int spriteWidth = frame.sourceSize.x;
+            int spriteHeight = frame.sourceSize.y;
 
-            int newWidth = (int)(Math.abs(frameWidth * Math.cos(angle)) + Math.abs(frameHeight * Math.sin(angle)));           
-            int newHeight = (int)(Math.abs(frameWidth * Math.sin(angle)) + Math.abs(frameHeight * Math.cos(angle)));
+            int newWidth = (int)(Math.abs(spriteWidth * Math.cos(angle)) + Math.abs(spriteHeight * Math.sin(angle)));           
+            int newHeight = (int)(Math.abs(spriteWidth * Math.sin(angle)) + Math.abs(spriteHeight * Math.cos(angle)));
 
-            int deltaX = (newWidth - frameWidth) / 2;
-            int deltaY = (newHeight - frameHeight) / 2;
+            int deltaX = (newWidth - spriteWidth) / 2;
+            int deltaY = (newHeight - spriteHeight) / 2;
 
-            image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+            int scaledWidth = (int)(newWidth * scale.x);
+            int scaledHeight = (int)(newHeight * scale.y);
+
+            int scaledDeltaX = (int)(deltaX * scale.x);
+            int scaledDeltaY = (int)(deltaY * scale.y);
+
+            pixels.dispose();
+            image = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
             pixels = image.createGraphics();
 
             if(debugMode)
             {
                 pixels.setColor(Color.RED);
-                pixels.drawRect(deltaX, deltaY, frameWidth - 1, frameHeight - 1);
+                pixels.drawRect(scaledDeltaX, scaledDeltaY, getSpriteWidth() - 1, getSpriteHeight() - 1);
             }
 
-            pixels.rotate(angle, newWidth / 2, newHeight / 2);
+            pixels.rotate(angle, scaledWidth / 2, scaledHeight / 2);
 
             if(debugMode)
             {
                 pixels.setColor(Color.BLUE);
-                pixels.drawRect(deltaX, deltaY, frameWidth - 1, frameHeight - 1);
+                pixels.drawRect(scaledDeltaX, scaledDeltaY, getSpriteWidth() - 1, getSpriteHeight() - 1);
             }
 
-            // System.out.println(deltaX + ", " + deltaY);
+            offset.x += deltaX; // + 24;
+            offset.y += deltaY; // + 25;
 
-            offset.x += deltaX;
-            offset.y += deltaY;
-
-            setLocation(framePoint.x - deltaX, framePoint.y - deltaY);
-            setSize(newWidth, newHeight);
+            setLocation(framePoint.x - scaledDeltaX, framePoint.y - scaledDeltaY);
+            setSize(scaledWidth, scaledHeight);
             revalidate();
         }
 
@@ -159,9 +163,6 @@ public class JBurstSprite extends JBurstBasic
         pixels.dispose();
 
         /**********************/
-
-        if(debugMode)
-            System.out.println(getWidth() + ", " + getHeight());
 
         if(debugMode)
             graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
@@ -318,6 +319,11 @@ public class JBurstSprite extends JBurstBasic
         return frames;
     }
 
+    public double getAngle()
+    {
+        return this.angle;
+    }
+
     /**
      * Sets the angle of rotation of this sprite, in degrees.
      * <p> For example, 180.0 would flip this sprite upside-down.
@@ -326,7 +332,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public void setAngleViaDegrees(double theta)
     {
-        setAngleViaRadians(theta * (Math.PI / 180.0));
+        setAngleViaRadians(Math.toRadians(theta));
     }
 
     /**
@@ -337,8 +343,8 @@ public class JBurstSprite extends JBurstBasic
      */
     public void setAngleViaRadians(double theta)
     {
-        if(theta >= 2.0 * Math.PI)
-            theta = 0.0;
+        if(theta <= -2.0 * Math.PI || theta >= 2.0 * Math.PI)
+            theta %= 2.0 * Math.PI; // Keep the angle within (-2pi, 2pi) to avoid overflow/underflow errors.
         
         this.angle = theta;
     }

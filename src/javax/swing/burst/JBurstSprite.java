@@ -1,4 +1,5 @@
 package javax.swing.burst;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,11 +27,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public double alpha = 1.0f;
 
+    /**
+     * Whether or not this sprite should be smoothed at rendering.
+     */
     public boolean antialiasing = false;
-
-    private double angle = 0.0;
-
-    public final Point2D.Double origin;
 
     /**
      * The manager to control animation property's of this sprite.
@@ -38,12 +38,11 @@ public class JBurstSprite extends JBurstBasic
      */
     public final JBurstAnimationController animation;
 
-    /**
-     * Graphic used by drawing.
-     */
-    private JBurstGraphic graphic;
-
     private final Point2D.Double scale;
+
+    private double angle = 0.0;
+
+    private final Point framePoint;
 
     /**
      * A collection of all the frames used by this sprite.
@@ -61,7 +60,7 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Whether or not the sprite's bounding box outline should be drawn.
      */
-    public boolean showBounds = false;
+    public boolean debugMode = false;
 
     /**
      * Constructs a new JBurstSprite at coordinates (0, 0);
@@ -78,11 +77,11 @@ public class JBurstSprite extends JBurstBasic
     {
         super();
 
-        setLocation(x, y);
-
-        origin = new Point2D.Double();
         scale = new Point2D.Double(1.0, 1.0);
+        framePoint = new Point();
         animation = new JBurstAnimationController(this);
+        
+        setLocation(x, y);
     }
 
     @Override
@@ -94,16 +93,14 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public void paint(Graphics graphics)
     {
-        if(!exists || !visible || alpha == 0)
+        if(frame == null || !exists || !visible || alpha == 0)
             return;
 
-        Rectangle drawBox = new Rectangle(frame.x, frame.y, frame.width, frame.height);
-
         BufferedImage frameImage = frame.graphic.image.getSubimage(
-            drawBox.x, 
-            drawBox.y, 
-            drawBox.width, 
-            drawBox.height
+            frame.x, 
+            frame.y, 
+            frame.width, 
+            frame.height
         );
 
         Point offset = new Point(frame.offset);
@@ -113,11 +110,46 @@ public class JBurstSprite extends JBurstBasic
 
         /* Image Manipulation */
 
+        if(angle != 0)
+        {
+            int frameWidth = getSpriteWidth();
+            int frameHeight = getSpriteHeight();
+
+            int newWidth = (int)(Math.abs(frameWidth * Math.cos(angle)) + Math.abs(frameHeight * Math.sin(angle)));           
+            int newHeight = (int)(Math.abs(frameWidth * Math.sin(angle)) + Math.abs(frameHeight * Math.cos(angle)));
+
+            int deltaX = (newWidth - frameWidth) / 2;
+            int deltaY = (newHeight - frameHeight) / 2;
+
+            image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+            pixels = image.createGraphics();
+
+            if(debugMode)
+            {
+                pixels.setColor(Color.RED);
+                pixels.drawRect(deltaX, deltaY, frameWidth - 1, frameHeight - 1);
+            }
+
+            pixels.rotate(angle, newWidth / 2, newHeight / 2);
+
+            if(debugMode)
+            {
+                pixels.setColor(Color.BLUE);
+                pixels.drawRect(deltaX, deltaY, frameWidth - 1, frameHeight - 1);
+            }
+
+            // System.out.println(deltaX + ", " + deltaY);
+
+            offset.x += deltaX;
+            offset.y += deltaY;
+
+            setLocation(framePoint.x - deltaX, framePoint.y - deltaY);
+            setSize(newWidth, newHeight);
+            revalidate();
+        }
+
         if(scale != null && (scale.x > 0 || scale.y > 0))
             pixels.scale(scale.x, scale.y);
-
-        if(angle != 0)
-            pixels.rotate(angle, image.getWidth() / 2, image.getHeight() / 2);
 
         if(antialiasing)
             pixels.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -128,8 +160,11 @@ public class JBurstSprite extends JBurstBasic
 
         /**********************/
 
-        if(showBounds)
-            graphics.drawRect(0, 0, (int) getWidth() - 1, (int) getHeight() - 1);
+        if(debugMode)
+            System.out.println(getWidth() + ", " + getHeight());
+
+        if(debugMode)
+            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 
         graphics.drawImage(image, 0, 0,null);
     }
@@ -165,8 +200,6 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
-        this.graphic = graphic;
-
         setFrame(new JBurstFrame(graphic, "Frame", 0, 0, graphic.getWidth(), graphic.getHeight()));
         frame.sourceSize.setLocation(frame.width, frame.height);
 
@@ -210,7 +243,6 @@ public class JBurstSprite extends JBurstBasic
 			height = (height > graphHeight) ? graphHeight : height;
 		}
 
-        this.graphic = graphic;
         this.frames = new JBurstFramesCollection(graphic);
 
         int x = 0;
@@ -246,7 +278,6 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
     {
-        this.graphic = frames.graphic;
         this.frames = frames;
         this.animation.clearAnimations();
 
@@ -287,13 +318,28 @@ public class JBurstSprite extends JBurstBasic
         return frames;
     }
 
+    /**
+     * Sets the angle of rotation of this sprite, in degrees.
+     * <p> For example, 180.0 would flip this sprite upside-down.
+     * 
+     * @param theta The amount to rotate this sprite by, in degrees
+     */
     public void setAngleViaDegrees(double theta)
     {
-        setAngleViaRadians(theta * (Math.PI / 180));
+        setAngleViaRadians(theta * (Math.PI / 180.0));
     }
 
+    /**
+     * Sets the angle of rotation of this sprite, in radians.
+     * <p> For example, 180.0 would flip this sprite upside-down.
+     * 
+     * @param theta The amount to rotate this sprite by, in radians
+     */
     public void setAngleViaRadians(double theta)
     {
+        if(theta >= 2.0 * Math.PI)
+            theta = 0.0;
+        
         this.angle = theta;
     }
 
@@ -354,17 +400,53 @@ public class JBurstSprite extends JBurstBasic
 
     private void updateBounds()
     {
-        setBounds(getX(), getY(), getWidth(), getHeight());
+        setBounds(getX(), getY(), getSpriteWidth(), getSpriteHeight());
         revalidate();
     }
 
     /**
-     * Returns the width of this compnent with scaling calculations.
+     * Sets the x position of this sprite.
      * 
-     * @return  the current width of this component
+     * @param x the new x-coordinate of this sprite
      */
-    @Override 
-    public int getWidth()
+    public void setX(int x)
+    {
+        framePoint.x = x;
+        setLocation(x, getY());
+    }
+
+    /**
+     * Sets the y position of this sprite.
+     * 
+     * @param y the new y-coordinate of this sprite
+     */
+    public void setY(int y)
+    {
+        framePoint.y = y;
+        setLocation(getX(), y);
+    }
+
+    /**
+     * Sets the position of this sprite.
+     * <p> This should be used in opposition to {@code setLocation()} 
+     * as this will also update the sprite's relative position which is used
+     * in calculating rotational offsets.
+     * 
+     * @param x the new x-coordinate of this sprite
+     * @param y the new y-coordinate of this sprite
+     */
+    public void setPosition(int x, int y)
+    {
+        framePoint.setLocation(x, y);
+        setLocation(x, y);
+    }
+
+    /**
+     * Returns the width of this sprite with scaling calculations.
+     * 
+     * @return  the current width of this sprite
+     */
+    public int getSpriteWidth()
     {
         int width = 0;
         if(frame != null)
@@ -374,12 +456,11 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Returns the height of this compnent with scaling calculations.
+     * Returns the height of this sprite with scaling calculations.
      * 
-     * @return  the current height of this component
+     * @return  the current height of this sprite
      */
-    @Override 
-    public int getHeight()
+    public int getSpriteHeight()
     {
         int height = 0;
         if(frame != null)
@@ -407,26 +488,6 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Returns the width of the current frame with scaling calculations.
-     * 
-     * @return the current width of this frame
-     */
-    public double getSpriteWidth()
-    {
-        return getFrameWidth() * scale.x;
-    }
-
-    /**
-     * Returns the height of the current frame with scaling calculations.
-     * 
-     * @return the current height of this frame
-     */
-    public double getSpriteHeight()
-    {
-        return getFrameHeight() * scale.y;
-    }
-
-    /**
      * Returns this sprite's graphic object, 
      * which may be {@code null}.
      * 
@@ -434,23 +495,34 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstGraphic getGraphic()
     {
+        JBurstGraphic graphic = null;
+        if(frame != null)
+            graphic = frame.graphic;
+
         return graphic;
     }
 
     /**
-     * Returns a writable graphics object from this sprite's graphic.
+     * Returns a writable graphics object from this sprite's graphic,
+     * which may be {@code null}.
      * 
-     * @return a writable graphic object
+     * @return a writable {@code Graphics2D} object
      */
     public Graphics2D getPixels()
     {
         Graphics2D pixels = null;
+        JBurstGraphic graphic = getGraphic();
         if(graphic != null)
             pixels = graphic.getPixels();
         
         return pixels;
     }
 
+    /**
+     * Returns the amount of frames stored within this sprite's frame collection.
+     * 
+     * @return  the length if this sprite's frame collection
+     */
     public int getNumFrames()
     {
         return frames.size();

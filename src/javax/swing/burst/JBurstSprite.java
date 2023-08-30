@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.burst.animation.JBurstAnimationController;
@@ -90,84 +91,69 @@ public class JBurstSprite extends JBurstBasic
     }
     
     @Override 
-    public void paint(Graphics graphics)
+    public void paint(Graphics g)
     {
         if(frame == null || !exists || !visible || alpha == 0)
             return;
 
-        BufferedImage frameImage = frame.graphic.image.getSubimage(
+        Graphics2D graphics = (Graphics2D) g;
+        AffineTransform saveAT = graphics.getTransform();
+        Point offset = new Point(frame.offset);
+
+        int spriteWidth = frame.sourceSize.x;
+        int spriteHeight = frame.sourceSize.y;
+
+        BufferedImage pixels = frame.graphic.image.getSubimage(
             frame.x, 
             frame.y, 
             frame.width, 
             frame.height
         );
 
-        Point offset = new Point(frame.offset);
+        boolean scaled = scale != null && (scale.x != 1.0 || scale.y != 1.0);
+        boolean rotated = angle != 0.0;
 
-        BufferedImage image = new BufferedImage(frameImage.getWidth() + offset.x, frameImage.getHeight() + offset.y, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D pixels = image.createGraphics();
+        if(scaled)
+            graphics.scale(scale.x, scale.y);
 
-        /* Image Manipulation */
-
-        if(angle != 0)
+        if(rotated)
         {
-            int spriteWidth = frame.sourceSize.x;
-            int spriteHeight = frame.sourceSize.y;
-
-            int newWidth = (int)(Math.abs(spriteWidth * Math.cos(angle)) + Math.abs(spriteHeight * Math.sin(angle)));           
-            int newHeight = (int)(Math.abs(spriteWidth * Math.sin(angle)) + Math.abs(spriteHeight * Math.cos(angle)));
+            int newWidth = (int) (Math.abs(spriteWidth * Math.cos(angle)) + Math.abs(spriteHeight * Math.sin(angle)));           
+            int newHeight = (int) (Math.abs(spriteWidth * Math.sin(angle)) + Math.abs(spriteHeight * Math.cos(angle)));
 
             int deltaX = (newWidth - spriteWidth) / 2;
             int deltaY = (newHeight - spriteHeight) / 2;
 
-            int scaledWidth = (int)(newWidth * scale.x);
-            int scaledHeight = (int)(newHeight * scale.y);
+            graphics.rotate(angle, newWidth / 2, newHeight / 2);
 
-            int scaledDeltaX = (int)(deltaX * scale.x);
-            int scaledDeltaY = (int)(deltaY * scale.y);
+            // setLocation(framePoint.x - deltaX, framePoint.y - deltaY);
+            setSize((int)(newWidth * scale.x), (int)(newHeight * scale.y));
 
-            pixels.dispose();
-            image = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
-            pixels = image.createGraphics();
+            offset.x += deltaX;
+            offset.y += deltaY;
 
             if(debugMode)
             {
-                pixels.setColor(Color.RED);
-                pixels.drawRect(scaledDeltaX, scaledDeltaY, getSpriteWidth() - 1, getSpriteHeight() - 1);
+                graphics.setColor(Color.BLUE);
+                graphics.drawRect(
+                    deltaX,
+                    deltaY, 
+                    spriteWidth, 
+                    spriteHeight
+                );
             }
-
-            pixels.rotate(angle, scaledWidth / 2, scaledHeight / 2);
-
-            if(debugMode)
-            {
-                pixels.setColor(Color.BLUE);
-                pixels.drawRect(scaledDeltaX, scaledDeltaY, getSpriteWidth() - 1, getSpriteHeight() - 1);
-            }
-
-            offset.x += deltaX; // + 24;
-            offset.y += deltaY; // + 25;
-
-            setLocation(framePoint.x - scaledDeltaX, framePoint.y - scaledDeltaY);
-            setSize(scaledWidth, scaledHeight);
-            revalidate();
         }
 
-        if(scale != null && (scale.x > 0 || scale.y > 0))
-            pixels.scale(scale.x, scale.y);
-
-        if(antialiasing)
-            pixels.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Draw with offsets pre-applied to dilated/rotated image
-        pixels.drawImage(frameImage, offset.x, offset.y, null);
-        pixels.dispose();
-
-        /**********************/
+        graphics.drawImage(pixels, offset.x, offset.y, null);
+        graphics.setTransform(saveAT);
 
         if(debugMode)
+        {
+            graphics.setColor(Color.BLACK);
             graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-
-        graphics.drawImage(image, 0, 0,null);
+        }
+            
+        graphics.dispose();
     }
 
     /**

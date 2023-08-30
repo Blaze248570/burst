@@ -103,7 +103,7 @@ public class JBurstSprite extends JBurstBasic
         int spriteWidth = frame.sourceSize.x;
         int spriteHeight = frame.sourceSize.y;
 
-        BufferedImage pixels = frame.graphic.image.getSubimage(
+        BufferedImage image = frame.graphic.image.getSubimage(
             frame.x, 
             frame.y, 
             frame.width, 
@@ -112,6 +112,10 @@ public class JBurstSprite extends JBurstBasic
 
         boolean scaled = scale != null && (scale.x != 1.0 || scale.y != 1.0);
         boolean rotated = angle != 0.0;
+
+        // I don't think this actually does anything when it's transformed...
+        if(antialiasing)
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         if(scaled)
             graphics.scale(scale.x, scale.y);
@@ -126,7 +130,7 @@ public class JBurstSprite extends JBurstBasic
 
             graphics.rotate(angle, newWidth / 2, newHeight / 2);
 
-            // setLocation(framePoint.x - deltaX, framePoint.y - deltaY);
+            setLocation(framePoint.x - (int)(deltaX * scale.x), framePoint.y - (int)(deltaY * scale.y));
             setSize((int)(newWidth * scale.x), (int)(newHeight * scale.y));
 
             offset.x += deltaX;
@@ -144,7 +148,7 @@ public class JBurstSprite extends JBurstBasic
             }
         }
 
-        graphics.drawImage(pixels, offset.x, offset.y, null);
+        graphics.drawImage(image, offset.x, offset.y, null);
         graphics.setTransform(saveAT);
 
         if(debugMode)

@@ -156,7 +156,7 @@ public class JBurstAnimationController
         if(animFrames.size() <= 0)
             return;
 
-        ArrayList<Integer> frameIndices = new ArrayList<>();
+        ArrayList<Integer> frameIndices = new ArrayList<>(animFrames.size());
         byPrefixHelper(frameIndices, animFrames, prefix);
 
         if(frameIndices.size() <= 0)

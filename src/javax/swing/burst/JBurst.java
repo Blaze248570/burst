@@ -1,8 +1,8 @@
 package javax.swing.burst;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,8 +15,14 @@ import javax.swing.JFrame;
  * It functions identically to JFrame, so objects like JPanel, 
  * JLabel, JButton, etc. can still be added to Burst.
  */
+@SuppressWarnings("rawtypes")
 public class JBurst extends JFrame
 {
+    public static int WINDOW_WIDTH;
+    public static int WINDOW_HEIGHT;
+
+    private JBurstState currentState;
+
     /**
      * Time in milliseconds since program began
      */
@@ -26,6 +32,8 @@ public class JBurst extends JFrame
      * Measured time between update() calls in milliseconds
      */
     public double elapsed;
+
+    private final Class _initialState;
 
     /**
      * The default camera that objects are sent to.
@@ -42,10 +50,18 @@ public class JBurst extends JFrame
      * 
      * @param frameWidth    The width of the newly created window.
      * @param frameHeight   The height of the newly created window.
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public JBurst(int frameWidth, int frameHeight) 
+    public JBurst(int frameWidth, int frameHeight, Class initialState) 
     {
         super();
+
+        this._initialState = initialState;
+
+        initState();
 
         /*
          * Format the window.
@@ -53,10 +69,14 @@ public class JBurst extends JFrame
         Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
         int windowX = (int)(resolution.getWidth() / 2 - frameWidth / 2);
         int windowY = (int)(resolution.getHeight() / 2 - frameHeight / 2);
-
-        setTitle("JBurst Project");
         setLocation(windowX, windowY); // Centers the window on the screen
+
+
+        WINDOW_WIDTH = frameWidth;
+        WINDOW_HEIGHT = frameHeight;
+
         setSize(frameWidth, frameHeight);
+        setTitle("JBurst Project");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Ensures the program ends upon termination
         
         /*
@@ -73,38 +93,26 @@ public class JBurst extends JFrame
          * Initialize update system. 
          */
         _startTime = Instant.now();
+
+        currentState.create();
     }
 
-    /**
-     * Adds the given Component to the default camera, <strong>not the JBurst object</strong>.
-     * 
-     * @param comp  The component to be added
-     * 
-     * @return  The component that was added
-     */
-    public Component add(Component comp)
+    @SuppressWarnings("unchecked")
+    private void initState()
     {
-        if(comp instanceof JBurstBasic)
-            return add((JBurstBasic) comp);
-        
-        return defaultCam.add(comp);
-    }
+        try
+        {
+            Class<JBurstState> initState = (Class<JBurstState>) _initialState;
 
-    /**
-     * Adds the given basic to the default camera, <strong>not the JBurst object</strong>.
-     * 
-     * @param basic The basic to be added
-     * 
-     * @return  The basic that was added
-     */
-    public JBurstBasic add(JBurstBasic basic)
-    {
-        if(basic instanceof JBurstSprite)
-            defaultCam.add((JBurstSprite) basic);
-
-        members.add(basic);
-
-        return basic;
+            currentState = initState.getConstructor().newInstance();
+            currentState.parent = this;
+        }
+        catch(NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { }
+        catch(ClassCastException e)
+        {
+            System.out.println("The class given to JBurst must be or extend JBurstState.");
+            System.exit(0);
+        }
     }
 
     /**
@@ -121,12 +129,7 @@ public class JBurst extends JFrame
         elapsed = getTime() - total;
         total = getTime();
 
-        for(JBurstBasic basic : members)
-        {
-            if(basic != null && basic.exists && basic.active)
-                basic.update(elapsed);
-        }
-
+        currentState.update(elapsed);
         defaultCam.update(elapsed);
     }
 

@@ -44,16 +44,24 @@ public class JBurst extends JFrame
 
     private final Instant _startTime;
 
+    private final Thread burstThread = new Thread()
+    {
+        @Override
+        public void run()
+        {
+            while(true)
+            {
+                update();
+            }
+        }
+    };
+
     /**
      * Creates a new JBurst window object.
-     * To make the window visible, call {@code setVisible(true)}.
      * 
-     * @param frameWidth    The width of the newly created window.
-     * @param frameHeight   The height of the newly created window.
-     * @throws InvocationTargetException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @param frameWidth    The width of the newly created window
+     * @param frameHeight   The height of the newly created window
+     * @param initialState  The class of the state this JBurst object should begin with
      */
     public JBurst(int frameWidth, int frameHeight, Class initialState) 
     {
@@ -95,6 +103,10 @@ public class JBurst extends JFrame
         _startTime = Instant.now();
 
         currentState.create();
+
+        burstThread.start();
+
+        setVisible(true);
     }
 
     @SuppressWarnings("unchecked")

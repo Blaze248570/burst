@@ -10,11 +10,7 @@
 
     Maybe seperate images with a common file name
     EX. walk0000.png, walk0001.png, walk0002.png...
-
-- **Get rid of the necessity of a `while(true)` loop.**
-
-    It's embarrassing...
-
+    
 - **Add states**
 
     I think I could use these to solve my while(true) dilemma

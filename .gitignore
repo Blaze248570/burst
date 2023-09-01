@@ -3,7 +3,7 @@
 
 # These are solely for testing
 assets/*
-src/Main.java
+src/*.java
 
 # Unnecessary for git
 bin/*

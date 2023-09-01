@@ -81,15 +81,27 @@ public class JBurstSprite extends JBurstBasic
         framePoint = new Point();
         animation = new JBurstAnimationController(this);
         
-        setLocation(x, y);
+        setPosition(x, y);
     }
 
+    /**
+     * Called every "frame".
+     * <p>
+     * <i>Make sure</i> to call {@code super.update(elapsed)} when overrided.
+     */
     @Override
     public void update(double elapsed)
     {
+        super.update(elapsed);
+
         animation.update(elapsed);
     }
     
+    /**
+     * Used by Java Swing internally to paint this sprite.
+     * <p>
+     * It is suggested that is <strong>not</strong> overriden.
+     */
     @Override 
     public void paint(Graphics g)
     {
@@ -146,6 +158,11 @@ public class JBurstSprite extends JBurstBasic
                     spriteHeight
                 );
             }
+        }
+        else
+        {
+            setLocation(framePoint.x, framePoint.y);
+            setSize((int)(spriteWidth * scale.x), (int)(spriteHeight * scale.y));
         }
 
         graphics.drawImage(image, offset.x, offset.y, null);
@@ -306,32 +323,32 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstFramesCollection getFrames()
     {
-        return frames;
+        return this.frames;
     }
 
+    /**
+     * Returns this sprite's angle of rotation, in radians.
+     * <p> 
+     * {@code Math.toDegrees()} can be used to convert 
+     * this value into degrees.
+     * 
+     * @return  this sprite's angle of rotation, in radians.
+     */
     public double getAngle()
     {
         return this.angle;
     }
 
     /**
-     * Sets the angle of rotation of this sprite, in degrees.
-     * <p> For example, 180.0 would flip this sprite upside-down.
-     * 
-     * @param theta The amount to rotate this sprite by, in degrees
-     */
-    public void setAngleViaDegrees(double theta)
-    {
-        setAngleViaRadians(Math.toRadians(theta));
-    }
-
-    /**
      * Sets the angle of rotation of this sprite, in radians.
-     * <p> For example, 180.0 would flip this sprite upside-down.
+     * If you'd rather use degrees, {@code Math.toRadians()} can be used.
+     * <p>
+     * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
+     * would flip this sprite upside-down.
      * 
      * @param theta The amount to rotate this sprite by, in radians
      */
-    public void setAngleViaRadians(double theta)
+    public void setAngle(double theta)
     {
         if(theta <= -2.0 * Math.PI || theta >= 2.0 * Math.PI)
             theta %= 2.0 * Math.PI; // Keep the angle within (-2pi, 2pi) to avoid overflow/underflow errors.

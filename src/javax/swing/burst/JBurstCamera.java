@@ -9,9 +9,7 @@ import javax.swing.JPanel;
  */
 public class JBurstCamera extends JPanel
 {
-    public final JBurst parent;
-
-     /**
+    /**
      * A list of all objects added to this JBurstCamera.
      */
     public final ArrayList<JBurstSprite> members;
@@ -24,13 +22,12 @@ public class JBurstCamera extends JPanel
      * 
      * @param parent The JBurst object to be managing this JBurstCamera
      */
-    public JBurstCamera(JBurst parent)
+    public JBurstCamera()
     {
-        this.parent = parent;
         this.members = new ArrayList<>();
 
         setLayout(null);
-        setBounds(0, 0, parent.getWidth(), parent.getHeight());
+        setSize(JBurst.size);
     }
 
     /**
@@ -48,7 +45,7 @@ public class JBurstCamera extends JPanel
         return sprite;
     }
 
-    public void update(double elapsed)
+    public void update()
     {
         for(JBurstSprite sprite : members)
         {

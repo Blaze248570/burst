@@ -16,12 +16,12 @@ public class JBurstState
 
     public void create() { }
 
-    public void update(double elapsed)
+    public void update()
     {
         for(JBurstBasic basic : members)
         {
             if(basic != null && basic.exists && basic.active)
-                basic.update(elapsed);
+                basic.update(JBurst.elapsed);
         }
     }
 
@@ -37,7 +37,7 @@ public class JBurstState
         if(comp instanceof JBurstBasic)
             return add((JBurstBasic) comp);
         
-        return parent.defaultCam.add(comp);
+        return JBurst.defaultCam.add(comp);
     }
 
     /**
@@ -50,10 +50,15 @@ public class JBurstState
     public JBurstBasic add(JBurstBasic basic)
     {
         if(basic instanceof JBurstSprite)
-            parent.defaultCam.add((JBurstSprite) basic);
+            JBurst.defaultCam.add((JBurstSprite) basic);
 
         members.add(basic);
 
         return basic;
+    }
+
+    public void startOutro(Runnable onOutroComplete)
+    {
+        onOutroComplete.run();
     }
 }

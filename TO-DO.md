@@ -11,6 +11,6 @@
     Maybe seperate images with a common file name
     EX. walk0000.png, walk0001.png, walk0002.png...
     
-- **Add states**
+- **Properly employ camera system**
 
-    I think I could use these to solve my while(true) dilemma
+    The JBurstCamera has more or less just been a painting manager.

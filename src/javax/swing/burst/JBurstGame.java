@@ -14,7 +14,6 @@ import javax.swing.JFrame;
  * Because it extends JFrame, JComponents such as JPanel, 
  * JLabel, JButton, etc. can still be added to a JBurstGame.
  */
-@SuppressWarnings("rawtypes")
 public class JBurstGame extends JFrame
 {
     /**
@@ -22,7 +21,7 @@ public class JBurstGame extends JFrame
      */
     private long _total;
 
-    private final Class _initialState;
+    private final Class<? extends JBurstState> _initialState;
 
     private final Instant _startTime;
 
@@ -53,7 +52,7 @@ public class JBurstGame extends JFrame
      * @param height        The height of the newly created window
      * @param initialState  The class of the state this JBurst object should begin with
      */
-    public JBurstGame(int width, int height, Class initialState) 
+    public JBurstGame(int width, int height, Class<? extends JBurstState> initialState) 
     {
         super();
 
@@ -89,19 +88,15 @@ public class JBurstGame extends JFrame
         setVisible(true);
     }
 
-    @SuppressWarnings("unchecked")
     private void reset()
     {
         try
         {
-            Class<JBurstState> initState = (Class<JBurstState>) _initialState;
-
-            _requestedState = initState.getConstructor().newInstance();
+            _requestedState = _initialState.getConstructor().newInstance();
         }
-        catch(NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) { }
-        catch(ClassCastException e)
+        catch(NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
-            System.out.println("The class given to JBurst must be or extend JBurstState.");
+            System.out.println("Error instantiating initial state.\n" + e.getMessage());
             System.exit(0);
         }
     }
@@ -113,19 +108,18 @@ public class JBurstGame extends JFrame
         // if(_state != null) state.destroy();
 
         _state = JBurst.state = _requestedState;
-
         _state.create();
     }
 
     private void update()
     {
-        // if(!_state.active || !_state.exists) return;
+        if(!_state.active || !_state.exists) return;
 
         if(_state != _requestedState) switchState();
 
         JBurst.elapsed = elapsed;
 
-        _state.update();
+        _state.update(elapsed);
 
         JBurst.defaultCam.update();
     }

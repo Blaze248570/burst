@@ -2,8 +2,9 @@ package javax.swing.burst;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import javax.swing.burst.group.JBurstGroup;
 
-public class JBurstState 
+public class JBurstState extends JBurstGroup<JBurstBasic>
 {
     public ArrayList<JBurstBasic> members;
 
@@ -15,15 +16,6 @@ public class JBurstState
     }
 
     public void create() { }
-
-    public void update()
-    {
-        for(JBurstBasic basic : members)
-        {
-            if(basic != null && basic.exists && basic.active)
-                basic.update(JBurst.elapsed);
-        }
-    }
 
     /**
      * Adds the given Component to the default camera, <strong>not the JBurst object</strong>.
@@ -47,14 +39,13 @@ public class JBurstState
      * 
      * @return  The basic that was added
      */
-    public JBurstBasic add(JBurstBasic basic)
+    @Override
+    public JBurstBasic add(JBurstBasic object)
     {
-        if(basic instanceof JBurstSprite)
-            JBurst.defaultCam.add((JBurstSprite) basic);
+        if(object instanceof JBurstSprite)
+            JBurst.defaultCam.add((JBurstSprite) object);
 
-        members.add(basic);
-
-        return basic;
+        return super.add(object);
     }
 
     public void startOutro(Runnable onOutroComplete)

@@ -14,3 +14,7 @@
 - **Properly employ camera system**
 
     The JBurstCamera has more or less just been a painting manager.
+
+- **Flesh out JBurstGraphic better**
+
+    Like the camera, this has just been an image manager for the most part.

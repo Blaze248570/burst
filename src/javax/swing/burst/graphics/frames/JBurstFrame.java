@@ -3,8 +3,9 @@ package javax.swing.burst.graphics.frames;
 import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.burst.graphics.JBurstGraphic;
+import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
-public class JBurstFrame extends Rectangle
+public class JBurstFrame extends Rectangle implements IBurstDestroyable
 {
     /**
      * The name of this frame.
@@ -14,7 +15,7 @@ public class JBurstFrame extends Rectangle
     /**
      * The parent graphic of this frame.
      */
-    public final JBurstGraphic graphic;
+    public JBurstGraphic graphic;
 
     /**
      * Original (uncropped) image size.
@@ -67,6 +68,15 @@ public class JBurstFrame extends Rectangle
         this.setFrame(x, y, right - x, bottom - y);
 
         return this;
+    }
+
+    @Override
+    public void destroy()
+    {
+        name = null;
+        graphic = null;
+        sourceSize = null;
+        offset = null;
     }
 
     @Override

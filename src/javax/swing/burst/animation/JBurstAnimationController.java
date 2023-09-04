@@ -7,12 +7,13 @@ import javax.swing.burst.JBurstSprite;
 import javax.swing.burst.graphics.frames.JBurstFrame;
 import javax.swing.burst.graphics.frames.JBurstFramesCollection;
 import javax.swing.burst.util.TriConsumer;
+import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * The BurstAnimationController is a class within a JBurstSprite that holds 
  * and performs actions regarding animation.
  */
-public class JBurstAnimationController 
+public class JBurstAnimationController implements IBurstDestroyable
 {
     /**
      * The currently playing animation, which may be {@code null}.
@@ -41,12 +42,12 @@ public class JBurstAnimationController
     /**
      * Internal, reference to owner sprite.
      */
-    private final JBurstSprite _sprite;
+    private JBurstSprite _sprite;
 
     /**
      * Internal, storage of animations added to this sprite.
      */
-    private final HashMap<String, JBurstAnimation> _animations;
+    private HashMap<String, JBurstAnimation> _animations;
 
     public JBurstAnimationController(JBurstSprite sprite) 
     {
@@ -171,16 +172,6 @@ public class JBurstAnimationController
 
     private void byPrefixHelper(ArrayList<Integer> addTo, ArrayList<JBurstFrame> animFrames, String prefix) 
     {
-        // Not sure how to handle this just yet. I'll make an algo at some point.
-        // Current goal is to make it work.
-        /*
-            String name = animFrames.get(0).name;
-            int postIndex = name.indexOf(".", prefix.length());
-            String postFix = name.substring(postIndex == -1 ? name.length() : postIndex, name.length());
-
-            BurstFrame.sort(animFrames, prefix.length(), postFix.length());
-        */
-
         for(JBurstFrame frame : animFrames) 
         {
             addTo.add(getFrameIndex(frame));
@@ -190,7 +181,7 @@ public class JBurstAnimationController
     private void findByPrefix(ArrayList<JBurstFrame> animFrames, String prefix) 
     {
         JBurstFramesCollection frames = _sprite.getFrames();
-        for(JBurstFrame frame : frames) 
+        for(JBurstFrame frame : frames.frames) 
         {
             if(frame.name != null && frame.name.startsWith(prefix, 0)) 
             {
@@ -201,7 +192,7 @@ public class JBurstAnimationController
     
     private int getFrameIndex(JBurstFrame frame) 
     {
-        return _sprite.getFrames().indexOf(frame);
+        return _sprite.getFrames().frames.indexOf(frame);
     }
 
     /**
@@ -340,9 +331,22 @@ public class JBurstAnimationController
      */
     public void clearAnimations()
     {
-        this._animations.clear();
-        this.curAnim = null;
-        this.frameIndex = -1;
+        if(_animations != null)
+        {
+            JBurstAnimation anim;
+            for(String key : _animations.keySet())
+            {
+                anim = _animations.get(key);
+                if(anim != null)
+                {
+                    anim.destroy();
+                }
+            }
+        }
+
+        _animations = new HashMap<>();
+        curAnim = null;
+        frameIndex = -1;
     }
 
     protected void fireCallback()
@@ -372,7 +376,7 @@ public class JBurstAnimationController
 
         if(frames != null && getNumFrames() > 0)
         {
-            _sprite.setFrame(frames.get(frameIndex));
+            _sprite.setFrame(frames.frames.get(frameIndex));
 
             fireCallback();
         }
@@ -381,5 +385,14 @@ public class JBurstAnimationController
     public int getNumFrames()
     {
         return _sprite.getNumFrames();
+    }
+
+    @Override
+    public void destroy()
+    { 
+        clearAnimations();
+        _animations = null;
+        callback = null;
+        _sprite = null;
     }
 }

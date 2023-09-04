@@ -13,6 +13,7 @@ import javax.swing.burst.graphics.JBurstGraphic;
 import javax.swing.burst.graphics.frames.JBurstAtlasFrames;
 import javax.swing.burst.graphics.frames.JBurstFrame;
 import javax.swing.burst.graphics.frames.JBurstFramesCollection;
+import javax.swing.burst.util.JBurstDestroyUtil;
 
 /**
  * A sprite class extension for the Java Swing package.
@@ -36,13 +37,13 @@ public class JBurstSprite extends JBurstBasic
      * The manager to control animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
-    public final JBurstAnimationController animation;
+    public JBurstAnimationController animation;
 
-    private final Point2D.Double scale;
+    private Point2D.Double scale;
 
     private double angle = 0.0;
 
-    private final Point framePoint;
+    private Point framePoint;
 
     /**
      * A collection of all the frames used by this sprite.
@@ -273,7 +274,7 @@ public class JBurstSprite extends JBurstBasic
             }
         }
 
-        setFrame(frames.get(0));
+        setFrame(frames.frames.get(0));
         updateBounds();
 
         return this;
@@ -289,7 +290,7 @@ public class JBurstSprite extends JBurstBasic
         this.frames = frames;
         this.animation.clearAnimations();
 
-        setFrame(frames.get(0));
+        setFrame(frames.frames.get(0));
         updateBounds();
 
         return frames;
@@ -538,7 +539,20 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getNumFrames()
     {
-        return frames.size();
+        return frames.frames.size();
+    }
+
+    @Override
+    public void destroy()
+    {
+        super.destroy();
+
+        animation = JBurstDestroyUtil.destroy(animation);
+        frames = JBurstDestroyUtil.destroy(frames);
+        frame = JBurstDestroyUtil.destroy(frame);
+
+        scale = null;
+        framePoint = null;
     }
 
     @Override

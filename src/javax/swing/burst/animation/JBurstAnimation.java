@@ -1,6 +1,8 @@
 package javax.swing.burst.animation;
 
-public class JBurstAnimation 
+import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+public class JBurstAnimation implements IBurstDestroyable
 {
     /**
      * The name of the animation.
@@ -235,5 +237,13 @@ public class JBurstAnimation
     public String toString()
     {
         return "BurstAnimation ~ {name: " + name + ", framerate: " + frameRate + ", looped: " + looped + ", reversed: " + reversed + "}";
+    }
+
+    @Override
+    public void destroy() 
+    { 
+        frames = null;
+        name = null;
+        _controller = null;
     }
 }

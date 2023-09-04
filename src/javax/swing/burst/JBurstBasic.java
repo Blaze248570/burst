@@ -1,5 +1,7 @@
 package javax.swing.burst;
 
+import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
 /**
  * The JBurstBasic class is sort of the basic building block
  * for all upper JBurst objects.
@@ -7,7 +9,7 @@ package javax.swing.burst;
  * If I ever advance this project, it'll be more useful,
  * but for now it's simply BurstSprite's parent.
  */
-public class JBurstBasic extends javax.swing.JComponent 
+public class JBurstBasic extends javax.swing.JComponent implements IBurstDestroyable
 {
     private static int idEnumerator = 0;
     public final int ID = idEnumerator++;
@@ -62,4 +64,9 @@ public class JBurstBasic extends javax.swing.JComponent
     }
 
     public void update(double elapsed) { }
+
+    public void destroy() 
+    {
+        camera.destroy();
+    }
 }

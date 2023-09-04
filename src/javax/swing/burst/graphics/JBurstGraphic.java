@@ -5,8 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
-public class JBurstGraphic 
+public class JBurstGraphic implements IBurstDestroyable
 {
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
@@ -118,7 +119,15 @@ public class JBurstGraphic
         return height;
     }
 
-    @Override public String toString()
+    @Override
+    public void destroy()
+    {
+        key = null;
+        image = null; // These needs further destruction
+    }
+
+    @Override 
+    public String toString()
     {
         return "BurstGraphic ~ {key: " + key + ", width: " + getWidth() + ", height: " + getHeight() + "}";
     }

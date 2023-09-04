@@ -1,5 +1,6 @@
 package javax.swing.burst;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -7,8 +8,11 @@ import javax.swing.JPanel;
 /**
  * A layer and grouping manager intended to better implemented in the future.
  */
-public class JBurstCamera extends JPanel
+public class JBurstCamera extends JBurstBasic
 {
+    private JPanel panel;
+    private BufferedImage buffer;
+    
     /**
      * A list of all objects added to this JBurstCamera.
      */
@@ -53,4 +57,6 @@ public class JBurstCamera extends JPanel
                 sprite.repaint();
         }
     }
+
+    public void destroy() { }
 }

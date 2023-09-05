@@ -1,14 +1,14 @@
-package javax.swing.burst;
+package burst;
 
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 import javax.swing.JComponent;
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * The JBurstBasic class is sort of the basic building block
  * for all upper JBurst objects.
- * <p>
- * If I ever advance this project, it'll be more useful,
- * but for now it's simply BurstSprite's parent.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxBasic.html">FlxBasic</a>
  */
 public class JBurstBasic extends JComponent implements IBurstDestroyable
 {

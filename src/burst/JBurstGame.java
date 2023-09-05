@@ -1,4 +1,4 @@
-package javax.swing.burst;
+package burst;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -13,6 +13,9 @@ import javax.swing.JFrame;
  * <p>
  * Because it extends JFrame, JComponents such as JPanel, 
  * JLabel, JButton, etc. can still be added to a JBurstGame.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxGame.html">FlxGame</a>
  */
 public class JBurstGame extends JFrame
 {

@@ -1,11 +1,10 @@
-package javax.swing.burst.graphics.frames;
+package burst.graphics.frames;
 
 import java.awt.Rectangle;
 import java.awt.Point;
 import java.util.Comparator;
 import java.util.Scanner;
-import javax.swing.burst.graphics.JBurstGraphic;
-import javax.swing.burst.util.XmlParser;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,9 +13,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import burst.graphics.JBurstGraphic;
+import burst.util.XmlParser;
+
 /**
  * A collection of frames stored as an atlas. 
  * <p> Also includes texture atlas parsing methods.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxAtlasFrames.html">FlxAtlasFrames</a>
  */
 public class JBurstAtlasFrames extends JBurstFramesCollection 
 {

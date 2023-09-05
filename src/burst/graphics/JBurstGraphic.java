@@ -1,12 +1,18 @@
-package javax.swing.burst.graphics;
+package burst.graphics;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+/**
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html">FlxGraphic</a>
+ */
 public class JBurstGraphic implements IBurstDestroyable
 {
     /**

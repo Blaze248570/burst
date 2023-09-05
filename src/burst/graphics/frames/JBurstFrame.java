@@ -1,10 +1,17 @@
-package javax.swing.burst.graphics.frames;
+package burst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import javax.swing.burst.graphics.JBurstGraphic;
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
+import burst.graphics.JBurstGraphic;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+/**
+ * A specialized rectangle used by the animation classes.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFrame.html">FlxFrame</a>
+ */
 public class JBurstFrame extends Rectangle implements IBurstDestroyable
 {
     /**

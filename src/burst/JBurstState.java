@@ -1,9 +1,15 @@
-package javax.swing.burst;
+package burst;
 
 import java.util.ArrayList;
 import javax.swing.JComponent;
-import javax.swing.burst.group.JBurstGroup;
 
+import burst.group.JBurstGroup;
+
+/**
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxState.html">FlxState</a>
+ */
 public class JBurstState extends JBurstGroup<JBurstBasic>
 {
     public ArrayList<JComponent> components = new ArrayList<>();

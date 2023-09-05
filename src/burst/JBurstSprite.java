@@ -1,4 +1,4 @@
-package javax.swing.burst;
+package burst;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,17 +8,18 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import javax.swing.burst.animation.JBurstAnimationController;
-import javax.swing.burst.graphics.JBurstGraphic;
-import javax.swing.burst.graphics.frames.JBurstAtlasFrames;
-import javax.swing.burst.graphics.frames.JBurstFrame;
-import javax.swing.burst.graphics.frames.JBurstFramesCollection;
-import javax.swing.burst.util.JBurstDestroyUtil;
+
+import burst.animation.JBurstAnimationController;
+import burst.graphics.JBurstGraphic;
+import burst.graphics.frames.JBurstAtlasFrames;
+import burst.graphics.frames.JBurstFrame;
+import burst.graphics.frames.JBurstFramesCollection;
+import burst.util.JBurstDestroyUtil;
 
 /**
- * A sprite class extension for the Java Swing package.
- * <p>
- * Allows for the use of static <i>and</i> animated sprites.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxSprite.html">FlxSprite</a>
  */
 public class JBurstSprite extends JBurstBasic 
 {

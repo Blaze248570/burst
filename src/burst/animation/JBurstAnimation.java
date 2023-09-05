@@ -1,7 +1,13 @@
-package javax.swing.burst.animation;
+package burst.animation;
 
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
+/**
+ * Structure used to store a JBurstSprite's animation data.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/animation/FlxAnimation.html">FlxAnimation</a>
+ */
 public class JBurstAnimation implements IBurstDestroyable
 {
     /**

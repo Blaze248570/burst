@@ -1,7 +1,11 @@
-package javax.swing.burst;
+package burst;
 
 import java.awt.Dimension;
 
+/**
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
+ */
 public class JBurst
 {
     public static Dimension size;

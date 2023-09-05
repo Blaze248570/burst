@@ -1,8 +1,9 @@
-package javax.swing.burst.group;
+package burst.group;
 
 import java.util.ArrayList;
-import javax.swing.burst.JBurstBasic;
-import javax.swing.burst.util.JBurstDestroyUtil;
+
+import burst.JBurstBasic;
+import burst.util.JBurstDestroyUtil;
 
 public class JBurstGroup<T extends JBurstBasic> extends JBurstBasic
 {

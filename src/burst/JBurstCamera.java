@@ -1,4 +1,4 @@
-package javax.swing.burst;
+package burst;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

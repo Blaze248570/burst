@@ -1,7 +1,11 @@
-package javax.swing.burst.util;
+package burst.util;
 
 import java.util.ArrayList;
 
+/**
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/util/FlxDestroyUtil.html">FlxDestroyUtil</a>
+ */
 public class JBurstDestroyUtil
 {
     /**

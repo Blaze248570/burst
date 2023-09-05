@@ -1,17 +1,20 @@
-package javax.swing.burst.animation;
+package burst.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
-import javax.swing.burst.JBurstSprite;
-import javax.swing.burst.graphics.frames.JBurstFrame;
-import javax.swing.burst.graphics.frames.JBurstFramesCollection;
-import javax.swing.burst.util.TriConsumer;
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+import burst.JBurstSprite;
+import burst.graphics.frames.JBurstFrame;
+import burst.graphics.frames.JBurstFramesCollection;
+import burst.util.TriConsumer;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
- * The BurstAnimationController is a class within a JBurstSprite that holds 
- * and performs actions regarding animation.
+ * A class that manages and performs animation operations
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/animation/FlxAnimationController.html">FlxAnimationController</a>
  */
 public class JBurstAnimationController implements IBurstDestroyable
 {

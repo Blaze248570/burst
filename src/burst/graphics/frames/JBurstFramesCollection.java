@@ -1,15 +1,19 @@
-package javax.swing.burst.graphics.frames;
+package burst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.burst.graphics.JBurstGraphic;
-import javax.swing.burst.util.JBurstDestroyUtil;
-import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+import burst.graphics.JBurstGraphic;
+import burst.util.JBurstDestroyUtil;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Base class for frame collections.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFramesCollection.html">FlxFramesCollection</a>
  */
 public class JBurstFramesCollection implements IBurstDestroyable
 {

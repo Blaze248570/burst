@@ -1,4 +1,4 @@
-package javax.swing.burst.util;
+package burst.util;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;

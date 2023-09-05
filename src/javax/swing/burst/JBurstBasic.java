@@ -1,5 +1,6 @@
 package javax.swing.burst;
 
+import javax.swing.JComponent;
 import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
@@ -9,7 +10,7 @@ import javax.swing.burst.util.JBurstDestroyUtil.IBurstDestroyable;
  * If I ever advance this project, it'll be more useful,
  * but for now it's simply BurstSprite's parent.
  */
-public class JBurstBasic extends javax.swing.JComponent implements IBurstDestroyable
+public class JBurstBasic extends JComponent implements IBurstDestroyable
 {
     private static int idEnumerator = 0;
     public final int ID = idEnumerator++;
@@ -65,8 +66,5 @@ public class JBurstBasic extends javax.swing.JComponent implements IBurstDestroy
 
     public void update(double elapsed) { }
 
-    public void destroy() 
-    {
-        camera.destroy();
-    }
+    public void destroy() { }
 }

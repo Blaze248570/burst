@@ -1,39 +1,34 @@
 package javax.swing.burst;
 
-import java.awt.Component;
 import java.util.ArrayList;
+import javax.swing.JComponent;
 import javax.swing.burst.group.JBurstGroup;
 
 public class JBurstState extends JBurstGroup<JBurstBasic>
 {
-    public ArrayList<JBurstBasic> members;
-
-    public JBurst parent;
-
-    public JBurstState()
-    {
-        members = new ArrayList<>();
-    }
+    public ArrayList<JComponent> components = new ArrayList<>();
 
     public void create() { }
 
     /**
-     * Adds the given Component to the default camera, <strong>not the JBurst object</strong>.
+     * 
      * 
      * @param comp  The component to be added
      * 
      * @return  The component that was added
      */
-    public Component add(Component comp)
+    public JComponent add(JComponent comp)
     {
         if(comp instanceof JBurstBasic)
             return add((JBurstBasic) comp);
         
-        return JBurst.defaultCam.add(comp);
+        components.add(comp);
+        JBurst.defaultCam.add(comp);
+        return comp;
     }
 
     /**
-     * Adds the given basic to the default camera, <strong>not the JBurst object</strong>.
+     * 
      * 
      * @param basic The basic to be added
      * 
@@ -51,5 +46,22 @@ public class JBurstState extends JBurstGroup<JBurstBasic>
     public void startOutro(Runnable onOutroComplete)
     {
         onOutroComplete.run();
+    }
+
+    @Override 
+    public void destroy()
+    {
+        super.destroy();
+
+        for(int i = 0; i < components.size(); i++)
+        {
+            JComponent comp = components.get(i);
+            JBurst.defaultCam.remove(comp);
+            components.remove(comp);
+
+            i--;
+        }
+
+        components = null;
     }
 }

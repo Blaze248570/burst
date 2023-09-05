@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 /**
  * An extended version of the {@code javax.swing.JFrame}
- * that allows basic animation animation through Burst objects.
+ * that allows basic animation animation through JBurst objects.
  * <p>
  * Because it extends JFrame, JComponents such as JPanel, 
  * JLabel, JButton, etc. can still be added to a JBurstGame.
@@ -37,6 +37,14 @@ public class JBurstGame extends JFrame
 
                 update();
             }
+
+            /*
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        createAndShowGUI();
+                    }
+                });
+            */
         }
     };
 
@@ -82,6 +90,7 @@ public class JBurstGame extends JFrame
         setTitle("JBurst Project");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Ensures the program ends upon termination
         setLayout(null);
+
         add(JBurst.defaultCam);
 
         burstThread.start();
@@ -105,7 +114,7 @@ public class JBurstGame extends JFrame
     {
         // JBurst.cameras.reset(); // For when I get around to cameras
 
-        // if(_state != null) state.destroy();
+        if(_state != null) _state.destroy();
 
         _state = JBurst.state = _requestedState;
         _state.create();

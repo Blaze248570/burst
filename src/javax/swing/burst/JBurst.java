@@ -6,7 +6,7 @@ public class JBurst
 {
     public static Dimension size;
 
-    public static JBurstGame game;
+    private static JBurstGame game;
 
     public static JBurstState state;
 
@@ -14,6 +14,8 @@ public class JBurst
      * The default camera that objects are sent to.
      */
     public static JBurstCamera defaultCam;
+
+    // public static JBurstKeyboard keys;
 
     /**
      * Measured time between update() calls in milliseconds

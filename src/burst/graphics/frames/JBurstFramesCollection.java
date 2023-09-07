@@ -1,30 +1,38 @@
-package javax.swing.burst.graphics.frames;
+package burst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.burst.graphics.JBurstGraphic;
+
+import burst.graphics.JBurstGraphic;
+import burst.util.JBurstDestroyUtil;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Base class for frame collections.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFramesCollection.html">FlxFramesCollection</a>
  */
-public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame> 
+public class JBurstFramesCollection implements IBurstDestroyable
 {
+    public ArrayList<JBurstFrame> frames = new ArrayList<>();
     /**
      * Hash of frames for this frame collection.
      */
-    public final HashMap<String, JBurstFrame> framesHash = new HashMap<>();
+    public HashMap<String, JBurstFrame> framesHash = new HashMap<>();
 
     /**
      * Graphic object this collection belongs to.
      */
-    public final JBurstGraphic graphic;
+    public JBurstGraphic graphic;
 
     public JBurstFramesCollection(JBurstGraphic graphic) 
     {
         super();
         this.graphic = graphic;
-        this.clear();
+        frames.clear();
     }
 
     public JBurstFrame addAtlasFrame(Rectangle frame, Point sourceSize, Point offset, String name) 
@@ -46,10 +54,18 @@ public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame>
         if(framesHash.containsKey(name))
             return framesHash.get(name);
 
-        add(frame);
+        frames.add(frame);
         framesHash.put(name, frame);
 
         return frame;
+    }
+
+    @Override 
+    public void destroy() 
+    { 
+        frames = JBurstDestroyUtil.destroyArrayList(frames);
+        framesHash = null;
+        graphic = null;
     }
 
     @Override
@@ -57,7 +73,7 @@ public class JBurstFramesCollection extends java.util.ArrayList<JBurstFrame>
     {
         String print = "BurstFrameCollection ~ [\n";
 
-        for(JBurstFrame frame : this)
+        for(JBurstFrame frame : frames)
         {
             print += "\t" + frame.toString() + ",\n";
         }

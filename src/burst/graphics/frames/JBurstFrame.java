@@ -1,10 +1,18 @@
-package javax.swing.burst.graphics.frames;
+package burst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import javax.swing.burst.graphics.JBurstGraphic;
 
-public class JBurstFrame extends Rectangle
+import burst.graphics.JBurstGraphic;
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+/**
+ * A specialized rectangle used by the animation classes.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFrame.html">FlxFrame</a>
+ */
+public class JBurstFrame extends Rectangle implements IBurstDestroyable
 {
     /**
      * The name of this frame.
@@ -14,7 +22,7 @@ public class JBurstFrame extends Rectangle
     /**
      * The parent graphic of this frame.
      */
-    public final JBurstGraphic graphic;
+    public JBurstGraphic graphic;
 
     /**
      * Original (uncropped) image size.
@@ -67,6 +75,15 @@ public class JBurstFrame extends Rectangle
         this.setFrame(x, y, right - x, bottom - y);
 
         return this;
+    }
+
+    @Override
+    public void destroy()
+    {
+        name = null;
+        graphic = null;
+        sourceSize = null;
+        offset = null;
     }
 
     @Override

@@ -1,13 +1,16 @@
-package javax.swing.burst;
+package burst;
+
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import javax.swing.JComponent;
 
 /**
  * The JBurstBasic class is sort of the basic building block
  * for all upper JBurst objects.
- * <p>
- * If I ever advance this project, it'll be more useful,
- * but for now it's simply BurstSprite's parent.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxBasic.html">FlxBasic</a>
  */
-public class JBurstBasic extends javax.swing.JComponent 
+public class JBurstBasic extends JComponent implements IBurstDestroyable
 {
     private static int idEnumerator = 0;
     public final int ID = idEnumerator++;
@@ -62,4 +65,6 @@ public class JBurstBasic extends javax.swing.JComponent
     }
 
     public void update(double elapsed) { }
+
+    public void destroy() { }
 }

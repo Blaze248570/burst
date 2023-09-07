@@ -1,4 +1,4 @@
-package javax.swing.burst.graphics;
+package burst.graphics;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -6,7 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class JBurstGraphic 
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
+/**
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html">FlxGraphic</a>
+ */
+public class JBurstGraphic implements IBurstDestroyable
 {
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
@@ -118,7 +125,15 @@ public class JBurstGraphic
         return height;
     }
 
-    @Override public String toString()
+    @Override
+    public void destroy()
+    {
+        key = null;
+        image = null; // These needs further destruction
+    }
+
+    @Override 
+    public String toString()
     {
         return "BurstGraphic ~ {key: " + key + ", width: " + getWidth() + ", height: " + getHeight() + "}";
     }

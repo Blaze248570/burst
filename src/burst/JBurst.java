@@ -32,6 +32,12 @@ public class JBurst
         JBurst.size = size;
 
         defaultCam = new JBurstCamera();
+
+        /*
+            keys = new JBurstKeyboard();
+            game.addKeyListener(keys);
+            game.setFocusable(true);
+        */
     }
 
     public static void switchState(JBurstState nextState)

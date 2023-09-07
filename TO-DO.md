@@ -1,20 +1,17 @@
-# Things to Add or Improve
+# JBurst To-do List
 
-- **Better Documentation**
+## Urgent
 
-    The concepts I've learned from
-    Flixel regarding animation properties have become invaluable to me,
-    So I'd like to be able to share them with others.
+- Ensure the burstThread is safe and won't lead to future problems. (Ideally remove completely)
 
-- **Implement other animation file parsing methods.**
+## Things to Reformat
 
-    Maybe seperate images with a common file name
-    EX. walk0000.png, walk0001.png, walk0002.png...
-    
-- **Properly employ camera system**
+- JBurstGame - I'd like this to be a "thing" as opposed to being the window itself.
 
-    The JBurstCamera has more or less just been a painting manager.
+- JBurstCamera - The camera system hasn't really done much so far, and it has a lot of potential.
 
-- **Flesh out JBurstGraphic better**
+- JBurstGraphic - I need to better myself with understanding how Swing/Java uses graphics to make this class as efficient as possible.
 
-    Like the camera, this has just been an image manager for the most part.
+## To Be Improved
+
+- Documentation - The concepts and code-flows I've learned from studying Flixel are invaluable to me, so I'd like to be able to properly convey them with others.

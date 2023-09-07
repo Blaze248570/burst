@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.Instant;
 import javax.swing.JFrame;
+import static javax.swing.SwingUtilities.invokeLater;
 
 /**
  * An extended version of the {@code javax.swing.JFrame}
@@ -40,14 +41,6 @@ public class JBurstGame extends JFrame
 
                 update();
             }
-
-            /*
-                javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        createAndShowGUI();
-                    }
-                });
-            */
         }
     };
 
@@ -68,27 +61,29 @@ public class JBurstGame extends JFrame
         super();
 
         this._initialState = initialState;
+        this._startTime = Instant.now();
+
+        JBurst.init(this, new Dimension(width, height));
 
         /*
          * Format the window.
          */
+        setSize(JBurst.size);
+        
         Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
-        int windowX = (int)(resolution.getWidth() / 2 - width / 2);
-        int windowY = (int)(resolution.getHeight() / 2 - height / 2);
+        int windowX = (int) (resolution.getWidth() / 2 - width / 2);
+        int windowY = (int) (resolution.getHeight() / 2 - height / 2);
         setLocation(windowX, windowY);
 
-        /*
-         * 
-         */
-        JBurst.init(this, new Dimension(width, height));
-        _startTime = Instant.now();
+        invokeLater(() -> create());
+    }
 
+    private void create()
+    {
         _total = getTotal();
 
         reset();
         switchState();
-
-        setSize(JBurst.size);
 
         setTitle("JBurst Project");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Ensures the program ends upon termination

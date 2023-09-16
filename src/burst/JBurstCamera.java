@@ -1,18 +1,16 @@
 package burst;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+
 /**
  * A layer and grouping manager intended to better implemented in the future.
  */
-public class JBurstCamera extends JBurstBasic
+public class JBurstCamera extends JPanel implements IBurstDestroyable
 {
-    private JPanel panel;
-    private BufferedImage buffer;
-    
     /**
      * A list of all objects added to this JBurstCamera.
      */

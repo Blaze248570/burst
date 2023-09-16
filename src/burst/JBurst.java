@@ -1,6 +1,13 @@
 package burst;
 
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.Instant;
+
+import javax.swing.JFrame;
 
 /**
  * @author Joe Bray
@@ -10,26 +17,57 @@ public class JBurst
 {
     public static Dimension size;
 
-    private static JBurstGame game;
-
-    public static JBurstState state;
-
     /**
      * The default camera that objects are sent to.
      */
     public static JBurstCamera defaultCam;
 
-    // public static JBurstKeyboard keys;
+    public boolean active = true;
+
+    private JFrame frame;
+
+    public JBurstState state;
+
+    private JBurstState _requestedState;
+
+    private final Class<? extends JBurstState> _initialState;
+
+    // public JBurstKeyboard keys;
+
+    /**
+     * Time in milliseconds since program began
+     */
+    private long _total;
 
     /**
      * Measured time between update() calls in milliseconds
      */
-    public static double elapsed;
+    public double elapsed;
 
-    protected static void init(JBurstGame game, Dimension size)
+    private final Instant _startTime = Instant.now();
+
+    private final Thread burstThread = new Thread()
     {
-        JBurst.game = game;
-        JBurst.size = size;
+        @Override
+        public void run()
+        {
+            while(true)
+            {
+                elapsed = getTotal() - _total;
+                _total = getTotal();
+
+                update();
+            }
+        }
+    };
+
+    public JBurst(JFrame frame, Class<? extends JBurstState> initialState)
+    {
+        this.frame = frame;
+        frame.addComponentListener(new FrameListener());
+        JBurst.size = frame.getSize();
+
+        this._initialState = initialState;
 
         defaultCam = new JBurstCamera();
 
@@ -38,12 +76,84 @@ public class JBurst
             game.addKeyListener(keys);
             game.setFocusable(true);
         */
+
+        _total = getTotal();
+
+        reset();
+        switchState();
+
+        frame.add(defaultCam);
+
+        burstThread.run();
     }
 
-    public static void switchState(JBurstState nextState)
+    private void update()
+    {
+        if(!active || !state.active || !state.exists) return;
+
+        if(state != _requestedState) switchState();
+
+        state.update(elapsed);
+
+        defaultCam.update();
+    }
+
+    public void switchState(JBurstState nextState)
     {
         state.startOutro(() -> {
-            game._requestedState = nextState;
+            _requestedState = nextState;
         });
+    }
+
+    private void switchState()
+    {
+        if(state != null) state.destroy();
+
+        state = _requestedState;
+        state.create();
+    }
+
+    private void reset()
+    {
+        try
+        {
+            _requestedState = _initialState.getConstructor().newInstance();
+        }
+        catch(NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+        {
+            System.out.println("Error instantiating initial state.\n" + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    private long getTotal()
+    {
+        return Duration.between(_startTime, Instant.now()).toMillis();
+    }
+
+    private class FrameListener implements ComponentListener
+    {
+
+        @Override
+        public void componentResized(ComponentEvent e) 
+        {
+            JBurst.size = frame.getSize();
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent e) { }
+
+        @Override
+        public void componentShown(ComponentEvent e) 
+        {
+            active = true;
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent e) 
+        {
+            active = false;
+        }
+        
     }
 }

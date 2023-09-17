@@ -37,13 +37,6 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public boolean visible = true;
 
-    /**
-     * The camera this object is drawn to
-     * <p>
-     * Currently only a placeholder. <i>Do not assign anything to it</I>.
-     */
-    public JBurstCamera camera;
-
     public JBurstBasic() { }
 
     /**

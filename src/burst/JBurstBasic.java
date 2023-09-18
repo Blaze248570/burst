@@ -37,7 +37,13 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public boolean visible = true;
 
-    public JBurstBasic() { }
+    public JBurstBasic() 
+    { 
+        if(!JBurst.initialized)
+            JBurst.init();
+
+        JBurst.members.add(this);
+    }
 
     /**
      * "Kills" the object, causing it to cease updating <i>and</i> drawing.
@@ -57,7 +63,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
         exists = true;
     }
 
-    public void update(double elapsed) { }
+    public void update(int elapsed) { }
 
     public void destroy() { }
 }

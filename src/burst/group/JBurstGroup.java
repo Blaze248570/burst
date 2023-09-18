@@ -11,7 +11,6 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
     public ArrayList<T> members;
 
     private int maxSize;
-    private int length;
 
     public JBurstGroup()
     {
@@ -29,14 +28,30 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
         this.maxSize = maxSize;
     }
 
-    public void update(double elasped)
+    public void update(int elasped)
     {
+        if(members == null) return;
+
         for(int i = 0; i < members.size(); i++)
         {
             JBurstBasic basic = members.get(i);
             if(basic != null && basic.exists && basic.active)
             {
                 basic.update(elasped);
+            }
+        }
+    }
+
+    public void repaint()
+    {
+        if(members == null) return;
+
+        for(int i = 0; i < members.size(); i++)
+        {
+            JBurstBasic basic = members.get(i);
+            if(basic != null && basic.exists && basic.active)
+            {
+                basic.repaint();
             }
         }
     }
@@ -49,9 +64,6 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
         if(index > -1)
         {
             members.set(index, object);
-            if(index >= length)
-                length = index + 1;
-
             return object;
         }
         
@@ -62,7 +74,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
     {
         if(object == null || contains(object)) return object;
 
-        if(maxSize > 0 && length >= maxSize)
+        if(maxSize > 0 && members.size() >= maxSize)
             return object;
 
         if(index > -1)
@@ -70,8 +82,6 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
         else
             members.add(object);
         
-        length++;
-
         return object;
     }
 
@@ -97,10 +107,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
             return null;
 
         if(splice)
-        {
             members.remove(object);
-            length--;
-        }
         else
             members.set(index, null);
 
@@ -111,15 +118,12 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
     {
         return members.indexOf(object) > -1;
     }
-
-    // Size is currently taken by JComponent
-    /*
-        public int size()
-        {
-            return length;
-        }
-    */
-
+    
+    public int size()
+    {
+        return members.size();
+    }
+    
     @Override
     public void destroy()
     {

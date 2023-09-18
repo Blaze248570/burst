@@ -92,11 +92,12 @@ public class JBurstSprite extends JBurstBasic
      * <i>Make sure</i> to call {@code super.update(elapsed)} when overrided.
      */
     @Override
-    public void update(double elapsed)
+    public void update(int elapsed)
     {
         super.update(elapsed);
 
-        animation.update(elapsed);
+        if(animation != null)
+            animation.update(elapsed);
     }
     
     /**

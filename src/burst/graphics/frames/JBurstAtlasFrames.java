@@ -28,8 +28,8 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
     /**
      * Parsing method for sparrow texture atlases.
      * 
-     * @param path          File location of desired spritesheet to be loaded and parsed.
-     * @param description   Parsing instructions file location (Should be .xml)
+     * @param path          file location of desired spritesheet to be loaded and parsed.
+     * @param description   parsing instructions file location (Should be .xml)
      */
     public static JBurstAtlasFrames fromSparrow(String graphic, String description)
     {
@@ -39,9 +39,8 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
     /**
      * Parsing method for sparrow texture atlases.
      * 
-     * @param graphic       Spritesheet to be parsed.
-     * @param description   Parsing instructions file location (Should be .xml)
-     * 
+     * @param graphic       spritesheet to be parsed.
+     * @param description   parsing instructions file location (Should be .xml)
      */
     public static JBurstAtlasFrames fromSparrow(JBurstGraphic graphic, String description) 
     {
@@ -100,8 +99,8 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
      * <p> 
      * <i>Note: There is currently no way to load rotated sprites.</i>
      * 
-     * @param graphic       File location of desired spritesheet to be loaded and parsed.
-     * @param description   Parsing instructions file location (Should be .json)
+     * @param graphic       file location of desired spritesheet to be loaded and parsed.
+     * @param description   parsing instructions file location (Should be .json)
      */
     public static JBurstAtlasFrames fromTexturePackerJson(String source, String description)
     {
@@ -113,8 +112,8 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
      * <p> 
      * <i>Note: There is currently no way to load rotated sprites.</i>
      * 
-     * @param graphic       Spritesheet to be parsed.
-     * @param description   Parsing instructions file location (Should be .json)
+     * @param graphic       spritesheet to be parsed.
+     * @param description   parsing instructions file location (Should be .json)
      */
     @SuppressWarnings("unchecked")
     public static JBurstAtlasFrames fromTexturePackerJson(JBurstGraphic graphic, String description)
@@ -187,7 +186,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
             String name = frameData.get("filename").toString();
             JSONObject frame = (JSONObject) frameData.get("frame");
-            // boolean rotated = (Boolean) frameData.get("rotated"); // I don't currently have a way to rotate graphics.
+            // boolean rotated = (Boolean) frameData.get("rotated"); // I don't currently frame rotation system.
             // boolean trimmed = (Boolean) frameData.get("trimmed");
             JSONObject spriteSourceSize = (JSONObject) frameData.get("spriteSourceSize");
             JSONObject sourceSize = (JSONObject) frameData.get("sourceSize");
@@ -216,7 +215,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
     /**
      * JSONs will sometimes have weird data at the beginning and ends. 
-     * <p> Of course, we don't want this.
+     * We don't want this.
      * 
      * @param content   JSON data to be checked.
      */
@@ -230,12 +229,10 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
     /**
      * Constructs a new JBurstAtlasFrames.
-     * <p> 
-     * For engine purposes, please use {@code fromSparrow()} or {@code fromPacker()} instead.
      * 
-     * @param graphic   Parent graphic to be used by this frame collection.
+     * @param graphic   parent graphic to be used by this frame collection.
      */
-    public JBurstAtlasFrames(JBurstGraphic graphic)
+    private JBurstAtlasFrames(JBurstGraphic graphic)
     {
         super(graphic);
     }

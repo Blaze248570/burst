@@ -5,8 +5,5 @@
 assets/*
 src/*.java
 
-# WIP
-src/burst/input/*
-
 # Unnecessary for git
 bin/*

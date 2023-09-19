@@ -18,7 +18,7 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    Path of image asset to be used in returned JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source) 
     {
@@ -28,8 +28,8 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    Path of image asset to be used in returned JBurstGraphic.
-     * @param key       Unique title for this JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic.
+     * @param key       unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {
@@ -39,7 +39,7 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the BufferedImage, {@code source}.
      * 
-     * @param source    Image to be used in returned JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic.
      */
     public static JBurstGraphic fromImage(BufferedImage source) 
     {
@@ -49,8 +49,8 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the BufferedImage, {@code source}.
      * 
-     * @param source    Image to be used in returned JBurstGraphic.
-     * @param key       Unique title for this JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic.
+     * @param key       unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromImage(BufferedImage source, String key) 
     {
@@ -83,7 +83,7 @@ public class JBurstGraphic implements IBurstDestroyable
     public String key;
 
     /**
-     * Pixel data about this graphic
+     * Image data about this graphic
      */
     public BufferedImage image;
 

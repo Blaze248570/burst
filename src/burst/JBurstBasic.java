@@ -4,8 +4,10 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 import javax.swing.JComponent;
 
 /**
- * The JBurstBasic class is sort of the basic building block
- * for all upper JBurst objects.
+ * The JBurstBasic class is sort of the building block for JBurstSprite.
+ * <p>
+ * This class could be used to create an object that is persistently updated, 
+ * but not quite as heavy as JBurstSprite.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxBasic.html">FlxBasic</a>
@@ -37,12 +39,29 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public boolean visible = true;
 
+    /**
+     * Creates a new JBurstBasic and initializes JBurst 
+     * if it has not already done so.
+     * <p>
+     * Also calls {@code add()} so that
+     */
     public JBurstBasic() 
     { 
         if(!JBurst.initialized)
             JBurst.init();
 
-        JBurst.members.add(this);
+        setIndependent(false);
+    }
+
+    /**
+     * Whether or not this JBurstBasic should be managed by JBurst
+     */
+    public void setIndependent(boolean flag)
+    {
+        if(flag)
+            JBurst.members.remove(this);
+        else
+            JBurst.members.add(this);
     }
 
     /**
@@ -65,5 +84,11 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
 
     public void update(int elapsed) { }
 
-    public void destroy() { }
+    /**
+     * Removes this object from JBurst's list of members
+     */
+    public void destroy() 
+    { 
+        JBurst.members.remove(this, true);
+    }
 }

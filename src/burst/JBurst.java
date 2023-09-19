@@ -11,8 +11,14 @@ import burst.group.JBurstGroup;
  */
 public class JBurst
 {
-    public static JBurstGroup<JBurstBasic> members;
+    /**
+     * Managing group of every JBurstBasic held by JBurst
+     */
+    public static final JBurstGroup<JBurstBasic> members = new JBurstGroup<>();
 
+    /**
+     * Whether or not ALL JBurstBasics should update
+     */
     public static boolean active = false;
 
     /**
@@ -34,8 +40,6 @@ public class JBurst
     protected static void init()
     {
         if(initialized) return;
-
-        members = new JBurstGroup<>();
 
         _total = getTotal();
 
@@ -72,14 +76,16 @@ public class JBurst
         return Duration.between(_startTime, Instant.now()).toMillis();
     }
 
+    /**
+     * Stops the JBurst from further updates, 
+     * removes all of its current members, and kills its thread
+     */
     public static void destroy()
     {
         if(burstThread == null) return;
         
         burstThread.interrupt();
         burstThread = null;
-
-        members.destroy();
 
         active = false;
         initialized = false;

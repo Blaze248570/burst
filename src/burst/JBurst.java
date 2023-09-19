@@ -1,6 +1,9 @@
 package burst;
 
-import java.awt.Dimension;
+import java.time.Duration;
+import java.time.Instant;
+
+import burst.group.JBurstGroup;
 
 /**
  * @author Joe Bray
@@ -8,42 +11,83 @@ import java.awt.Dimension;
  */
 public class JBurst
 {
-    public static Dimension size;
-
-    private static JBurstGame game;
-
-    public static JBurstState state;
+    /**
+     * Managing group of every JBurstBasic held by JBurst
+     */
+    public static final JBurstGroup<JBurstBasic> members = new JBurstGroup<>();
 
     /**
-     * The default camera that objects are sent to.
+     * Whether or not ALL JBurstBasics should update
      */
-    public static JBurstCamera defaultCam;
+    public static boolean active = false;
 
-    // public static JBurstKeyboard keys;
+    /**
+     * Time in milliseconds since program began
+     */
+    private static long _total;
 
     /**
      * Measured time between update() calls in milliseconds
      */
-    public static double elapsed;
+    public static int elapsed;
 
-    protected static void init(JBurstGame game, Dimension size)
+    private static final Instant _startTime = Instant.now();
+
+    protected static boolean initialized = false;
+
+    private static Thread burstThread;
+
+    protected static void init()
     {
-        JBurst.game = game;
-        JBurst.size = size;
+        if(initialized) return;
 
-        defaultCam = new JBurstCamera();
+        _total = getTotal();
 
-        /*
-            keys = new JBurstKeyboard();
-            game.addKeyListener(keys);
-            game.setFocusable(true);
-        */
+        burstThread = new Thread() 
+        {
+            @Override
+            public void run()
+            {
+                while(!isInterrupted())
+                {
+                    elapsed = Math.toIntExact(getTotal() - _total);
+                    _total = getTotal();
+
+                    update();
+                }
+            }
+        };
+        burstThread.start();
+
+        active = true;
+        initialized = true;
     }
 
-    public static void switchState(JBurstState nextState)
+    private static void update()
     {
-        state.startOutro(() -> {
-            game._requestedState = nextState;
-        });
+        if(!active || members.size() == 0) return;
+
+        members.update(elapsed);
+        members.repaint();
+    }
+
+    private static long getTotal()
+    {
+        return Duration.between(_startTime, Instant.now()).toMillis();
+    }
+
+    /**
+     * Stops the JBurst from further updates, 
+     * removes all of its current members, and kills its thread
+     */
+    public static void destroy()
+    {
+        if(burstThread == null) return;
+        
+        burstThread.interrupt();
+        burstThread = null;
+
+        active = false;
+        initialized = false;
     }
 }

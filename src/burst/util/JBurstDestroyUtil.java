@@ -11,7 +11,7 @@ public class JBurstDestroyUtil
     /**
      * Checks if an object is not null before destroying it, <i>always returns null.</i>
      * 
-     * @param object    Object to be destroyed
+     * @param object    object to be destroyed
      * @return  a null pointer
      */
     public static <T extends IBurstDestroyable> T destroy(IBurstDestroyable object)
@@ -24,7 +24,7 @@ public class JBurstDestroyUtil
     /**
 	 * Destroys every element of an array of IBurstDestroyables.
 	 *
-	 * @param	array	An array of IFlxDestroyable objects
+	 * @param	array	an array of IFlxDestroyable objects
 	 * @return	a null pointer
 	 */
     public static <T extends IBurstDestroyable> T destroyArray(T[] array)
@@ -39,7 +39,7 @@ public class JBurstDestroyUtil
     /**
 	 * Destroys every element of an ArrayList of IBurstDestroyables.
 	 *
-	 * @param	array	An ArrayList of IFlxDestroyable objects
+	 * @param	array	an ArrayList of IFlxDestroyable objects
 	 * @return	a null pointer
 	 */
     public static <T extends IBurstDestroyable> ArrayList<T> destroyArrayList(ArrayList<T> array)

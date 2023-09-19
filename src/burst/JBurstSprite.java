@@ -17,9 +17,19 @@ import burst.graphics.frames.JBurstFramesCollection;
 import burst.util.JBurstDestroyUtil;
 
 /**
+ * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.
+ * <p>
+ * When a JBurstSprite is instantiated, it is automatically added to {@code JBurst.members}.
+ * To undo this, use {@code setIndependent()}.
+ * <p>
+ * <i>Note:</i> As of now, most layout managers do not handle JBurstSprites correctly,
+ * so none must be used by its container. (This can be achieved through {@code setLayout(null)})
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxSprite.html">FlxSprite</a>
+ * 
+ * @see JBurstAnimationController
+ * @see JBurstAtlasFrames
  */
 public class JBurstSprite extends JBurstBasic 
 {
@@ -35,7 +45,7 @@ public class JBurstSprite extends JBurstBasic
     public boolean antialiasing = false;
 
     /**
-     * The manager to control animation property's of this sprite.
+     * Manages animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
     public JBurstAnimationController animation;
@@ -47,25 +57,24 @@ public class JBurstSprite extends JBurstBasic
     private Point framePoint;
 
     /**
-     * A collection of all the frames used by this sprite.
-     * <p>
-     * Public access is provided for the sake of the animation classes, 
-     * but it is strongly suggested that it be treated as <strong>read-only</strong>.
+     * A collection of all the frames used by this sprite
      */
     private JBurstFramesCollection frames;
 
     /**
-     * The current frame being used in the drawing process.
+     * The current frame being used in the drawing process
      */
     private JBurstFrame frame;
 
     /**
-     * Whether or not the sprite's bounding box outline should be drawn.
+     * Whether or not the sprite's bounding box outline should be painted
      */
     public boolean debugMode = false;
 
     /**
-     * Constructs a new JBurstSprite at coordinates (0, 0);
+     * Constructs a new JBurstSprite at coordinates (0, 0),
+     * so long as its container uses no layout manager.
+     * Otherwise, it probably won't be anywhere.
      */
     public JBurstSprite() 
     {
@@ -73,7 +82,9 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}).
+     * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}),
+     * so long as its container uses no layout manager.
+     * Otherwise, it probably won't be anywhere.
      */
     public JBurstSprite(int x, int y) 
     {
@@ -87,22 +98,23 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Called every "frame".
-     * <p>
-     * <i>Make sure</i> to call {@code super.update(elapsed)} when overrided.
+     * Called by {@code JBurst} every "frame" unless this sprite is independent.
+     * 
+     * @param elapsed   time since the last call to {@code update()} in milliseconds
      */
     @Override
-    public void update(double elapsed)
+    public void update(int elapsed)
     {
         super.update(elapsed);
 
-        animation.update(elapsed);
+        if(animation != null)
+            animation.update(elapsed);
     }
     
     /**
      * Used by Java Swing internally to paint this sprite.
      * <p>
-     * It is suggested that is <strong>not</strong> overriden.
+     * It is highly suggested that is <strong><i>not</i></strong> overriden.
      */
     @Override 
     public void paint(Graphics g)
@@ -182,11 +194,11 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Loads this sprite as a rectangle of one solid color.
      * 
-     * @param width     Width of rectangle
-     * @param height    Height of rectangle
-     * @param color     Color of rectangle
+     * @param width     width of rectangle
+     * @param height    height of rectangle
+     * @param color     color of rectangle
      * 
-     * @return  This JBurstSprite. Useful for chaining.
+     * @return  this JBurstSprite. Useful for chaining.
      */
     public JBurstSprite makeGraphic(int width, int height, Color color)
     {
@@ -203,9 +215,9 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Loads a graphic onto this sprite.
      * 
-     * @param graphic   Image to be loaded onto this sprite.
+     * @param graphic   image to be loaded onto this sprite.
      * 
-     * @return  This JBurstSprite. Useful for chaining.
+     * @return  this JBurstSprite. (Useful for chaining)
      * @see {@link JBurstGraphic}
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
@@ -229,11 +241,11 @@ public class JBurstSprite extends JBurstBasic
      * with the dimensions of {@code width} and {@code height}, adding each one to the sprite's
      * list of frames.
      * 
-     * @param graphic   Image to be sliced and displayed
-     * @param width     Width of frame used to slice
-     * @param height    Height of frame used to slice
+     * @param graphic   image to be sliced and displayed
+     * @param width     width of frame used to slice
+     * @param height    height of frame used to slice
      * 
-     * @return  This JBurstSprite. Useful for chaining.
+     * @return  this JBurstSprite. (Useful for chaining)
      * @see {@link JBurstGraphic}
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int width, int height)
@@ -284,7 +296,7 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Loads a frame collection from a spritesheet and designated animation file.
      * 
-     * @param frames    Frame collection to be loaded
+     * @return  this sprite's frame collection
      */
     public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
     {
@@ -294,13 +306,11 @@ public class JBurstSprite extends JBurstBasic
         setFrame(frames.frames.get(0));
         updateBounds();
 
-        return frames;
+        return this.frames;
     }
 
     /**
      * Sets the current frame of the sprite.
-     * 
-     * @param frame Frame to be set
      */
     public void setFrame(JBurstFrame frame)
     {
@@ -321,7 +331,7 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Returns a collection of all the frames used by this sprite, which may be {@code null}.
      * 
-     * @return  a collection of this sprite's frames
+     * @return  this sprite's frame collection
      */
     public JBurstFramesCollection getFrames()
     {
@@ -333,8 +343,6 @@ public class JBurstSprite extends JBurstBasic
      * <p> 
      * {@code Math.toDegrees()} can be used to convert 
      * this value into degrees.
-     * 
-     * @return  this sprite's angle of rotation, in radians.
      */
     public double getAngle()
     {
@@ -348,7 +356,7 @@ public class JBurstSprite extends JBurstBasic
      * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
      * would flip this sprite upside-down.
      * 
-     * @param theta The amount to rotate this sprite by, in radians
+     * @param theta the amount to rotate this sprite by, in radians
      */
     public void setAngle(double theta)
     {
@@ -379,8 +387,8 @@ public class JBurstSprite extends JBurstBasic
      * <p>
      * <i>Values less then or equal to zero will be ignored.</i>
      * 
-     * @param scaleX    How big or small to make this sprite, horizontally.     
-     * @param scaleY    How big or small to make this sprite, vertically.
+     * @param scaleX    how big or small to make this sprite, horizontally.     
+     * @param scaleY    how big or small to make this sprite, vertically.
      */
     public void setScale(double scaleX, double scaleY)
     {
@@ -395,8 +403,8 @@ public class JBurstSprite extends JBurstBasic
      * <p>
      * <i>Values less than or equal to zero will be ignored.</i>
      * 
-     * @param width     New width of graphic
-     * @param height    New height of graphic
+     * @param width     new width of graphic
+     * @param height    new height of graphic
      */
     public void setGraphicSize(int width, int height)
     {
@@ -427,7 +435,6 @@ public class JBurstSprite extends JBurstBasic
     public void setX(int x)
     {
         framePoint.x = x;
-        setLocation(x, getY());
     }
 
     /**
@@ -438,7 +445,6 @@ public class JBurstSprite extends JBurstBasic
     public void setY(int y)
     {
         framePoint.y = y;
-        setLocation(getX(), y);
     }
 
     /**
@@ -453,13 +459,10 @@ public class JBurstSprite extends JBurstBasic
     public void setPosition(int x, int y)
     {
         framePoint.setLocation(x, y);
-        setLocation(x, y);
     }
 
     /**
      * Returns the width of this sprite with scaling calculations.
-     * 
-     * @return  the current width of this sprite
      */
     public int getSpriteWidth()
     {
@@ -472,8 +475,6 @@ public class JBurstSprite extends JBurstBasic
 
     /**
      * Returns the height of this sprite with scaling calculations.
-     * 
-     * @return  the current height of this sprite
      */
     public int getSpriteHeight()
     {
@@ -484,29 +485,32 @@ public class JBurstSprite extends JBurstBasic
         return height;
     }
 
-    private int getFrameWidth()
+    /**
+     * Returns the true width of this sprite, without scaling
+     */
+    public int getFrameWidth()
     {
         int width = 0;
         if(frame != null)
-            width = frame.width;
+            width = frame.sourceSize.x;
         
         return width;
     }
 
-    private int getFrameHeight()
+    /**
+     * Returns the true height of this sprite, without scaling
+     */
+    public int getFrameHeight()
     {
         int height = 0;
         if(frame != null)
-            height = frame.height;
+            height = frame.sourceSize.y;
 
         return height;
     }
 
     /**
-     * Returns this sprite's graphic object, 
-     * which may be {@code null}.
-     * 
-     * @return  this sprite's graphic object
+     * Returns this sprite's graphic object, which may be {@code null}.
      */
     public JBurstGraphic getGraphic()
     {
@@ -520,8 +524,6 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Returns a writable graphics object from this sprite's graphic,
      * which may be {@code null}.
-     * 
-     * @return a writable {@code Graphics2D} object
      */
     public Graphics2D getPixels()
     {
@@ -534,15 +536,23 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Returns the amount of frames stored within this sprite's frame collection.
-     * 
-     * @return  the length if this sprite's frame collection
+     * Returns the number of frames stored within this sprite's frame collection.
      */
     public int getNumFrames()
     {
         return frames.frames.size();
     }
 
+    /**
+     * Completely removes all of this sprite's tools from memory. 
+     * After calling {@code destroy()}, instances of this sprite should be nulled.
+     * <p>
+     * <i>Warning: This sprite will no longer be usable after {@code destroy()} is called.
+     * To simply deactivate this sprite, use {@code kill()}.
+     * 
+     * @see {@link #kill()}
+     * @see {@link #revive()}
+     */
     @Override
     public void destroy()
     {

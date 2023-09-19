@@ -7,11 +7,11 @@ import java.util.function.Consumer;
 import burst.JBurstSprite;
 import burst.graphics.frames.JBurstFrame;
 import burst.graphics.frames.JBurstFramesCollection;
-import burst.util.TriConsumer;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import burst.util.function.TriConsumer;
 
 /**
- * A class that manages and performs animation operations
+ * A class that manages and performs animation operations.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/animation/FlxAnimationController.html">FlxAnimationController</a>

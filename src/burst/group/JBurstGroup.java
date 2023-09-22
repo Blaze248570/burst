@@ -11,6 +11,9 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
  * A JBurstGroup is more or less just a glorified ArrayList that holds JBurstBasics.
  * <p>
  * It's main job is to make sure that all of its necessary members are updated and painted.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/group/FlxGroup.html">FlxG</a>
  */
 public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
 {
@@ -96,7 +99,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
      * this call to add will be ignored.
      * 
      * @param element   the element to be added to this group
-     * @return  whether ot not the element was successfully added
+     * @return  whether or not the element was successfully added
      */
     public boolean add(T element)
     {
@@ -119,7 +122,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
      * this call to add will be ignored.
      * 
      * @param element   the element to be added to this group
-     * @return  whether ot not the element was successfully added
+     * @return  whether or not the element was successfully added
      */
     public boolean add(int index, T element)
     {
@@ -140,7 +143,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
     /**
      * Replaces the element at {@code index} with {@code element}.
      * <p>
-     * If index is less than zero or exceeds the length of this group, 
+     * If {@code index} is less than zero or exceeds the length of {@code members}, 
      * the element will be appended to the end, if possible.
      * 
      * @param index     the index of the element to be replaced

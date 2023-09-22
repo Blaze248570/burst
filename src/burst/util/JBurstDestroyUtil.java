@@ -30,8 +30,10 @@ public class JBurstDestroyUtil
     public static <T extends IBurstDestroyable> T destroyArray(T[] array)
     {
         if(array != null)
-            for(T object : array)
-                destroy(object);
+            for(int i = 0; i < array.length; i++)
+            {
+                array[i] = destroy(array[i]);
+            }
             
         return null;
     }
@@ -45,8 +47,12 @@ public class JBurstDestroyUtil
     public static <T extends IBurstDestroyable> ArrayList<T> destroyArrayList(ArrayList<T> array)
     {
         if(array != null)
-            for(T object : array)
-                destroy(object);
+        {
+            for(int i = 0; i < array.size(); i++)
+            {
+                destroy(array.set(i, null));
+            }
+        }
             
         return null;
     }

@@ -1,11 +1,13 @@
 package burst.graphics;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import burst.graphics.frames.JBurstImageFrame;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
@@ -18,7 +20,7 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    path of image asset to be used in returned JBurstGraphic.
+     * @param source    Path of image asset to be used in returned JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source) 
     {
@@ -28,8 +30,8 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    path of image asset to be used in returned JBurstGraphic.
-     * @param key       unique title for this JBurstGraphic.
+     * @param source    Path of image asset to be used in returned JBurstGraphic.
+     * @param key       Unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {
@@ -39,7 +41,7 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the BufferedImage, {@code source}.
      * 
-     * @param source    image to be used in returned JBurstGraphic.
+     * @param source    Image to be used in returned JBurstGraphic.
      */
     public static JBurstGraphic fromImage(BufferedImage source) 
     {
@@ -49,8 +51,8 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the BufferedImage, {@code source}.
      * 
-     * @param source    image to be used in returned JBurstGraphic.
-     * @param key       unique title for this JBurstGraphic.
+     * @param source    Image to be used in returned JBurstGraphic.
+     * @param key       Unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromImage(BufferedImage source, String key) 
     {
@@ -59,17 +61,16 @@ public class JBurstGraphic implements IBurstDestroyable
 
     public static BufferedImage returnBuffImage(String path) 
     {
-        BufferedImage img = null;
         try 
         {
-            img = ImageIO.read(new File(path));
+            return ImageIO.read(new File(path));
         } 
         catch(IOException e) 
         {
             System.out.print("Image not found: " + path);
         }
 
-        return img;
+        return null;
     }
 
     private static String generateKey()
@@ -83,28 +84,16 @@ public class JBurstGraphic implements IBurstDestroyable
     public String key;
 
     /**
-     * Image data about this graphic
+     * Pixel data about this graphic
      */
     public BufferedImage image;
+
+    private JBurstImageFrame _imageFrame;
 
     public JBurstGraphic(String key, BufferedImage image) 
     {
         this.key = key;
         this.image = image;
-    }
-
-    /**
-     * Returns writable graphics object from this graphic's image.
-     * 
-     * @return  a writeable graphics object
-     */
-    public Graphics2D getPixels()
-    {
-        Graphics2D pixels = null;
-        if(image != null)
-            pixels = image.createGraphics();
-
-        return pixels;
     }
 
     public int getWidth()
@@ -125,11 +114,24 @@ public class JBurstGraphic implements IBurstDestroyable
         return height;
     }
 
+    public Graphics2D createGraphics()
+    {
+        return image.createGraphics();
+    }
+
+    public JBurstImageFrame getImageFrame()
+    {
+        if(_imageFrame == null)
+            _imageFrame = JBurstImageFrame.fromGraphic(this, new Rectangle(0, 0, getWidth(), getHeight()));
+
+        return _imageFrame;
+    }
+
     @Override
     public void destroy()
     {
         key = null;
-        image = null; // These needs further destruction
+        image = null;
     }
 
     @Override 

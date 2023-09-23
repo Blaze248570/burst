@@ -1,5 +1,6 @@
 package burst.graphics.frames;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -12,8 +13,10 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFrame.html">FlxFrame</a>
  */
-public class JBurstFrame extends Rectangle implements IBurstDestroyable
+public class JBurstFrame implements IBurstDestroyable
 {
+    public Rectangle frame;
+
     /**
      * The name of this frame.
      */
@@ -27,54 +30,45 @@ public class JBurstFrame extends Rectangle implements IBurstDestroyable
     /**
      * Original (uncropped) image size.
      */
-    public Point sourceSize;
+    public Dimension sourceSize;
 
     /**
      * Frame offset from the top left corner of original image.
      */
     public Point offset;
 
-    public JBurstFrame(JBurstGraphic graphic, String name)
+    public double angle;
+
+    public JBurstFrame(JBurstGraphic graphic)
     {
-        this(graphic, name, 0, 0, graphic.getWidth(), graphic.getHeight());
+        this(graphic, 0);
     }
 
-    public JBurstFrame(JBurstGraphic graphic, String name, int x, int y, int width, int height)
+    public JBurstFrame(JBurstGraphic graphic, double angle)
     {
-        super(x, y, width, height);
         this.graphic = graphic;
 
-        this.name = name;
-        this.sourceSize = new Point();
-        this.offset = new Point();
+        sourceSize = new Dimension();
+        offset = new Point();
     }
 
-    /**
-     * Ensures the frame isn't outside the images boundaries
-     * 
-     * @return  Checked and trimmed frame rectangle
-     */
-    public JBurstFrame checkFrame() 
+    public JBurstFrame copyTo(JBurstFrame clone)
     {
-        int x = this.x;
-        if(x > graphic.image.getWidth())
-            x -= (x - graphic.image.getWidth());
+        if(clone == null)
+            clone = new JBurstFrame(graphic, angle);
+        else
+        {
+            clone.graphic = graphic;
+            clone.angle = angle;
+            clone.frame = null;
+        }
 
-        int y = this.y;
-        if(y > graphic.image.getHeight())
-            y -= (y - graphic.image.getHeight());
+        clone.offset.setLocation(offset);
+        clone.sourceSize.setSize(sourceSize);
+        clone.frame = new Rectangle(frame);
+        clone.name = name;
 
-        int right = (this.x + this.width);
-        if(right > graphic.image.getWidth())
-            right -= (right - graphic.image.getWidth());
-
-        int bottom = (this.y + this.height);
-        if(bottom > graphic.image.getHeight())
-            bottom -= (bottom - graphic.image.getHeight());
-
-        this.setFrame(x, y, right - x, bottom - y);
-
-        return this;
+        return clone;
     }
 
     @Override
@@ -89,6 +83,6 @@ public class JBurstFrame extends Rectangle implements IBurstDestroyable
     @Override
     public String toString()
     {
-        return "BurstFrame ~ {name: " + name + " x: " + x + ", y: " + y + ", width: " + width + ", height: " + height + "}";
+        return "BurstFrame ~ {name: " + name + " x: " + frame.x + ", y: " + frame.y + ", width: " + frame.width + ", height: " + frame.height + "}";
     }
 }

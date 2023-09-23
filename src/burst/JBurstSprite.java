@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -39,6 +40,8 @@ public class JBurstSprite extends JBurstBasic
      */
     public double alpha = 1.0f;
 
+    public boolean dirty = false;
+
     /**
      * Whether or not this sprite should be smoothed at rendering.
      */
@@ -64,7 +67,7 @@ public class JBurstSprite extends JBurstBasic
     /**
      * The current frame being used in the drawing process
      */
-    private JBurstFrame frame;
+    private JBurstFrame _frame;
 
     /**
      * Whether or not the sprite's bounding box outline should be painted
@@ -119,21 +122,21 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public void paint(Graphics g)
     {
-        if(frame == null || !exists || !visible || alpha == 0)
+        if(_frame == null || !exists || !visible || alpha == 0)
             return;
 
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform saveAT = graphics.getTransform();
-        Point offset = new Point(frame.offset);
+        Point offset = new Point(_frame.offset);
 
-        int spriteWidth = frame.sourceSize.x;
-        int spriteHeight = frame.sourceSize.y;
+        int spriteWidth = _frame.sourceSize.width;
+        int spriteHeight = _frame.sourceSize.height;
 
-        BufferedImage image = frame.graphic.image.getSubimage(
-            frame.x, 
-            frame.y, 
-            frame.width, 
-            frame.height
+        BufferedImage image = _frame.graphic.image.getSubimage(
+            _frame.frame.x, 
+            _frame.frame.y, 
+            _frame.frame.width, 
+            _frame.frame.height
         );
 
         boolean scaled = scale != null && (scale.x != 1.0 || scale.y != 1.0);
@@ -194,11 +197,11 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Loads this sprite as a rectangle of one solid color.
      * 
-     * @param width     width of rectangle
-     * @param height    height of rectangle
-     * @param color     color of rectangle
+     * @param width     Width of rectangle
+     * @param height    Height of rectangle
+     * @param color     Color of rectangle
      * 
-     * @return  this JBurstSprite. Useful for chaining.
+     * @return  This JBurstSprite. Useful for chaining.
      */
     public JBurstSprite makeGraphic(int width, int height, Color color)
     {
@@ -215,20 +218,27 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Loads a graphic onto this sprite.
      * 
-     * @param graphic   image to be loaded onto this sprite.
+     * @param path  File path to the image to be loaded onto this sprite.
      * 
-     * @return  this JBurstSprite. (Useful for chaining)
+     * @return  This JBurstSprite. Useful for chaining.
+     * @see {@link JBurstGraphic}
+     */
+    public JBurstSprite loadGraphic(String path)
+    {
+        return loadGraphic(JBurstGraphic.fromFile(path));
+    }
+
+    /**
+     * Loads a graphic onto this sprite.
+     * 
+     * @param graphic   Image to be loaded onto this sprite.
+     * 
+     * @return  This JBurstSprite. Useful for chaining.
      * @see {@link JBurstGraphic}
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
-        setFrame(new JBurstFrame(graphic, "Frame", 0, 0, graphic.getWidth(), graphic.getHeight()));
-        frame.sourceSize.setLocation(frame.width, frame.height);
-
-        this.frames = new JBurstFramesCollection(graphic);
-        this.frames.pushFrame(frame);
-
-        updateBounds();
+        setFrames(graphic.getImageFrame());
         
         return this;
     }
@@ -241,56 +251,76 @@ public class JBurstSprite extends JBurstBasic
      * with the dimensions of {@code width} and {@code height}, adding each one to the sprite's
      * list of frames.
      * 
-     * @param graphic   image to be sliced and displayed
-     * @param width     width of frame used to slice
-     * @param height    height of frame used to slice
+     * @param graphic       Image to be sliced and displayed
+     * @param frameWidth    Width of rectangle used to slice
+     * @param frameHeight   Height of rectangle used to slice
      * 
-     * @return  this JBurstSprite. (Useful for chaining)
+     * @return  This JBurstSprite. Useful for chaining.
      * @see {@link JBurstGraphic}
      */
-    public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int width, int height)
+    public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
     {
+        // JBurst.bitmap.add(graphic);
+
         int graphWidth = graphic.getWidth();
         int graphHeight = graphic.getHeight();
 
-        if(width == 0) 
+        if(frameWidth == 0) 
         {
-            width = graphHeight;
-			width = (width > graphWidth) ? graphWidth : width;
+            frameWidth = graphHeight;
+			frameWidth = (frameWidth > graphWidth) ? graphWidth : frameWidth;
         }
 
-        if (height == 0)
+        if (frameHeight == 0)
 		{
-			height = graphWidth;
-			height = (height > graphHeight) ? graphHeight : height;
+			frameHeight = graphWidth;
+			frameHeight = (frameHeight > graphHeight) ? graphHeight : frameHeight;
 		}
 
-        this.frames = new JBurstFramesCollection(graphic);
+        JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
-        int x = 0;
-        int y = 0;
-        for(int i = 0; y < graphHeight; i++)
-        {
-            String frameNum = "" + i;
-            while(frameNum.length() < 4) frameNum = "0" + frameNum;
-            
-            JBurstFrame frame = new JBurstFrame(graphic, "frame" + frameNum, x, y, width, height);
-            frame.sourceSize.setLocation(width, height);
-            frame.checkFrame();
-            frames.pushFrame(frame);
-
-            x += width;
-            if(x >= graphWidth)
+        int numRows = graphHeight / frameHeight;
+        int numCols = graphWidth / frameWidth;
+        for(int i = 0; i < numRows; i++)
+            for(int j = 0; j < numCols; j++)
             {
-                x = 0;
-                y += height;
+                frames.addSpriteSheetFrame(new Rectangle(j * frameWidth, i * frameHeight, frameWidth, frameHeight));
             }
-        }
 
-        setFrame(frames.frames.get(0));
-        updateBounds();
+        setFrames(frames);
 
         return this;
+    }
+
+    /**
+     * This will be called whenever the sprite's graphic is loaded. 
+     * It normally does nothing and is meant to be overriden.
+     */
+    public void graphicLoaded() { }
+
+    /**
+     * Sets the current frame of the sprite.
+     * 
+     * @param frame Frame to be set
+     */
+    public JBurstFrame setFrame(JBurstFrame frame)
+    {
+        if(frame != null)
+        {
+            // resetFrameSize();
+            dirty = true;
+        }
+        else if(frames != null && frames.frames != null && getNumFrames() > 0)
+        {
+            frame = frames.frames.get(0);
+            dirty = true;
+        }
+        else
+            return null;
+
+        _frame = frame.copyTo(_frame);
+
+        return frame;
     }
 
     /**
@@ -298,7 +328,7 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return  this sprite's frame collection
      */
-    public JBurstFramesCollection loadFrames(JBurstAtlasFrames frames)
+    public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
         this.frames = frames;
         this.animation.clearAnimations();
@@ -307,25 +337,6 @@ public class JBurstSprite extends JBurstBasic
         updateBounds();
 
         return this.frames;
-    }
-
-    /**
-     * Sets the current frame of the sprite.
-     */
-    public void setFrame(JBurstFrame frame)
-    {
-        JBurstFrame oldFrame = this.frame;
-
-        this.frame = frame;
-
-        firePropertyChange("frame", oldFrame, frame);
-
-        if(oldFrame == null || oldFrame == frame) return;
-
-        if(frame.width != oldFrame.width && frame.height != oldFrame.height)
-        {
-            updateBounds();
-        }
     }
 
     /**
@@ -466,11 +477,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getSpriteWidth()
     {
-        int width = 0;
-        if(frame != null)
-            width = (int) (frame.sourceSize.x * scale.x);
+        if(_frame != null)
+            return (int) (_frame.sourceSize.width * scale.x);
 
-        return width;
+        return 0;
     }
 
     /**
@@ -478,11 +488,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getSpriteHeight()
     {
-        int height = 0;
-        if(frame != null)
-            height = (int) (frame.sourceSize.y * scale.y);
+        if(_frame != null)
+            return (int) (_frame.sourceSize.height * scale.y);
 
-        return height;
+        return 0;
     }
 
     /**
@@ -490,11 +499,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getFrameWidth()
     {
-        int width = 0;
-        if(frame != null)
-            width = frame.sourceSize.x;
+        if(_frame != null)
+            return _frame.sourceSize.width;
         
-        return width;
+        return 0;
     }
 
     /**
@@ -502,11 +510,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getFrameHeight()
     {
-        int height = 0;
-        if(frame != null)
-            height = frame.sourceSize.y;
+        if(_frame != null)
+            return _frame.sourceSize.height;
 
-        return height;
+        return 0;
     }
 
     /**
@@ -514,11 +521,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstGraphic getGraphic()
     {
-        JBurstGraphic graphic = null;
-        if(frame != null)
-            graphic = frame.graphic;
+        if(frames != null)
+            return frames.graphic;
 
-        return graphic;
+        return null;
     }
 
     /**
@@ -527,12 +533,11 @@ public class JBurstSprite extends JBurstBasic
      */
     public Graphics2D getPixels()
     {
-        Graphics2D pixels = null;
         JBurstGraphic graphic = getGraphic();
         if(graphic != null)
-            pixels = graphic.getPixels();
+            return graphic.createGraphics();
         
-        return pixels;
+        return null;
     }
 
     /**
@@ -540,7 +545,10 @@ public class JBurstSprite extends JBurstBasic
      */
     public int getNumFrames()
     {
-        return frames.frames.size();
+        if(frames != null && frames.frames != null)
+            return frames.frames.size();
+
+        return 0;
     }
 
     /**
@@ -560,7 +568,7 @@ public class JBurstSprite extends JBurstBasic
 
         animation = JBurstDestroyUtil.destroy(animation);
         frames = JBurstDestroyUtil.destroy(frames);
-        frame = JBurstDestroyUtil.destroy(frame);
+        _frame = JBurstDestroyUtil.destroy(_frame);
 
         scale = null;
         framePoint = null;

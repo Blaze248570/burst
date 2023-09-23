@@ -1,8 +1,12 @@
 package burst.graphics.frames;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import burst.graphics.JBurstGraphic;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
@@ -50,6 +54,29 @@ public class JBurstFrame implements IBurstDestroyable
 
         sourceSize = new Dimension();
         offset = new Point();
+    }
+
+    public BufferedImage paint(BufferedImage image)
+    {
+        if(image == null)
+            image = new BufferedImage(sourceSize.width, sourceSize.height, BufferedImage.TYPE_INT_ARGB);
+        else
+            clearFrame(image);
+
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null);
+        graphics.dispose();
+
+        return image;
+    }
+
+    public void clearFrame(BufferedImage image)
+    {
+        Graphics2D graphics = image.createGraphics();
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
+        graphics.setColor(new Color(0));
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics.dispose();
     }
 
     public JBurstFrame copyTo(JBurstFrame clone)

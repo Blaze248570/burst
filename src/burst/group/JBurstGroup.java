@@ -85,7 +85,7 @@ public class JBurstGroup<T extends JBurstBasic> implements IBurstDestroyable
         for(int i = 0; i < members.size(); i++)
         {
             JBurstBasic basic = members.get(i);
-            if(basic != null && basic.exists && basic.visible)
+            if(basic != null)
             {
                 basic.repaint();
             }

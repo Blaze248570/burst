@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -43,11 +42,6 @@ public class JBurstSprite extends JBurstBasic
     public boolean dirty = false;
 
     /**
-     * Whether or not this sprite should be smoothed at rendering.
-     */
-    public boolean antialiasing = false;
-
-    /**
      * Manages animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
@@ -57,7 +51,9 @@ public class JBurstSprite extends JBurstBasic
 
     private double angle = 0.0;
 
-    private Point framePoint;
+    private Point _framePoint;
+
+    private Rectangle _frameRect;
 
     /**
      * A collection of all the frames used by this sprite
@@ -68,6 +64,8 @@ public class JBurstSprite extends JBurstBasic
      * The current frame being used in the drawing process
      */
     private JBurstFrame _frame;
+
+    private BufferedImage _framePixels;
 
     /**
      * Whether or not the sprite's bounding box outline should be painted
@@ -93,9 +91,11 @@ public class JBurstSprite extends JBurstBasic
     {
         super();
 
-        scale = new Point2D.Double(1.0, 1.0);
-        framePoint = new Point();
         animation = new JBurstAnimationController(this);
+
+        scale = new Point2D.Double(1.0, 1.0);
+        _framePoint = new Point();
+        _frameRect = new Rectangle();
         
         setPosition(x, y);
     }
@@ -112,86 +112,6 @@ public class JBurstSprite extends JBurstBasic
 
         if(animation != null)
             animation.update(elapsed);
-    }
-    
-    /**
-     * Used by Java Swing internally to paint this sprite.
-     * <p>
-     * It is highly suggested that is <strong><i>not</i></strong> overriden.
-     */
-    @Override 
-    public void paint(Graphics g)
-    {
-        if(_frame == null || !exists || !visible || alpha == 0)
-            return;
-
-        Graphics2D graphics = (Graphics2D) g;
-        AffineTransform saveAT = graphics.getTransform();
-        Point offset = new Point(_frame.offset);
-
-        int spriteWidth = _frame.sourceSize.width;
-        int spriteHeight = _frame.sourceSize.height;
-
-        BufferedImage image = _frame.graphic.image.getSubimage(
-            _frame.frame.x, 
-            _frame.frame.y, 
-            _frame.frame.width, 
-            _frame.frame.height
-        );
-
-        boolean scaled = scale != null && (scale.x != 1.0 || scale.y != 1.0);
-        boolean rotated = angle != 0.0;
-
-        // I don't think this actually does anything when it's transformed...
-        if(antialiasing)
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        if(scaled)
-            graphics.scale(scale.x, scale.y);
-
-        if(rotated)
-        {
-            int newWidth = (int) (Math.abs(spriteWidth * Math.cos(angle)) + Math.abs(spriteHeight * Math.sin(angle)));           
-            int newHeight = (int) (Math.abs(spriteWidth * Math.sin(angle)) + Math.abs(spriteHeight * Math.cos(angle)));
-
-            int deltaX = (newWidth - spriteWidth) / 2;
-            int deltaY = (newHeight - spriteHeight) / 2;
-
-            graphics.rotate(angle, newWidth / 2, newHeight / 2);
-
-            setLocation(framePoint.x - (int)(deltaX * scale.x), framePoint.y - (int)(deltaY * scale.y));
-            setSize((int)(newWidth * scale.x), (int)(newHeight * scale.y));
-
-            offset.x += deltaX;
-            offset.y += deltaY;
-
-            if(debugMode)
-            {
-                graphics.setColor(Color.BLUE);
-                graphics.drawRect(
-                    deltaX,
-                    deltaY, 
-                    spriteWidth, 
-                    spriteHeight
-                );
-            }
-        }
-        else
-        {
-            setLocation(framePoint.x, framePoint.y);
-            setSize((int)(spriteWidth * scale.x), (int)(spriteHeight * scale.y));
-        }
-
-        graphics.drawImage(image, offset.x, offset.y, null);
-        graphics.setTransform(saveAT);
-
-        if(debugMode)
-        {
-            graphics.setColor(Color.BLACK);
-            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-        }
-            
-        graphics.dispose();
     }
 
     /**
@@ -319,6 +239,8 @@ public class JBurstSprite extends JBurstBasic
             return null;
 
         _frame = frame.copyTo(_frame);
+        _frameRect.setLocation(0, 0);
+        _frameRect.setSize(getFrameWidth(), getFrameHeight());
 
         return frame;
     }
@@ -432,9 +354,84 @@ public class JBurstSprite extends JBurstBasic
         setScale(scaleX, scaleY);
     }
 
+    /**
+     * Used by Java Swing internally to paint this sprite.
+     * <p>
+     * It is highly suggested that is <strong><i>not</i></strong> overriden.
+     */
+    @Override 
+    public void paintComponent(Graphics g)
+    {
+        if(!exists || !visible || alpha == 0) return;
+
+        super.paintComponent(g);
+
+        updateFramePixels();
+
+        if(isSimpleRender())
+            paintSimple(g);
+        else
+            paintComplex((Graphics2D) g);
+
+        if(debugMode)
+        {
+            g.setColor(Color.BLACK);
+            g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+        }
+            
+        g.dispose();
+
+        updateBounds();
+    }
+
+    public boolean isSimpleRender()
+    {
+        return angle == 0 && scale.x == 1 && scale.y == 1;
+    }
+
+    private void paintSimple(Graphics graphics)
+    {
+        _frameRect.setLocation(_framePoint.x, _framePoint.y);
+        _frameRect.setSize(getFrameWidth(), getFrameHeight());
+        graphics.drawImage(_framePixels, 0, 0, null);
+    }
+
+    private void paintComplex(Graphics2D graphics)
+    {
+        AffineTransform xForm = new AffineTransform();
+
+        int frameWidth = getFrameWidth();
+        int frameHeight = getFrameHeight();
+
+        int newWidth = (int) (Math.abs(frameWidth * Math.cos(angle)) + Math.abs(frameHeight * Math.sin(angle)));           
+        int newHeight = (int) (Math.abs(frameWidth * Math.sin(angle)) + Math.abs(frameHeight * Math.cos(angle)));
+
+        int deltaX = (newWidth - frameWidth) / 2;
+        int deltaY = (newHeight - frameHeight) / 2;
+
+        _frameRect.setLocation(_framePoint.x - (int)(deltaX * scale.x), _framePoint.y - (int)(deltaY * scale.y));
+        _frameRect.setSize((int)(newWidth * scale.x), (int)(newHeight * scale.y));
+        
+        xForm.scale(scale.x, scale.y);
+        xForm.rotate(angle, newWidth / 2, newHeight / 2);
+        xForm.translate(deltaX, deltaY);
+
+        graphics.drawImage(_framePixels, xForm, null);
+    }
+
+    private BufferedImage updateFramePixels()
+    {
+        if(_frame == null || !dirty) return _framePixels;
+
+        _framePixels = _frame.paint(_framePixels);
+
+        dirty = false;
+        return _framePixels;
+    }
+
     private void updateBounds()
     {
-        setBounds(getX(), getY(), getSpriteWidth(), getSpriteHeight());
+        setBounds(_frameRect);
         revalidate();
     }
 
@@ -445,7 +442,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public void setX(int x)
     {
-        framePoint.x = x;
+        _framePoint.x = x;
     }
 
     /**
@@ -455,7 +452,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public void setY(int y)
     {
-        framePoint.y = y;
+        _framePoint.y = y;
     }
 
     /**
@@ -469,7 +466,7 @@ public class JBurstSprite extends JBurstBasic
      */
     public void setPosition(int x, int y)
     {
-        framePoint.setLocation(x, y);
+        _framePoint.setLocation(x, y);
     }
 
     /**
@@ -571,7 +568,8 @@ public class JBurstSprite extends JBurstBasic
         _frame = JBurstDestroyUtil.destroy(_frame);
 
         scale = null;
-        framePoint = null;
+        _framePoint = null;
+        _frameRect = null;
     }
 
     @Override

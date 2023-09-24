@@ -108,6 +108,8 @@ public class JBurstSprite extends JBurstBasic
     @Override
     public void update(int elapsed)
     {
+        if(!exists || !active) return;
+
         super.update(elapsed);
 
         if(animation != null)

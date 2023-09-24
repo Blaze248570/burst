@@ -2,15 +2,16 @@ package burst;
 
 import java.time.Duration;
 import java.time.Instant;
-
-import burst.group.JBurstGroup;
+import java.util.ArrayList;
 
 /**
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
  */
-public class JBurst extends JBurstGroup<JBurstBasic>
+public class JBurst
 {
+    public ArrayList<JBurstBasic> members;
+
     /**
      * Whether or not ALL of this JBurst's objects should update
      */
@@ -55,15 +56,23 @@ public class JBurst extends JBurstGroup<JBurstBasic>
      */
     public JBurst()
     {
+        members = new ArrayList<>();
         burstThread.start();
     }
 
     private void update()
     {
-        if(!active || size() == 0) return;
+        if(!active || members.size() == 0) return;
 
-        update(elapsed);
-        repaint();
+        for(int i = 0; i < members.size(); i++)
+        {
+            JBurstBasic basic = members.get(i);
+            if(basic != null)
+            {
+                basic.update(elapsed);
+                basic.repaint();
+            }
+        }
     }
 
     private long getTotal()
@@ -82,7 +91,7 @@ public class JBurst extends JBurstGroup<JBurstBasic>
     public boolean add(JBurstBasic element)
     {
         element.burst = this;
-        return super.add(element);
+        return members.add(element);
     }
 
     /**
@@ -93,10 +102,10 @@ public class JBurst extends JBurstGroup<JBurstBasic>
      * @param element   the element to be added to this group
      * @return  whether or not the element was successfully added
      */
-    public boolean add(int index, JBurstBasic element)
+    public void add(int index, JBurstBasic element)
     {
         element.burst = this;
-        return super.add(index, element);
+        members.add(index, element);
     }
 
     /**
@@ -114,7 +123,7 @@ public class JBurst extends JBurstGroup<JBurstBasic>
     public JBurstBasic set(int index, JBurstBasic element)
     {
         element.burst = this;
-        return super.set(index, element);
+        return members.set(index, element);
     }
 
     /**
@@ -128,30 +137,7 @@ public class JBurst extends JBurstGroup<JBurstBasic>
     public boolean remove(JBurstBasic element)
     {
         element.burst = null;
-        return super.remove(element, false);
-    }
-
-    /**
-     * Removes an element from {@code members}
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be removed
-     * @param splice    whether to replace the element with null or not
-     * @return  whether or not the JBurst contained {@code element}
-     */
-    public boolean remove(JBurstBasic element, boolean splice)
-    {
-        element.burst = null;
-        return super.remove(element, splice);
-    }
-
-    /**
-     * Clears all objects from this {@code members}
-     */
-    public void clear()
-    {
-        members.clear();
+        return members.remove(element);
     }
 
     /**
@@ -188,16 +174,13 @@ public class JBurst extends JBurstGroup<JBurstBasic>
      */
     public void destroy()
     {
-        if(burstThread == null) 
+        if(burstThread == null)
         {
-            super.destroy();
-            return;
+            burstThread.interrupt();
+            burstThread = null;
         }
-        
-        burstThread.interrupt();
-        burstThread = null;
 
-        super.destroy();
+        members = burst.util.JBurstDestroyUtil.destroyArrayList(members);
 
         System.gc();
     }

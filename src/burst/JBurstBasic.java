@@ -77,6 +77,6 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     public void destroy() 
     {
         if(burst != null)
-            burst.remove(this, true);
+            burst.remove(this);
     }
 }

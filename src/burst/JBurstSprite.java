@@ -364,9 +364,9 @@ public class JBurstSprite extends JBurstBasic
     @Override 
     public void paintComponent(Graphics g)
     {
-        if(!exists || !visible || alpha == 0) return;
-
         super.paintComponent(g);
+
+        if(!exists || !visible || alpha == 0) return;
 
         updateFramePixels();
 

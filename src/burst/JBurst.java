@@ -10,7 +10,9 @@ import java.util.ArrayList;
  */
 public class JBurst
 {
-    public ArrayList<JBurstBasic> members;
+    public static final JBurst BURST = new JBurst();
+
+    protected ArrayList<JBurstBasic> members;
 
     /**
      * Whether or not ALL of this JBurst's objects should update
@@ -29,7 +31,7 @@ public class JBurst
 
     private final Instant _startTime = Instant.now();
 
-    private Thread burstThread = new Thread() 
+    private Thread burstThread = new Thread("Burst-Manager") 
     {
         @Override
         public void run()
@@ -81,66 +83,6 @@ public class JBurst
     }
 
     /**
-     * Appends an element to the end of {@code members}.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be added to this group
-     * @return  whether or not the element was successfully added
-     */
-    public boolean add(JBurstBasic element)
-    {
-        element.burst = this;
-        return members.add(element);
-    }
-
-    /**
-     * Inserts an element at {@code index}.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be added to this group
-     * @return  whether or not the element was successfully added
-     */
-    public void add(int index, JBurstBasic element)
-    {
-        element.burst = this;
-        members.add(index, element);
-    }
-
-    /**
-     * Replaces the element at {@code index} with {@code element}.
-     * <p>
-     * If {@code index} is less than zero or exceeds the length of {@code members}, 
-     * the element will be appended to the end.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param index     the index of the element to be replaced
-     * @param element   the element to be set at {@code index}
-     * @return  the element that was replaced
-     */
-    public JBurstBasic set(int index, JBurstBasic element)
-    {
-        element.burst = this;
-        return members.set(index, element);
-    }
-
-    /**
-     * Removes an element from {@code members}, leaving the open space as {@code null}
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be removed
-     * @return  whether or not the JBurst contained {@code element}
-     */
-    public boolean remove(JBurstBasic element)
-    {
-        element.burst = null;
-        return members.remove(element);
-    }
-
-    /**
      * "Kills" this JBurst, causing it to cease updating.
      * 
      * @see {@link #revive()}
@@ -161,25 +103,17 @@ public class JBurst
     }
 
     /**
-     * Stops the JBurst from further updates, 
-     * destroys all of its current members, and kills its thread.
+     * Stops the JBurst from further updates, and destroys all of its current members.
      * <p>
      * <i>
      *  Warning: This will render every single object added to this JBurst completely useless.
-     *  Use {@code clear()} to prevent the objects from destruction.
-     *  To simply disable this JBurst, use {@code kill()}
+     *  To simply disable JBurst, use {@code kill()}
      * </i>
      * 
      * @see {@link #kill()}
      */
-    public void destroy()
+    public void reset()
     {
-        if(burstThread == null)
-        {
-            burstThread.interrupt();
-            burstThread = null;
-        }
-
         members = burst.util.JBurstDestroyUtil.destroyArrayList(members);
 
         System.gc();

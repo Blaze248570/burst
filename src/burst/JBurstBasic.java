@@ -14,9 +14,6 @@ import javax.swing.JComponent;
  */
 public class JBurstBasic extends JComponent implements IBurstDestroyable
 {
-    public static JBurst defaultBurst = new JBurst();
-    protected JBurst burst = defaultBurst;
-    
     static int idEnumerator = 0;
     public final int ID = idEnumerator++;
 
@@ -47,8 +44,8 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public JBurstBasic() 
     { 
-        if(burst != null)
-            burst.add(this);
+        if(JBurst.BURST != null)
+            JBurst.BURST.members.add(this);
     }
 
     /**
@@ -76,7 +73,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public void destroy() 
     {
-        if(burst != null)
-            burst.remove(this);
+        if(JBurst.BURST != null)
+            JBurst.BURST.members.remove(this);
     }
 }

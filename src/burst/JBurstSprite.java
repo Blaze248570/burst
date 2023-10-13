@@ -182,8 +182,6 @@ public class JBurstSprite extends JBurstBasic
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
     {
-        // JBurst.bitmap.add(graphic);
-
         int graphWidth = graphic.getWidth();
         int graphHeight = graphic.getHeight();
 

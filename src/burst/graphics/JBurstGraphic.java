@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import burst.graphics.frames.JBurstImageFrame;
@@ -17,6 +18,10 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
  */
 public class JBurstGraphic implements IBurstDestroyable
 {
+    private static int graphEnumerator = 0;
+    private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
+
+
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
@@ -56,10 +61,13 @@ public class JBurstGraphic implements IBurstDestroyable
      */
     public static JBurstGraphic fromImage(BufferedImage source, String key) 
     {
+        if(_cache.containsKey(key))
+            return _cache.get(key);
+        
         return new JBurstGraphic(key, source);
     }
 
-    public static BufferedImage returnBuffImage(String path) 
+    private static BufferedImage returnBuffImage(String path) 
     {
         try 
         {
@@ -75,7 +83,7 @@ public class JBurstGraphic implements IBurstDestroyable
 
     private static String generateKey()
     {
-        return "";
+        return "JBurstGraphic-" + graphEnumerator++;
     }
 
     /**

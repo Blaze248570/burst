@@ -41,6 +41,10 @@ public class JBurstFrame implements IBurstDestroyable
      */
     public Point offset;
 
+    /**
+     * Used for rotated frames on spritesheets
+     * <p><i>Currently not supported</i>
+     */
     public double angle;
 
     public JBurstFrame(JBurstGraphic graphic)
@@ -51,6 +55,7 @@ public class JBurstFrame implements IBurstDestroyable
     public JBurstFrame(JBurstGraphic graphic, double angle)
     {
         this.graphic = graphic;
+        this.angle = angle;
 
         sourceSize = new Dimension();
         offset = new Point();
@@ -87,7 +92,6 @@ public class JBurstFrame implements IBurstDestroyable
         {
             clone.graphic = graphic;
             clone.angle = angle;
-            clone.frame = null;
         }
 
         clone.offset.setLocation(offset);

@@ -228,10 +228,7 @@ public class JBurstSprite extends JBurstBasic
     public JBurstFrame setFrame(JBurstFrame frame)
     {
         if(frame != null)
-        {
-            // resetFrameSize();
             dirty = true;
-        }
         else if(frames != null && frames.frames != null && getNumFrames() > 0)
         {
             frame = frames.frames.get(0);
@@ -241,10 +238,14 @@ public class JBurstSprite extends JBurstBasic
             return null;
 
         _frame = frame.copyTo(_frame);
-        _frameRect.setLocation(0, 0);
-        _frameRect.setSize(getFrameWidth(), getFrameHeight());
+        resetFrameSize();
 
         return frame;
+    }
+
+    private void resetFrameSize()
+    {
+        _frameRect.setBounds(_framePoint.x, _framePoint.y, getFrameWidth(), getFrameHeight());
     }
 
     /**
@@ -260,6 +261,7 @@ public class JBurstSprite extends JBurstBasic
         setFrame(frames.frames.get(0));
         updateBounds();
 
+        graphicLoaded();
         return this.frames;
     }
 
@@ -336,7 +338,8 @@ public class JBurstSprite extends JBurstBasic
     /**
      * Sets the size that this sprite's graphic should be drawn at, in pixels.
      * <p>
-     * <i>Values less than or equal to zero will be ignored.</i>
+     * <i>If height is less than or equal to zero, it will match width and vice versa.</i>
+     * <p><i>If both arguments are less than or equal to zero, this call will be ignored.</i>
      * 
      * @param width     new width of graphic
      * @param height    new height of graphic

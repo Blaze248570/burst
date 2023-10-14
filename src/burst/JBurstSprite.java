@@ -1,6 +1,7 @@
 package burst;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -20,7 +21,6 @@ import burst.util.JBurstDestroyUtil;
  * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.
  * <p>
  * When a JBurstSprite is instantiated, it is automatically added to {@code JBurst.members}.
- * To undo this, use {@code setIndependent()}.
  * <p>
  * <i>Note:</i> As of now, most layout managers do not handle JBurstSprites correctly,
  * so none must be used by its container. (This can be achieved through {@code setLayout(null)})
@@ -34,31 +34,45 @@ import burst.util.JBurstDestroyUtil;
 public class JBurstSprite extends JBurstBasic 
 {
     /**
-     * The transparency of this sprite.
+     * Whether or not this object is painted
+     */
+    public boolean visible = true;
+
+    /**
+     * The transparency of this sprite
      * <p> <i>Currently unused</i>
      */
     public double alpha = 1.0f;
 
+    /**
+     * Whether or not this sprite's frame needs updating
+     * <p> <i>Normally handled internally</i>
+     */
     public boolean dirty = false;
+
+    /**
+     * Whether or not the sprite's bounding box outline should be painted
+     */
+    public boolean debugMode = false;
 
     /**
      * Manages animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
-    public JBurstAnimationController animation;
+    public final JBurstAnimationController animation;
 
-    private Point2D.Double scale;
+    private final Point2D.Double _scale;
 
-    private double angle = 0.0;
+    private double _angle = 0.0;
 
-    private Point _framePoint;
+    private final Point _framePoint;
 
-    private Rectangle _frameRect;
+    private final Rectangle _frameRect;
 
     /**
      * A collection of all the frames used by this sprite
      */
-    private JBurstFramesCollection frames;
+    private JBurstFramesCollection _frames;
 
     /**
      * The current frame being used in the drawing process
@@ -68,14 +82,10 @@ public class JBurstSprite extends JBurstBasic
     private BufferedImage _framePixels;
 
     /**
-     * Whether or not the sprite's bounding box outline should be painted
-     */
-    public boolean debugMode = false;
-
-    /**
-     * Constructs a new JBurstSprite at coordinates (0, 0),
-     * so long as its container uses no layout manager.
-     * Otherwise, it probably won't be anywhere.
+     * Constructs a new JBurstSprite at coordinates (0, 0).
+     * <p> 
+     * It is recommended it is used without a layout manager.
+     * Otherwise, it'll probably won't behave.
      */
     public JBurstSprite() 
     {
@@ -83,9 +93,10 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}),
-     * so long as its container uses no layout manager.
-     * Otherwise, it probably won't be anywhere.
+     * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}).
+     * <p> 
+     * It is recommended it is used without a layout manager.
+     * Otherwise, it'll probably won't behave.
      */
     public JBurstSprite(int x, int y) 
     {
@@ -93,37 +104,33 @@ public class JBurstSprite extends JBurstBasic
 
         animation = new JBurstAnimationController(this);
 
-        scale = new Point2D.Double(1.0, 1.0);
+        _scale = new Point2D.Double(1.0, 1.0);
         _framePoint = new Point();
         _frameRect = new Rectangle();
         
-        setPosition(x, y);
+        setSpriteLocation(x, y);
     }
 
     /**
-     * Called by {@code JBurst} every "frame" unless this sprite is independent.
+     * Called by {@code JBurst} every "frame"
      * 
      * @param elapsed   time since the last call to {@code update()} in milliseconds
      */
     @Override
     public void update(int elapsed)
     {
-        if(!exists || !active) return;
-
-        super.update(elapsed);
-
         if(animation != null)
             animation.update(elapsed);
     }
 
     /**
-     * Loads this sprite as a rectangle of one solid color.
+     * Loads this sprite as a rectangle of one solid color
      * 
-     * @param width     Width of rectangle
-     * @param height    Height of rectangle
-     * @param color     Color of rectangle
+     * @param width     width of rectangle
+     * @param height    height of rectangle
+     * @param color     color of rectangle
      * 
-     * @return  This JBurstSprite. Useful for chaining.
+     * @return  this JBurstSprite. Useful for chaining.
      */
     public JBurstSprite makeGraphic(int width, int height, Color color)
     {
@@ -138,25 +145,28 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Loads a graphic onto this sprite.
+     * Loads a graphic onto this sprite and automatically calls {@code JBurstGraphic.fromFile()}
      * 
-     * @param path  File path to the image to be loaded onto this sprite.
+     * @param source    file path to the image to be loaded onto this sprite
      * 
-     * @return  This JBurstSprite. Useful for chaining.
-     * @see {@link JBurstGraphic}
+     * @return  this JBurstSprite. Useful for chaining.
+     * 
+     * @see JBurstGraphic
      */
-    public JBurstSprite loadGraphic(String path)
+    public JBurstSprite loadGraphic(String source)
     {
-        return loadGraphic(JBurstGraphic.fromFile(path));
+        return loadGraphic(JBurstGraphic.fromFile(source));
     }
 
     /**
-     * Loads a graphic onto this sprite.
+     * Loads a graphic onto this sprite
      * 
-     * @param graphic   Image to be loaded onto this sprite.
+     * @param graphic   image to be loaded onto this sprite
      * 
-     * @return  This JBurstSprite. Useful for chaining.
-     * @see {@link JBurstGraphic}
+     * @return  this JBurstSprite. Useful for chaining
+     * 
+     * @see JBurstGraphic#fromFile()
+     * @see JBurstGraphic#fromImage()
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
@@ -166,19 +176,42 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Loads a graphic onto this sprite. 
-     * However, unlike {@code loadGraphic()}, this will give it animation properties.
+     * Loads a graphic onto this sprite with animation properties 
+     * and automatically calls {@code JBurstGraphic.fromFile()}. 
      * <p>
      * This version will take the provided graphic and split it into as many frames as it can
      * with the dimensions of {@code width} and {@code height}, adding each one to the sprite's
      * list of frames.
      * 
-     * @param graphic       Image to be sliced and displayed
-     * @param frameWidth    Width of rectangle used to slice
-     * @param frameHeight   Height of rectangle used to slice
+     * @param source        file path to the image to be loaded onto this sprite
+     * @param frameWidth    width of rectangle used to slice
+     * @param frameHeight   height of rectangle used to slice
      * 
-     * @return  This JBurstSprite. Useful for chaining.
-     * @see {@link JBurstGraphic}
+     * @return  this JBurstSprite. Useful for chaining
+     * 
+     * @see JBurstGraphic#fromFile()
+     * @see JBurstGraphic#fromImage()
+     */
+    public JBurstSprite loadAnimatedGraphic(String source, int frameWidth, int frameHeight)
+    {
+        return loadAnimatedGraphic(JBurstGraphic.fromFile(source), frameWidth, frameHeight);
+    }
+
+    /**
+     * Loads a graphic onto this sprite with animation properties. 
+     * <p>
+     * This version will take the provided graphic and split it into as many frames as it can
+     * with the dimensions of {@code width} and {@code height}, adding each one to the sprite's
+     * list of frames.
+     * 
+     * @param graphic       image to be sliced and displayed
+     * @param frameWidth    width of rectangle used to slice
+     * @param frameHeight   height of rectangle used to slice
+     * 
+     * @return  this JBurstSprite. Useful for chaining.
+     * 
+     * @see JBurstGraphic#fromFile()
+     * @see JBurstGraphic#fromImage()
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
     {
@@ -213,154 +246,87 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * This will be called whenever the sprite's graphic is loaded. 
-     * It normally does nothing and is meant to be overriden.
-     */
-    public void graphicLoaded() { }
-
-    /**
-     * Sets the current frame of the sprite.
+     * Sets the current frame of the sprite
      * 
-     * @param frame Frame to be set
+     * @param frame frame to be set
      */
     public JBurstFrame setFrame(JBurstFrame frame)
     {
         if(frame != null)
             dirty = true;
-        else if(frames != null && frames.frames != null && getNumFrames() > 0)
+        else if(_frames != null && _frames.frames != null && getNumFrames() > 0)
         {
-            frame = frames.frames.get(0);
+            frame = _frames.frames.get(0);
             dirty = true;
         }
         else
             return null;
 
         _frame = frame.copyTo(_frame);
-        resetFrameSize();
+        _frameRect.setBounds(_framePoint.x, _framePoint.y, getFrameWidth(), getFrameHeight());
 
         return frame;
     }
 
-    private void resetFrameSize()
+    /**
+     * Returns the true width of this sprite, without scaling
+     */
+    public int getFrameWidth()
     {
-        _frameRect.setBounds(_framePoint.x, _framePoint.y, getFrameWidth(), getFrameHeight());
+        if(_frame != null)
+            return _frame.sourceSize.width;
+        
+        return 0;
     }
 
     /**
-     * Loads a frame collection from a spritesheet and designated animation file.
+     * Returns the true height of this sprite, without scaling
+     */
+    public int getFrameHeight()
+    {
+        if(_frame != null)
+            return _frame.sourceSize.height;
+
+        return 0;
+    }
+
+    /**
+     * Returns a collection of all the frames used by this sprite, which may be {@code null}
+     * 
+     * @return  this sprite's frame collection
+     */
+    public JBurstFramesCollection getFrames()
+    {
+        return this._frames;
+    }
+
+    /**
+     * Loads a frame collection from a spritesheet and designated animation file
      * 
      * @return  this sprite's frame collection
      */
     public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
-        this.frames = frames;
+        this._frames = frames;
         this.animation.clearAnimations();
 
         setFrame(frames.frames.get(0));
         updateBounds();
 
         graphicLoaded();
-        return this.frames;
+        return this._frames;
     }
 
     /**
-     * Returns a collection of all the frames used by this sprite, which may be {@code null}.
-     * 
-     * @return  this sprite's frame collection
+     * This normally does nothing.
+     * It will be called whenever the sprite's graphic is loaded and is meant to be overriden.
      */
-    public JBurstFramesCollection getFrames()
-    {
-        return this.frames;
-    }
-
-    /**
-     * Returns this sprite's angle of rotation, in radians.
-     * <p> 
-     * {@code Math.toDegrees()} can be used to convert 
-     * this value into degrees.
-     */
-    public double getAngle()
-    {
-        return this.angle;
-    }
-
-    /**
-     * Sets the angle of rotation of this sprite, in radians.
-     * If you'd rather use degrees, {@code Math.toRadians()} can be used.
-     * <p>
-     * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
-     * would flip this sprite upside-down.
-     * 
-     * @param theta the amount to rotate this sprite by, in radians
-     */
-    public void setAngle(double theta)
-    {
-        if(theta <= -2.0 * Math.PI || theta >= 2.0 * Math.PI)
-            theta %= 2.0 * Math.PI; // Keep the angle within (-2pi, 2pi) to avoid overflow/underflow errors.
-        
-        this.angle = theta;
-    }
-
-    /**
-     * Sets the sizing scale of this sprite.
-     * <p>
-     * For example: providing 0.5 would halve the sprite in size.
-     * <p>
-     * <i>A value less then or equal to zero will be ignored.</i>
-     * 
-     * @param scale How big or small to make this sprite.
-     */
-    public void setScale(double scale)
-    {
-        setScale(scale, scale);
-    }
-
-    /**
-     * Sets the sizing scale of this sprite.
-     * <p>
-     * For example: providing 0.5 to {@code scaleX} would halve the sprite in size, horizontally.
-     * <p>
-     * <i>Values less then or equal to zero will be ignored.</i>
-     * 
-     * @param scaleX    how big or small to make this sprite, horizontally.     
-     * @param scaleY    how big or small to make this sprite, vertically.
-     */
-    public void setScale(double scaleX, double scaleY)
-    {
-        if(scaleX <= 0 && scaleY <= 0) return;
-
-        scale.setLocation(scaleX, scaleY);
-        updateBounds();
-    }
-
-    /**
-     * Sets the size that this sprite's graphic should be drawn at, in pixels.
-     * <p>
-     * <i>If height is less than or equal to zero, it will match width and vice versa.</i>
-     * <p><i>If both arguments are less than or equal to zero, this call will be ignored.</i>
-     * 
-     * @param width     new width of graphic
-     * @param height    new height of graphic
-     */
-    public void setGraphicSize(int width, int height)
-    {
-        if(width <= 0 && height <= 0) return;
-
-        double scaleX = ((double) width) / getFrameWidth();
-        double scaleY = ((double) height) / getFrameHeight();
-
-        if(width <= 0)
-            scaleX = scaleY;
-        else if(height <= 0)
-            scaleY = scaleX;
-
-        setScale(scaleX, scaleY);
-    }
+    public void graphicLoaded() { }
 
     /**
      * Used by Java Swing internally to paint this sprite.
      * <p>
-     * It is highly suggested that is <strong><i>not</i></strong> overriden.
+     * <i>It is highly suggested that is <strong>not</strong> overriden.</i>
      */
     @Override 
     public void paintComponent(Graphics g)
@@ -389,7 +355,7 @@ public class JBurstSprite extends JBurstBasic
 
     public boolean isSimpleRender()
     {
-        return angle == 0 && scale.x == 1 && scale.y == 1;
+        return _angle == 0 && _scale.x == 1 && _scale.y == 1;
     }
 
     private void paintSimple(Graphics graphics)
@@ -406,17 +372,17 @@ public class JBurstSprite extends JBurstBasic
         int frameWidth = getFrameWidth();
         int frameHeight = getFrameHeight();
 
-        int newWidth = (int) (Math.abs(frameWidth * Math.cos(angle)) + Math.abs(frameHeight * Math.sin(angle)));           
-        int newHeight = (int) (Math.abs(frameWidth * Math.sin(angle)) + Math.abs(frameHeight * Math.cos(angle)));
+        int newWidth = (int) (Math.abs(frameWidth * Math.cos(_angle)) + Math.abs(frameHeight * Math.sin(_angle)));           
+        int newHeight = (int) (Math.abs(frameWidth * Math.sin(_angle)) + Math.abs(frameHeight * Math.cos(_angle)));
 
         int deltaX = (newWidth - frameWidth) / 2;
         int deltaY = (newHeight - frameHeight) / 2;
 
-        _frameRect.setLocation(_framePoint.x - (int)(deltaX * scale.x), _framePoint.y - (int)(deltaY * scale.y));
-        _frameRect.setSize((int)(newWidth * scale.x), (int)(newHeight * scale.y));
+        _frameRect.setLocation(_framePoint.x - (int)(deltaX * _scale.x), _framePoint.y - (int)(deltaY * _scale.y));
+        _frameRect.setSize((int)(newWidth * _scale.x), (int)(newHeight * _scale.y));
         
-        xForm.scale(scale.x, scale.y);
-        xForm.rotate(angle, newWidth / 2, newHeight / 2);
+        xForm.scale(_scale.x, _scale.y);
+        xForm.rotate(_angle, newWidth / 2, newHeight / 2);
         xForm.translate(deltaX, deltaY);
 
         graphics.drawImage(_framePixels, xForm, null);
@@ -439,97 +405,374 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Sets the x position of this sprite.
+     * @deprecated This does not return the true x-coordinate of this sprite.
+     * Use {@code getSpriteX()} instead.
      * 
-     * @param x the new x-coordinate of this sprite
+     * @see #getSpriteX()
      */
-    public void setX(int x)
+    @Override
+    @Deprecated
+    public int getX()
+    {
+        return super.getX();
+    }
+
+    public int getSpriteX()
+    {
+        return _framePoint.x;
+    }
+
+    public void setSpriteX(int x)
     {
         _framePoint.x = x;
     }
 
     /**
-     * Sets the y position of this sprite.
+     * @deprecated This does not return the true y-coordinate of this sprite.
+     * Use {@code getSpriteY()} instead.
      * 
-     * @param y the new y-coordinate of this sprite
+     * @see #getSpriteY()
      */
-    public void setY(int y)
+    @Override
+    @Deprecated
+    public int getY()
+    {
+        return super.getY();
+    }
+
+    public int getSpriteY()
+    {
+        return _framePoint.x;
+    }
+
+    public void setSpriteY(int y)
     {
         _framePoint.y = y;
     }
 
     /**
-     * Sets the position of this sprite.
-     * <p> This should be used in opposition to {@code setLocation()} 
-     * as this will also update the sprite's relative position which is used
-     * in calculating rotational offsets.
+     * @deprecated This does not return the true coordinates of this sprite.
+     * Use {@code getSpriteLocation()} instead.
+     * 
+     * @see #getSpriteLocation()
+     */
+    @Override
+    @Deprecated
+    public Point getLocation()
+    {
+        return super.getLocation();
+    }
+
+    /**
+     * @deprecated This does not return the true coordinates of this sprite.
+     * Use {@code getSpriteLocation()} instead.
+     * 
+     * @see #getSpriteLocation(rv)
+     */
+    @Override
+    @Deprecated
+    public Point getLocation(Point rv)
+    {
+        return super.getLocation(rv);
+    }
+
+    public Point getSpriteLocation()
+    {
+        return new Point(_framePoint);
+    }
+
+    /**
+     * Gets this sprite's location and applies the corrdinates to {@code rv}
+     * <p>
+     * <i>If {@code rv} is null, a new Point is returned</i>
+     */
+    public Point getSpriteLocation(Point rv)
+    {
+        if(rv == null)
+            return new Point(_framePoint);
+        else
+        {
+            rv.setLocation(_framePoint);
+            return rv;
+        }
+    }
+
+    /**
+     * @deprecated {@code setLocation()} has no effect on this sprite.
+     * Use {@code setSpriteLocation()} instead.
+     * 
+     * @see #setSpriteLocation()
+     */
+    @Override
+    @Deprecated
+    public void setLocation(int x, int y)
+    {
+        super.setLocation(x, y);
+    }
+
+    /**
+     * @deprecated {@code setLocation()} has no effect on this sprite.
+     * Use {@code setSpriteLocation()} instead.
+     * 
+     * @see #setSpriteLocation()
+     */
+    @Override
+    @Deprecated
+    public void setLocation(Point p)
+    {
+        super.setLocation(p);
+    }
+
+    /**
+     * Sets the position of this sprite
      * 
      * @param x the new x-coordinate of this sprite
      * @param y the new y-coordinate of this sprite
      */
-    public void setPosition(int x, int y)
+    public void setSpriteLocation(int x, int y)
     {
         _framePoint.setLocation(x, y);
     }
 
     /**
-     * Returns the width of this sprite with scaling calculations.
+     * Sets the position of this sprite
+     * 
+     * @param p the new coordinates of this sprite
      */
+    public void setSpriteLocation(Point p)
+    {
+        _framePoint.setLocation(p.x, p.y);
+    }
+
     public int getSpriteWidth()
     {
         if(_frame != null)
-            return (int) (_frame.sourceSize.width * scale.x);
+            return (int) (_frame.sourceSize.width * _scale.x);
 
         return 0;
     }
 
-    /**
-     * Returns the height of this sprite with scaling calculations.
-     */
     public int getSpriteHeight()
     {
         if(_frame != null)
-            return (int) (_frame.sourceSize.height * scale.y);
+            return (int) (_frame.sourceSize.height * _scale.y);
 
         return 0;
     }
 
     /**
-     * Returns the true width of this sprite, without scaling
+     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * Use {@code getSpriteSize()} instead.
+     * 
+     * @see #getSpriteSize()
      */
-    public int getFrameWidth()
+    @Override
+    @Deprecated
+    public Dimension getSize()
     {
-        if(_frame != null)
-            return _frame.sourceSize.width;
-        
-        return 0;
+        return super.getSize();
     }
 
     /**
-     * Returns the true height of this sprite, without scaling
+     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * Use {@code getSpriteSize()} instead.
+     * 
+     * @see #getSpriteSize(rv)
      */
-    public int getFrameHeight()
+    @Override
+    @Deprecated
+    public Dimension getSize(Dimension rv)
     {
-        if(_frame != null)
-            return _frame.sourceSize.height;
+        return super.getSize();
+    }
 
-        return 0;
+    public Dimension getSpriteSize()
+    {
+        return new Dimension(getSpriteWidth(), getSpriteHeight());
+    }
+
+     /**
+     * Gets this sprite's location and applies the corrdinates to {@code rv}
+     * <p>
+     * <i>If {@code rv} is null, a new Point is returned</i>
+     */
+    public Dimension getSpriteSize(Dimension rv)
+    {
+        if(rv == null)
+            return new Dimension(getSpriteSize());
+        else
+        {
+            rv.setSize(getSpriteWidth(), getSpriteHeight());
+            return rv;
+        }
     }
 
     /**
-     * Returns this sprite's graphic object, which may be {@code null}.
+     * @deprecated {@code setSize()} has no effect on this sprite.
+     * Use {@code setScale()} or {@code setGraphicSize()} instead.
+     * 
+     * @see #setScale()
+     * @see #setGraphicSize()
+     */
+    @Override
+    @Deprecated
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+    }
+
+    /**
+     * @deprecated {@code setSize()} has no effect on this sprite.
+     * Use {@code setScale()} or {@code setGraphicSize()} instead.
+     * 
+     * @see #setScale()
+     * @see #setGraphicSize()
+     */
+    @Override
+    @Deprecated
+    public void setSize(Dimension d)
+    {
+        super.setSize(d);
+    }
+
+    /**
+     * Sets the sizing scale of this sprite.
+     * <p>
+     * For example: providing 0.5 would halve the sprite in size.
+     * <p>
+     * <i>A value less then or equal to zero will be ignored.</i>
+     * 
+     * @param scale how much to scale this sprite.
+     */
+    public void setScale(double scale)
+    {
+        setScale(scale, scale);
+    }
+
+    /**
+     * Sets the sizing scale of this sprite.
+     * <p>
+     * For example: {@code setScale(0.5, 1)} would halve the sprite in size, horizontally.
+     * <p>
+     * <i>Values less then or equal to zero will be ignored.</i>
+     * 
+     * @param scaleX    how much to scale this sprite, horizontally.     
+     * @param scaleY    how much to scale this sprite, vertically.
+     */
+    public void setScale(double scaleX, double scaleY)
+    {
+        if(scaleX > 0)
+            _scale.x = scaleX;
+        if(scaleY > 0)
+            _scale.y = scaleY;
+    }
+
+    /**
+     * Sets the size that this sprite's graphic should be drawn at, in pixels.
+     * <p>
+     * <i>If height is less than or equal to zero, it will match width and vice versa.</i>
+     * <p><i>If both arguments are less than or equal to zero, this call will be ignored.</i>
+     * 
+     * @param width     new width of graphic
+     * @param height    new height of graphic
+     */
+    public void setGraphicSize(int width, int height)
+    {
+        if(width <= 0 && height <= 0) return;
+
+        double scaleX = ((double) width) / getFrameWidth();
+        double scaleY = ((double) height) / getFrameHeight();
+
+        if(width <= 0)
+            scaleX = scaleY;
+        else if(height <= 0)
+            scaleY = scaleX;
+
+        setScale(scaleX, scaleY);
+    }
+
+    /**
+     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     */
+    @Override
+    @Deprecated
+    public Rectangle getBounds()
+    {
+        return super.getBounds();
+    }
+
+    /**
+     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     */
+    @Override
+    @Deprecated
+    public Rectangle getBounds(Rectangle rv)
+    {
+        return super.getBounds(rv);
+    }
+
+    /**
+     * @deprecated {@code setBounds()} has no effect on this sprite.
+     */
+    @Override
+    @Deprecated
+    public void setBounds(int x, int y, int width, int height)
+    {
+        super.setBounds(x, y, width, height);
+    }
+
+    /**
+     * @deprecated {@code setBounds()} has no effect on this sprite.
+     */
+    @Override
+    @Deprecated
+    public void setBounds(Rectangle r)
+    {
+        super.setBounds(r);
+    }
+
+    /**
+     * Returns this sprite's angle of rotation, in radians
+     * <p> 
+     * <i>Use {@code Math.toDegrees()} to convert this value into degrees</i>
+     * <p>
+     * <i>This will always return a value within a range of (-2pi, 2pi)</i>
+     */
+    public double getAngle()
+    {
+        return this._angle;
+    }
+
+    /**
+     * Sets the angle of rotation of this sprite, in radians.
+     * <i>If you'd rather use degrees, use {@code Math.toRadians()}.</i>
+     * <p>
+     * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
+     * would flip this sprite upside-down.
+     * <p>
+     * <i>{@code theta} will be reduced if it isn't within a range of (-2pi, 2pi)</i>
+     * 
+     * @param theta the amount to rotate this sprite by, in radians
+     */
+    public void setAngle(double theta)
+    {
+        this._angle = (theta %= 2.0 * Math.PI);
+    }
+
+    /**
+     * Returns this sprite's frame collection's graphic object, which may be {@code null}
      */
     public JBurstGraphic getGraphic()
     {
-        if(frames != null)
-            return frames.graphic;
+        if(_frames != null)
+            return _frames.graphic;
 
         return null;
     }
 
     /**
      * Returns a writable graphics object from this sprite's graphic,
-     * which may be {@code null}.
+     * which may be {@code null}
      */
     public Graphics2D getPixels()
     {
@@ -541,21 +784,21 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Returns the number of frames stored within this sprite's frame collection.
+     * Returns the number of frames stored within this sprite's frame collection
      */
     public int getNumFrames()
     {
-        if(frames != null && frames.frames != null)
-            return frames.frames.size();
+        if(_frames != null && _frames.frames != null)
+            return _frames.frames.size();
 
         return 0;
     }
 
     /**
-     * Completely removes all of this sprite's tools from memory. 
+     * Completely deactivates all of this sprite's tools. 
      * After calling {@code destroy()}, instances of this sprite should be nulled.
      * <p>
-     * <i>Warning: This sprite will no longer be usable after {@code destroy()} is called.
+     * <i>Warning: Sprites are no longer usable after {@code destroy()} is called.
      * To simply deactivate this sprite, use {@code kill()}.
      * 
      * @see {@link #kill()}
@@ -566,18 +809,14 @@ public class JBurstSprite extends JBurstBasic
     {
         super.destroy();
 
-        animation = JBurstDestroyUtil.destroy(animation);
-        frames = JBurstDestroyUtil.destroy(frames);
+        JBurstDestroyUtil.destroy(animation);
+        _frames = JBurstDestroyUtil.destroy(_frames);
         _frame = JBurstDestroyUtil.destroy(_frame);
-
-        scale = null;
-        _framePoint = null;
-        _frameRect = null;
     }
 
     @Override
     public String toString()
     {
-        return "JBurstSprite ~ {x: " + getX() + ", y: " + getY() + ", width: " + getWidth() + ", height: " + getHeight() + "}";
+        return String.format("%s[x=%d,y=%d]", getClass().getName(), _framePoint.x, _framePoint.y);
     }
 }

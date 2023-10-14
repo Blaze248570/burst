@@ -12,13 +12,16 @@ import burst.graphics.JBurstGraphic;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
- * A specialized rectangle used by the animation classes.
+ * Frame data used to slice spritesheets and paint sprites.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFrame.html">FlxFrame</a>
  */
 public class JBurstFrame implements IBurstDestroyable
 {
+    /**
+     * This frame's location on {@code graphic}'s spritesheet
+     */
     public Rectangle frame;
 
     /**
@@ -61,6 +64,11 @@ public class JBurstFrame implements IBurstDestroyable
         offset = new Point();
     }
 
+    /**
+     * Paints this frame's content onto the {@code image}
+     * 
+     * @return  {@code image}
+     */
     public BufferedImage paint(BufferedImage image)
     {
         if(image == null)
@@ -75,6 +83,11 @@ public class JBurstFrame implements IBurstDestroyable
         return image;
     }
 
+    /**
+     * Clears the content of {@code image}
+     * 
+     * @param image
+     */
     public void clearFrame(BufferedImage image)
     {
         Graphics2D graphics = image.createGraphics();
@@ -84,6 +97,11 @@ public class JBurstFrame implements IBurstDestroyable
         graphics.dispose();
     }
 
+    /**
+     * Copies this frame's data onto {@code frame}
+     * 
+     * @return  {@code clone} with this frame's properties
+     */
     public JBurstFrame copyTo(JBurstFrame clone)
     {
         if(clone == null)
@@ -114,6 +132,6 @@ public class JBurstFrame implements IBurstDestroyable
     @Override
     public String toString()
     {
-        return "BurstFrame ~ {name: " + name + " x: " + frame.x + ", y: " + frame.y + ", width: " + frame.width + ", height: " + frame.height + "}";
+        return String.format("%s[name=\"%s\",x=%d,y=%d,width=%d,height=%d]", getClass().getName(), name, frame.x, frame.y, frame.width, frame.height);
     }
 }

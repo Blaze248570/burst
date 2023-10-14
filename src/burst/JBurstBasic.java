@@ -4,10 +4,10 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 import javax.swing.JComponent;
 
 /**
- * The JBurstBasic class is sort of the building block for JBurstSprite.
+ * The JBurstBasic class is sort of just the simple JBurstSprite.
  * <p>
- * This class could be used to create an object that is persistently updated, 
- * but not quite as heavy as JBurstSprite.
+ * It can be used to create an object that is persistently updated, 
+ * but not quite as heavy as a JBurstSprite.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxBasic.html">FlxBasic</a>
@@ -35,11 +35,6 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     public boolean exists = true;
 
     /**
-     * Whether or not this object is drawn
-     */
-    public boolean visible = true;
-
-    /**
      * Creates a new JBurstBasic
      */
     public JBurstBasic() 
@@ -49,7 +44,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     }
 
     /**
-     * "Kills" the object, causing it to cease updating <i>and</i> drawing.
+     * "Kills" the object, causing it to cease updating <i>and</i> drawing
      */
     public void kill() 
     {
@@ -58,7 +53,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     }
 
     /**
-     * "Revives" the object, causing it continue updating <i>and</i> drawing.
+     * "Revives" the object, causing it continue updating <i>and</i> drawing
      */
     public void revive() 
     {
@@ -75,5 +70,11 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     {
         if(JBurst.BURST != null)
             JBurst.BURST.members.remove(this);
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[exists=%b,alive=%b,active=%b]", getClass().getName(), exists, alive, active);
     }
 }

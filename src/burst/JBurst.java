@@ -4,14 +4,29 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import burst.util.JBurstDestroyUtil;
+
 /**
+ * Core of JBurst and manager class of all JBurstBasics.
+ * <p>
+ * Handles updating thread and
+ * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
  */
 public class JBurst
 {
+    /**
+     * The overarching JBurst object managing all JBurstBasics
+     */
     public static final JBurst BURST = new JBurst();
 
+    /**
+     * All currently active JBurstBasic objects are held within this ArrayList.
+     * <p> 
+     * You shouldn't need to add JBurstBasics manually as they automatically
+     * add themselves when they are instantiated.
+     */
     protected ArrayList<JBurstBasic> members;
 
     /**
@@ -29,8 +44,11 @@ public class JBurst
      */
     public int elapsed;
 
-    private final Instant _startTime = Instant.now();
+    private Instant _startTime = Instant.now();
 
+    /**
+     * Independent thread running sprite update system
+     */
     private Thread burstThread = new Thread("Burst-Manager") 
     {
         @Override
@@ -71,7 +89,8 @@ public class JBurst
             JBurstBasic basic = members.get(i);
             if(basic != null)
             {
-                basic.update(elapsed);
+                if(basic.exists && basic.active)
+                    basic.update(elapsed);
                 basic.repaint();
             }
         }
@@ -114,8 +133,15 @@ public class JBurst
      */
     public void reset()
     {
-        members = burst.util.JBurstDestroyUtil.destroyArrayList(members);
-
+        JBurstDestroyUtil.destroyArrayList(members);
         System.gc();
+
+        _startTime = Instant.now();
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[total=%dms,elapsed=%dms,length=%d]", getClass().getName(), _total, elapsed, members.size());
     }
 }

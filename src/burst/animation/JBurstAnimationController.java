@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import burst.JBurstSprite;
+import burst.graphics.frames.JBurstAtlasFrames;
 import burst.graphics.frames.JBurstFrame;
 import burst.graphics.frames.JBurstFramesCollection;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
@@ -28,16 +29,6 @@ public class JBurstAnimationController implements IBurstDestroyable
      */
     public int frameIndex = -1;
 
-    /**
-     * Used to pause and resume the current animation.
-     */
-    public boolean paused;
-
-    /**
-     * Whether or not the animation has finished.
-     */
-    public boolean finished;
-
     public TriConsumer<String, Integer, Integer> callback;
 
     public Consumer<String> finishedCallBack;
@@ -55,7 +46,6 @@ public class JBurstAnimationController implements IBurstDestroyable
     public JBurstAnimationController(JBurstSprite sprite) 
     {
         this._sprite = sprite;
-
         this._animations = new HashMap<>();
     }
 
@@ -76,6 +66,12 @@ public class JBurstAnimationController implements IBurstDestroyable
      * For example, providing 
      * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
      * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
+     * <p> <i> If an animation titled {@code name} already exists, it will be overwritten</i>
+     * 
+     * @param name      the title for the new animation
+     * @param frames    which frames the new animation displays
+     * 
+     * @see JBurstSprite#loadAnimatedGraphic()
      */
     public void add(String name, int[] frames)
     {
@@ -91,6 +87,13 @@ public class JBurstAnimationController implements IBurstDestroyable
      * For example, providing 
      * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
      * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
+     * <p> <i> If an animation titled {@code name} already exists, it will be overwritten</i>
+     * 
+     * @param name      the title for the new animation
+     * @param frames    which frames the new animation displays
+     * @param framerate the speed this animation should play at in frames per second
+     * 
+     * @see JBurstSprite#loadAnimatedGraphic()
      */
     public void add(String name, int[] frames, int framerate)
     {
@@ -104,8 +107,16 @@ public class JBurstAnimationController implements IBurstDestroyable
      * The {@code frames} object required will be which indices to use to animate with.
      * <p>
      * For example, providing 
-     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 4, 6}, 30, true)</code>
-     * <p> will create an animation named "Dance" using the first, second, third, fifth, and seventh frames.
+     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 3, 4}, 30, true)</code>
+     * <p> will create an animation named "Dance" using the first five frames.
+     * <p> <i> If an animation titled {@code name} already exists, it will be overwritten</i>
+     * 
+     * @param name      the title for the new animation
+     * @param frames    which frames the new animation displays
+     * @param framerate the speed this animation should play at in frames per second
+     * @param looped    whether or not the new animation should replay when finished
+     * 
+     * @see JBurstSprite#loadAnimatedGraphic()
      */
     public void add(String name, int[] frames, int framerate, boolean looped)
     {
@@ -115,11 +126,14 @@ public class JBurstAnimationController implements IBurstDestroyable
     }
 
     /**
-     * Adds an animation to the parent sprite.
-     * To be used after {@code loadFrames()}.
+     * Adds an animation to the parent sprite using a key from their animation data.
      * 
-     * @param name      What to name the animation.
-     * @param prefix    Name of the animation on the animation file.
+     * @param name      what to name the animation.
+     * @param prefix    name of the animation on the animation file.
+     * 
+     * @see JBurstSprite#setFrames()
+     * @see JBurstAtlasFrames#fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix)
     {
@@ -127,12 +141,15 @@ public class JBurstAnimationController implements IBurstDestroyable
     }
 
     /**
-     * Adds an animation to the parent sprite.
-     * To be used after {@code loadFrames()}.
+     * Adds an animation to the parent sprite using a key from their animation data.
      * 
-     * @param name          What to name the animation.
-     * @param prefix        Name of the animation on the animation file.
-     * @param framerate     How fat or slow this animation should play.
+     * @param name          what to name the animation.
+     * @param prefix        name of the animation on the animation file.
+     * @param framerate     how fat or slow this animation should play.
+     * 
+     * @see JBurstSprite#setFrames()
+     * @see JBurstAtlasFrames#fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix, int framerate)
     {
@@ -141,13 +158,16 @@ public class JBurstAnimationController implements IBurstDestroyable
 
 
     /**
-     * Adds an animation to the parent sprite.
-     * To be used after {@code loadFrames()}.
+     * Adds an animation to the parent sprite using a key from their animation data.
      * 
-     * @param name          What to name the animation.
-     * @param prefix        Name of the animation on the animation file.
-     * @param framerate     How fat or slow this animation should play.
-     * @param looped        Whether or not this animation should play again once it is finished.
+     * @param name          what to name the animation.
+     * @param prefix        name of the animation on the animation file.
+     * @param framerate     how fat or slow this animation should play.
+     * @param looped        whether or not this animation should play again once it is finished.
+     * 
+     * @see JBurstSprite#setFrames()
+     * @see JBurstAtlasFrames#fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix, int framerate, boolean looped)
     {
@@ -300,8 +320,8 @@ public class JBurstAnimationController implements IBurstDestroyable
     }
 
     /**
-     * Returns a list of all the animations *names*.
-     * <p> This does not return the animation objects themselves!
+     * Returns a list of all the animations' names.
+     * <p><i>This does not return the animation objects themselves.</i>
      */
     public ArrayList<String> getNamesList()
     {
@@ -316,7 +336,7 @@ public class JBurstAnimationController implements IBurstDestroyable
 
     /**
      * Returns a list of all the animations.
-     * <p> This does not return the animation objects' names!
+     * <p><i>This does not return the animation names.</i>
      */
     public ArrayList<JBurstAnimation> getAnimationsList()
     {
@@ -341,9 +361,7 @@ public class JBurstAnimationController implements IBurstDestroyable
             {
                 anim = _animations.get(key);
                 if(anim != null)
-                {
                     anim.destroy();
-                }
             }
         }
 
@@ -397,5 +415,11 @@ public class JBurstAnimationController implements IBurstDestroyable
         _animations = null;
         callback = null;
         _sprite = null;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[curanim=%s,frameindex=%d]", getClass().getName(), curAnim.toString(), frameIndex);
     }
 }

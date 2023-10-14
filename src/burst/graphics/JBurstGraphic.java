@@ -1,24 +1,31 @@
 package burst.graphics;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
+import burst.graphics.frames.JBurstImageFrame;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
+ * Image caching and managing
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html">FlxGraphic</a>
  */
 public class JBurstGraphic implements IBurstDestroyable
 {
+    private static int graphEnumerator = 0;
+    private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
+
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    path of image asset to be used in returned JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic
      */
     public static JBurstGraphic fromFile(String source) 
     {
@@ -28,7 +35,7 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    path of image asset to be used in returned JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic
      * @param key       unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source, String key) 
@@ -37,9 +44,9 @@ public class JBurstGraphic implements IBurstDestroyable
     }
 
     /**
-     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}
      * 
-     * @param source    image to be used in returned JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic
      */
     public static JBurstGraphic fromImage(BufferedImage source) 
     {
@@ -47,45 +54,49 @@ public class JBurstGraphic implements IBurstDestroyable
     }
 
     /**
-     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}
      * 
-     * @param source    image to be used in returned JBurstGraphic.
-     * @param key       unique title for this JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic
+     * @param key       unique title for this JBurstGraphic
      */
     public static JBurstGraphic fromImage(BufferedImage source, String key) 
     {
+        if(_cache.containsKey(key))
+            return _cache.get(key);
+        
         return new JBurstGraphic(key, source);
     }
 
-    public static BufferedImage returnBuffImage(String path) 
+    private static BufferedImage returnBuffImage(String path) 
     {
-        BufferedImage img = null;
         try 
         {
-            img = ImageIO.read(new File(path));
+            return ImageIO.read(new File(path));
         } 
         catch(IOException e) 
         {
             System.out.print("Image not found: " + path);
         }
 
-        return img;
+        return null;
     }
 
     private static String generateKey()
     {
-        return "";
+        return "JBurstGraphic-" + graphEnumerator++;
     }
 
     /**
-     * Unique label to be used in future caching system
+     * Unique label used in caching system
      */
     public String key;
 
     /**
-     * Image data about this graphic
+     * Pixel data about this graphic
      */
     public BufferedImage image;
+
+    private JBurstImageFrame _imageFrame;
 
     public JBurstGraphic(String key, BufferedImage image) 
     {
@@ -93,43 +104,43 @@ public class JBurstGraphic implements IBurstDestroyable
         this.image = image;
     }
 
-    /**
-     * Returns writable graphics object from this graphic's image.
-     * 
-     * @return  a writeable graphics object
-     */
-    public Graphics2D getPixels()
-    {
-        Graphics2D pixels = null;
-        if(image != null)
-            pixels = image.createGraphics();
-
-        return pixels;
-    }
-
     public int getWidth()
     {
-        int width = 0;
         if(image != null)
-            width = image.getWidth();
+            return image.getWidth();
 
-        return width;
+        return 0;
     }
 
     public int getHeight()
     {
-        int height = 0;
         if(image != null)
-            height = image.getHeight();
+            return image.getHeight();
 
-        return height;
+        return 0;
+    }
+
+    public Graphics2D createGraphics()
+    {
+        if(image != null)
+            return image.createGraphics();
+
+        return null;
+    }
+
+    public JBurstImageFrame getImageFrame()
+    {
+        if(_imageFrame == null)
+            _imageFrame = JBurstImageFrame.fromGraphic(this, new Rectangle(0, 0, getWidth(), getHeight()));
+
+        return _imageFrame;
     }
 
     @Override
     public void destroy()
     {
         key = null;
-        image = null; // These needs further destruction
+        image = null;
     }
 
     @Override 

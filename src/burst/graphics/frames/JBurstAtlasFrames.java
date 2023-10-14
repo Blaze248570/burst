@@ -2,7 +2,6 @@ package burst.graphics.frames;
 
 import java.awt.Rectangle;
 import java.awt.Point;
-import java.util.Comparator;
 import java.util.Scanner;
 
 import org.json.simple.JSONArray;
@@ -28,12 +27,12 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
     /**
      * Parsing method for sparrow texture atlases.
      * 
-     * @param path          file location of desired spritesheet to be loaded and parsed.
+     * @param source          file location of desired spritesheet to be loaded and parsed.
      * @param description   parsing instructions file location (Should be .xml)
      */
-    public static JBurstAtlasFrames fromSparrow(String graphic, String description)
+    public static JBurstAtlasFrames fromSparrow(String source, String description)
     {
-        return fromSparrow(JBurstGraphic.fromFile(graphic, graphic), description);
+        return fromSparrow(JBurstGraphic.fromFile(source), description);
     }
 
     /**
@@ -99,12 +98,12 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
      * <p> 
      * <i>Note: There is currently no way to load rotated sprites.</i>
      * 
-     * @param graphic       file location of desired spritesheet to be loaded and parsed.
+     * @param source        file location of desired spritesheet to be loaded and parsed.
      * @param description   parsing instructions file location (Should be .json)
      */
-    public static JBurstAtlasFrames fromTexturePackerJson(String source, String description)
+    public static JBurstAtlasFrames fromJsonPacker(String source, String description)
     {
-        return fromTexturePackerJson(JBurstGraphic.fromFile(source, source), description);
+        return fromJsonPacker(JBurstGraphic.fromFile(source), description);
     }
 
     /**
@@ -116,7 +115,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
      * @param description   parsing instructions file location (Should be .json)
      */
     @SuppressWarnings("unchecked")
-    public static JBurstAtlasFrames fromTexturePackerJson(JBurstGraphic graphic, String description)
+    public static JBurstAtlasFrames fromJsonPacker(JBurstGraphic graphic, String description)
     {
         if(graphic == null || description == null)
             return null;
@@ -168,15 +167,11 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
                 frameList.add(frame);
             }
 
-            frameList.sort(new Comparator<JSONObject>() {
-                @Override
-                public int compare(JSONObject o1, JSONObject o2) 
-                {
-                    String name1 = o1.get("filename").toString();
-                    String name2 = o2.get("filename").toString();
+            frameList.sort((o1, o2) -> {
+                String name1 = ((JSONObject) o1).get("filename").toString();
+                String name2 = ((JSONObject) o2).get("filename").toString();
 
-                    return name1.compareToIgnoreCase(name2);
-                }
+                return name1.compareToIgnoreCase(name2);
             });
         }
 

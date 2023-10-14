@@ -3,7 +3,7 @@ package burst.animation;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
- * Structure used to store a JBurstSprite's animation data.
+ * Structure used to store animation data.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/animation/FlxAnimation.html">FlxAnimation</a>
@@ -23,7 +23,7 @@ public class JBurstAnimation implements IBurstDestroyable
     /**
      * The speed in frames per second of the animation.
      */
-    public double frameRate;
+    public int frameRate;
 
     /**
      * The current frame of the animation.
@@ -90,9 +90,9 @@ public class JBurstAnimation implements IBurstDestroyable
     /**
      * Starts playback of this animation.
      * 
-     * @param force     Whether to force this animation to restart.
-     * @param reversed  Whether to play animation backwards or not.
-     * @param frame     The frame index to start from.
+     * @param force     whether to force this animation to restart.
+     * @param reversed  whether to play animation backwards or not.
+     * @param frame     the frame index to start from.
      */
     public void play(boolean force, boolean reversed, int frame)
     {
@@ -240,16 +240,17 @@ public class JBurstAnimation implements IBurstDestroyable
     }
 
     @Override
-    public String toString()
-    {
-        return "BurstAnimation ~ {name: " + name + ", framerate: " + frameRate + ", looped: " + looped + ", reversed: " + reversed + "}";
-    }
-
-    @Override
     public void destroy() 
     { 
         frames = null;
         name = null;
         _controller = null;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[name=\"%s\",framerate=%d,looped=%b,reversed=%b]", 
+            getClass().getName(), name, frameRate, looped, reversed);
     }
 }

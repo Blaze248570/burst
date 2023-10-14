@@ -2,15 +2,33 @@ package burst;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
-import burst.group.JBurstGroup;
+import burst.util.JBurstDestroyUtil;
 
 /**
+ * Core of JBurst and manager class of all JBurstBasics.
+ * <p>
+ * Handles updating thread and
+ * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
  */
-public class JBurst extends JBurstGroup<JBurstBasic>
+public class JBurst
 {
+    /**
+     * The overarching JBurst object managing all JBurstBasics
+     */
+    public static final JBurst BURST = new JBurst();
+
+    /**
+     * All currently active JBurstBasic objects are held within this ArrayList.
+     * <p> 
+     * You shouldn't need to add JBurstBasics manually as they automatically
+     * add themselves when they are instantiated.
+     */
+    protected ArrayList<JBurstBasic> members;
+
     /**
      * Whether or not ALL of this JBurst's objects should update
      */
@@ -26,9 +44,12 @@ public class JBurst extends JBurstGroup<JBurstBasic>
      */
     public int elapsed;
 
-    private final Instant _startTime = Instant.now();
+    private Instant _startTime = Instant.now();
 
-    private Thread burstThread = new Thread() 
+    /**
+     * Independent thread running sprite update system
+     */
+    private Thread burstThread = new Thread("Burst-Manager") 
     {
         @Override
         public void run()
@@ -55,103 +76,29 @@ public class JBurst extends JBurstGroup<JBurstBasic>
      */
     public JBurst()
     {
+        members = new ArrayList<>();
         burstThread.start();
     }
 
     private void update()
     {
-        if(!active || size() == 0) return;
+        if(!active || members.size() == 0) return;
 
-        update(elapsed);
-        repaint();
+        for(int i = 0; i < members.size(); i++)
+        {
+            JBurstBasic basic = members.get(i);
+            if(basic != null)
+            {
+                if(basic.exists && basic.active)
+                    basic.update(elapsed);
+                basic.repaint();
+            }
+        }
     }
 
     private long getTotal()
     {
         return Duration.between(_startTime, Instant.now()).toMillis();
-    }
-
-    /**
-     * Appends an element to the end of {@code members}.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be added to this group
-     * @return  whether or not the element was successfully added
-     */
-    public boolean add(JBurstBasic element)
-    {
-        element.burst = this;
-        return super.add(element);
-    }
-
-    /**
-     * Inserts an element at {@code index}.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be added to this group
-     * @return  whether or not the element was successfully added
-     */
-    public boolean add(int index, JBurstBasic element)
-    {
-        element.burst = this;
-        return super.add(index, element);
-    }
-
-    /**
-     * Replaces the element at {@code index} with {@code element}.
-     * <p>
-     * If {@code index} is less than zero or exceeds the length of {@code members}, 
-     * the element will be appended to the end.
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param index     the index of the element to be replaced
-     * @param element   the element to be set at {@code index}
-     * @return  the element that was replaced
-     */
-    public JBurstBasic set(int index, JBurstBasic element)
-    {
-        element.burst = this;
-        return super.set(index, element);
-    }
-
-    /**
-     * Removes an element from {@code members}, leaving the open space as {@code null}
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be removed
-     * @return  whether or not the JBurst contained {@code element}
-     */
-    public boolean remove(JBurstBasic element)
-    {
-        element.burst = null;
-        return super.remove(element, false);
-    }
-
-    /**
-     * Removes an element from {@code members}
-     * <p>
-     * <i>Used internally to match containers</i>
-     * 
-     * @param element   the element to be removed
-     * @param splice    whether to replace the element with null or not
-     * @return  whether or not the JBurst contained {@code element}
-     */
-    public boolean remove(JBurstBasic element, boolean splice)
-    {
-        element.burst = null;
-        return super.remove(element, splice);
-    }
-
-    /**
-     * Clears all objects from this {@code members}
-     */
-    public void clear()
-    {
-        members.clear();
     }
 
     /**
@@ -175,30 +122,26 @@ public class JBurst extends JBurstGroup<JBurstBasic>
     }
 
     /**
-     * Stops the JBurst from further updates, 
-     * destroys all of its current members, and kills its thread.
+     * Stops the JBurst from further updates, and destroys all of its current members.
      * <p>
      * <i>
      *  Warning: This will render every single object added to this JBurst completely useless.
-     *  Use {@code clear()} to prevent the objects from destruction.
-     *  To simply disable this JBurst, use {@code kill()}
+     *  To simply disable JBurst, use {@code kill()}
      * </i>
      * 
      * @see {@link #kill()}
      */
-    public void destroy()
+    public void reset()
     {
-        if(burstThread == null) 
-        {
-            super.destroy();
-            return;
-        }
-        
-        burstThread.interrupt();
-        burstThread = null;
-
-        super.destroy();
-
+        JBurstDestroyUtil.destroyArrayList(members);
         System.gc();
+
+        _startTime = Instant.now();
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[total=%dms,elapsed=%dms,length=%d]", getClass().getName(), _total, elapsed, members.size());
     }
 }

@@ -1,19 +1,29 @@
 package burst.graphics.frames;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import burst.graphics.JBurstGraphic;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
- * A specialized rectangle used by the animation classes.
+ * Frame data used to slice spritesheets and paint sprites.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxFrame.html">FlxFrame</a>
  */
-public class JBurstFrame extends Rectangle implements IBurstDestroyable
+public class JBurstFrame implements IBurstDestroyable
 {
+    /**
+     * This frame's location on {@code graphic}'s spritesheet
+     */
+    public Rectangle frame;
+
     /**
      * The name of this frame.
      */
@@ -27,54 +37,87 @@ public class JBurstFrame extends Rectangle implements IBurstDestroyable
     /**
      * Original (uncropped) image size.
      */
-    public Point sourceSize;
+    public Dimension sourceSize;
 
     /**
      * Frame offset from the top left corner of original image.
      */
     public Point offset;
 
-    public JBurstFrame(JBurstGraphic graphic, String name)
+    /**
+     * Used for rotated frames on spritesheets
+     * <p><i>Currently not supported</i>
+     */
+    public double angle;
+
+    public JBurstFrame(JBurstGraphic graphic)
     {
-        this(graphic, name, 0, 0, graphic.getWidth(), graphic.getHeight());
+        this(graphic, 0);
     }
 
-    public JBurstFrame(JBurstGraphic graphic, String name, int x, int y, int width, int height)
+    public JBurstFrame(JBurstGraphic graphic, double angle)
     {
-        super(x, y, width, height);
         this.graphic = graphic;
+        this.angle = angle;
 
-        this.name = name;
-        this.sourceSize = new Point();
-        this.offset = new Point();
+        sourceSize = new Dimension();
+        offset = new Point();
     }
 
     /**
-     * Ensures the frame isn't outside the images boundaries
+     * Paints this frame's content onto the {@code image}
      * 
-     * @return  Checked and trimmed frame rectangle
+     * @return  {@code image}
      */
-    public JBurstFrame checkFrame() 
+    public BufferedImage paint(BufferedImage image)
     {
-        int x = this.x;
-        if(x > graphic.image.getWidth())
-            x -= (x - graphic.image.getWidth());
+        if(image == null)
+            image = new BufferedImage(sourceSize.width, sourceSize.height, BufferedImage.TYPE_INT_ARGB);
+        else
+            clearFrame(image);
 
-        int y = this.y;
-        if(y > graphic.image.getHeight())
-            y -= (y - graphic.image.getHeight());
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null);
+        graphics.dispose();
 
-        int right = (this.x + this.width);
-        if(right > graphic.image.getWidth())
-            right -= (right - graphic.image.getWidth());
+        return image;
+    }
 
-        int bottom = (this.y + this.height);
-        if(bottom > graphic.image.getHeight())
-            bottom -= (bottom - graphic.image.getHeight());
+    /**
+     * Clears the content of {@code image}
+     * 
+     * @param image
+     */
+    public void clearFrame(BufferedImage image)
+    {
+        Graphics2D graphics = image.createGraphics();
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
+        graphics.setColor(new Color(0));
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics.dispose();
+    }
 
-        this.setFrame(x, y, right - x, bottom - y);
+    /**
+     * Copies this frame's data onto {@code frame}
+     * 
+     * @return  {@code clone} with this frame's properties
+     */
+    public JBurstFrame copyTo(JBurstFrame clone)
+    {
+        if(clone == null)
+            clone = new JBurstFrame(graphic, angle);
+        else
+        {
+            clone.graphic = graphic;
+            clone.angle = angle;
+        }
 
-        return this;
+        clone.offset.setLocation(offset);
+        clone.sourceSize.setSize(sourceSize);
+        clone.frame = new Rectangle(frame);
+        clone.name = name;
+
+        return clone;
     }
 
     @Override
@@ -89,6 +132,6 @@ public class JBurstFrame extends Rectangle implements IBurstDestroyable
     @Override
     public String toString()
     {
-        return "BurstFrame ~ {name: " + name + " x: " + x + ", y: " + y + ", width: " + width + ", height: " + height + "}";
+        return String.format("%s[name=\"%s\",x=%d,y=%d,width=%d,height=%d]", getClass().getName(), name, frame.x, frame.y, frame.width, frame.height);
     }
 }

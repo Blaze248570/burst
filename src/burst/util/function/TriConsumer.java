@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 
 /**
  * Functional interface that accepts three arguments and returns none.
- * <p> Modeled from java {@link BiConsumer}.
+ * <p> Modeled from {@link BiConsumer}.
  */
 @FunctionalInterface
 public interface TriConsumer<T, U, V> 

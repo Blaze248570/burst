@@ -17,9 +17,13 @@ import burst.util.JBurstDestroyUtil.IBurstDestroyable;
  */
 public class JBurstFramesCollection implements IBurstDestroyable
 {
-    public ArrayList<JBurstFrame> frames = new ArrayList<>();
     /**
-     * Hash of frames for this frame collection.
+     * All of the frames stored within this frame collection
+     */
+    public ArrayList<JBurstFrame> frames = new ArrayList<>();
+
+    /**
+     * Hash of frames stored within this frame collection.
      */
     public HashMap<String, JBurstFrame> framesHash = new HashMap<>();
 
@@ -30,9 +34,7 @@ public class JBurstFramesCollection implements IBurstDestroyable
 
     public JBurstFramesCollection(JBurstGraphic graphic) 
     {
-        super();
         this.graphic = graphic;
-        frames.clear();
     }
 
     public JBurstFrame addSpriteSheetFrame(Rectangle region)
@@ -62,7 +64,7 @@ public class JBurstFramesCollection implements IBurstDestroyable
     /**
      * Ensures the frame isn't outside the images boundaries
      * 
-     * @return  Checked and trimmed frame rectangle
+     * @return  checked and trimmed frame rectangle
      */
     public Rectangle checkFrame(Rectangle rect) 
     {
@@ -100,13 +102,6 @@ public class JBurstFramesCollection implements IBurstDestroyable
     @Override
     public String toString()
     {
-        String print = "BurstFrameCollection ~ [\n";
-
-        for(JBurstFrame frame : frames)
-        {
-            print += "\t" + frame.toString() + ",\n";
-        }
-
-        return print.substring(0, print.length() - 2) + "\n]";
+        return String.format("%s[frames=%s]", getClass().getName(), frames.toString());
     }
 }

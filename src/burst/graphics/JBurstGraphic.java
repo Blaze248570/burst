@@ -12,6 +12,7 @@ import burst.graphics.frames.JBurstImageFrame;
 import burst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
+ * Image caching and managing
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html">FlxGraphic</a>
@@ -21,11 +22,10 @@ public class JBurstGraphic implements IBurstDestroyable
     private static int graphEnumerator = 0;
     private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
 
-
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    Path of image asset to be used in returned JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic
      */
     public static JBurstGraphic fromFile(String source) 
     {
@@ -35,8 +35,8 @@ public class JBurstGraphic implements IBurstDestroyable
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
-     * @param source    Path of image asset to be used in returned JBurstGraphic.
-     * @param key       Unique title for this JBurstGraphic.
+     * @param source    path of image asset to be used in returned JBurstGraphic
+     * @param key       unique title for this JBurstGraphic.
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {
@@ -44,9 +44,9 @@ public class JBurstGraphic implements IBurstDestroyable
     }
 
     /**
-     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}
      * 
-     * @param source    Image to be used in returned JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic
      */
     public static JBurstGraphic fromImage(BufferedImage source) 
     {
@@ -54,10 +54,10 @@ public class JBurstGraphic implements IBurstDestroyable
     }
 
     /**
-     * Returns a JBurstGraphic using the BufferedImage, {@code source}.
+     * Returns a JBurstGraphic using the BufferedImage, {@code source}
      * 
-     * @param source    Image to be used in returned JBurstGraphic.
-     * @param key       Unique title for this JBurstGraphic.
+     * @param source    image to be used in returned JBurstGraphic
+     * @param key       unique title for this JBurstGraphic
      */
     public static JBurstGraphic fromImage(BufferedImage source, String key) 
     {
@@ -87,7 +87,7 @@ public class JBurstGraphic implements IBurstDestroyable
     }
 
     /**
-     * Unique label to be used in future caching system
+     * Unique label used in caching system
      */
     public String key;
 
@@ -106,25 +106,26 @@ public class JBurstGraphic implements IBurstDestroyable
 
     public int getWidth()
     {
-        int width = 0;
         if(image != null)
-            width = image.getWidth();
+            return image.getWidth();
 
-        return width;
+        return 0;
     }
 
     public int getHeight()
     {
-        int height = 0;
         if(image != null)
-            height = image.getHeight();
+            return image.getHeight();
 
-        return height;
+        return 0;
     }
 
     public Graphics2D createGraphics()
     {
-        return image.createGraphics();
+        if(image != null)
+            return image.createGraphics();
+
+        return null;
     }
 
     public JBurstImageFrame getImageFrame()

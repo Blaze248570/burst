@@ -4,23 +4,20 @@ import java.awt.Rectangle;
 
 import burst.graphics.JBurstGraphic;
 
+/**
+ * Simple frame collection comprising of a single frame.
+ * 
+ * @author Joe Bray
+ * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/graphics/frames/FlxImageFrame.html">FlxImageFrame</a>
+ */
 public class JBurstImageFrame extends JBurstFramesCollection
 {
-    public static JBurstImageFrame findFrame(JBurstGraphic source, Rectangle region)
-    {
-        return null;
-    }
-
     public static JBurstImageFrame fromGraphic(JBurstGraphic source, Rectangle region)
     {
         if(source == null)
             return null;
 
-        JBurstImageFrame imageFrame = findFrame(source, region);
-        if(imageFrame != null)
-            return imageFrame;
-        
-        imageFrame= new JBurstImageFrame(source);
+        JBurstImageFrame imageFrame = new JBurstImageFrame(source);
 
         if(region == null)
             region = new Rectangle(0, 0, source.getWidth(), source.getHeight());
@@ -41,10 +38,5 @@ public class JBurstImageFrame extends JBurstFramesCollection
     public JBurstImageFrame(JBurstGraphic graphic)
     {
         super(graphic);
-    }
-
-    public JBurstFrame getFrame()
-    {
-        return frames.get(0);
     }
 }

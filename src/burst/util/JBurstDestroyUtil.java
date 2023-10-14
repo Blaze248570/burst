@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class JBurstDestroyUtil
 {
     /**
-     * Checks if an object is not null before destroying it, <i>always returns null.</i>
+     * Checks if an object is not null before destroying it.
+     * <p><i>Always returns null</i>
      * 
      * @param object    object to be destroyed
      * @return  a null pointer
@@ -23,6 +24,7 @@ public class JBurstDestroyUtil
 
     /**
 	 * Destroys every element of an array of IBurstDestroyables.
+     * <p><i>Always returns null</i>
 	 *
 	 * @param	array	an array of IFlxDestroyable objects
 	 * @return	a null pointer
@@ -40,6 +42,7 @@ public class JBurstDestroyUtil
 
     /**
 	 * Destroys every element of an ArrayList of IBurstDestroyables.
+     * <p><i>Always returns null</i>
 	 *
 	 * @param	array	an ArrayList of IFlxDestroyable objects
 	 * @return	a null pointer

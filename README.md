@@ -13,6 +13,10 @@ I always found it frustrating how JLabel only really supported static images.
 
 - I worked on this in my free time during high school so it may have problems here and there. If you find one, report it! I may look into it.
 
+## *Notice*
+I would like to convert this project to use Apache Maven, but I've had a lot of trouble with it. 
+If anyone has experience or would like to assist me, help would be greatly appreciated.
+
 ## How do I use it?
 It's as simple as:
 ```java
@@ -31,7 +35,10 @@ sprite.animation.play("idle");
 ```
 
 ### Dependencies
-- JBurst uses [json-simple-1.1.1](https://github.com/fangyidong/json-simple) for json support. 
+- JBurst uses [json-simple-1.1.1](https://github.com/fangyidong/json-simple) for json support.
+
+*Note:* JBurst is compiled with VS Code's [Language Support for Java(TM) by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java) using `JRE 17.0.8.1`.
+I've done my best to ensure that older versions can use it as well, so please mention version issues if you come across them.
 
 ### Demos
 - An example program using JBurst can be found within demo.zip
@@ -40,9 +47,6 @@ sprite.animation.play("idle");
 
 ## Helping
 There are things that I still do not know about Swing and about Java. So, if you have any suggestions (or warnings) let me hear them.
-
-*Note:* JBurst is compiled with VS Code's [Language Support for Java(TM) by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java) using `JRE 17.0.8.1`.
-I've done my best to ensure that older versions can use it as well, so please mention version issues if you come across them.
 
 # HaxeFlixel
 If you enjoy using this, give [HaxeFlixel](https://haxeflixel.com) a shot. A large amount of JBurst's animation system is modeled on their game engine, so it would feel wrong not to mention them.

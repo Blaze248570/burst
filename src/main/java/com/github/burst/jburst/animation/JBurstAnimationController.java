@@ -1,15 +1,15 @@
-package burst.animation;
+package com.github.burst.jburst.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import burst.JBurstSprite;
-import burst.graphics.frames.JBurstAtlasFrames;
-import burst.graphics.frames.JBurstFrame;
-import burst.graphics.frames.JBurstFramesCollection;
-import burst.util.JBurstDestroyUtil.IBurstDestroyable;
-import burst.util.function.TriConsumer;
+import com.github.burst.jburst.JBurstSprite;
+import com.github.burst.jburst.graphics.frames.JBurstAtlasFrames;
+import com.github.burst.jburst.graphics.frames.JBurstFrame;
+import com.github.burst.jburst.graphics.frames.JBurstFramesCollection;
+import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.burst.jburst.util.function.TriConsumer;
 
 /**
  * A class that manages and performs animation operations.

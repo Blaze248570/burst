@@ -1,13 +1,13 @@
-package burst.graphics.frames;
+package com.github.burst.jburst.graphics.frames;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import burst.graphics.JBurstGraphic;
-import burst.util.JBurstDestroyUtil;
-import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.burst.jburst.graphics.JBurstGraphic;
+import com.github.burst.jburst.util.JBurstDestroyUtil;
+import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Base class for frame collections.

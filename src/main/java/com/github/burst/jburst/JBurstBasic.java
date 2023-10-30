@@ -1,6 +1,6 @@
-package burst;
+package com.github.burst.jburst;
 
-import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 import javax.swing.JComponent;
 
 /**

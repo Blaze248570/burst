@@ -1,8 +1,8 @@
-package burst.graphics.frames;
+package com.github.burst.jburst.graphics.frames;
 
 import java.awt.Rectangle;
 
-import burst.graphics.JBurstGraphic;
+import com.github.burst.jburst.graphics.JBurstGraphic;
 
 /**
  * Simple frame collection comprising of a single frame.

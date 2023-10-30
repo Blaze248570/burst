@@ -1,10 +1,10 @@
-package burst;
+package com.github.burst.jburst;
+
+import com.github.burst.jburst.util.JBurstDestroyUtil;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-
-import burst.util.JBurstDestroyUtil;
 
 /**
  * Core of JBurst and manager class of all JBurstBasics.

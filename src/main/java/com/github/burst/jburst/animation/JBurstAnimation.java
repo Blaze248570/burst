@@ -1,6 +1,6 @@
-package burst.animation;
+package com.github.burst.jburst.animation;
 
-import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Structure used to store animation data.

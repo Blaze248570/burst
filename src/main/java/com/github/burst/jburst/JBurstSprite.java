@@ -1,4 +1,4 @@
-package burst;
+package com.github.burst.jburst;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,12 +10,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-import burst.animation.JBurstAnimationController;
-import burst.graphics.JBurstGraphic;
-import burst.graphics.frames.JBurstAtlasFrames;
-import burst.graphics.frames.JBurstFrame;
-import burst.graphics.frames.JBurstFramesCollection;
-import burst.util.JBurstDestroyUtil;
+import com.github.burst.jburst.animation.JBurstAnimationController;
+import com.github.burst.jburst.graphics.JBurstGraphic;
+import com.github.burst.jburst.graphics.frames.JBurstAtlasFrames;
+import com.github.burst.jburst.graphics.frames.JBurstFrame;
+import com.github.burst.jburst.graphics.frames.JBurstFramesCollection;
+import com.github.burst.jburst.util.JBurstDestroyUtil;
 
 /**
  * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.

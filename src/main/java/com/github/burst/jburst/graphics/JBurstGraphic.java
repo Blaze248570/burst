@@ -1,4 +1,4 @@
-package burst.graphics;
+package com.github.burst.jburst.graphics;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
-import burst.graphics.frames.JBurstImageFrame;
-import burst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.burst.jburst.graphics.frames.JBurstImageFrame;
+import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Image caching and managing

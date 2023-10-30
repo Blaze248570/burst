@@ -1,4 +1,4 @@
-package burst.util;
+package com.github.burst.jburst.util;
 
 import java.io.IOException;
 

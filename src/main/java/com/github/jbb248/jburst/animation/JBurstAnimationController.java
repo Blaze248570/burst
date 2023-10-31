@@ -1,15 +1,16 @@
-package com.github.burst.jburst.animation;
+package com.github.jbb248.jburst.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import com.github.burst.jburst.JBurstSprite;
-import com.github.burst.jburst.graphics.frames.JBurstAtlasFrames;
-import com.github.burst.jburst.graphics.frames.JBurstFrame;
-import com.github.burst.jburst.graphics.frames.JBurstFramesCollection;
-import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
-import com.github.burst.jburst.util.function.TriConsumer;
+import com.github.jbb248.jburst.JBurstSprite;
+import com.github.jbb248.jburst.graphics.JBurstGraphic;
+import com.github.jbb248.jburst.graphics.frames.JBurstAtlasFrames;
+import com.github.jbb248.jburst.graphics.frames.JBurstFrame;
+import com.github.jbb248.jburst.graphics.frames.JBurstFramesCollection;
+import com.github.jbb248.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.jbb248.jburst.util.function.TriConsumer;
 
 /**
  * A class that manages and performs animation operations.
@@ -71,7 +72,7 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param name      the title for the new animation
      * @param frames    which frames the new animation displays
      * 
-     * @see JBurstSprite#loadAnimatedGraphic()
+     * @see JBurstSprite#loadAnimatedGraphic(String, int, int) JBurstSprite.loadAnimatedGraphic()
      */
     public void add(String name, int[] frames)
     {
@@ -93,7 +94,7 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param frames    which frames the new animation displays
      * @param framerate the speed this animation should play at in frames per second
      * 
-     * @see JBurstSprite#loadAnimatedGraphic()
+     * @see JBurstSprite#loadAnimatedGraphic(String, int, int) JBurstSprite.loadAnimatedGraphic()
      */
     public void add(String name, int[] frames, int framerate)
     {
@@ -116,7 +117,7 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param framerate the speed this animation should play at in frames per second
      * @param looped    whether or not the new animation should replay when finished
      * 
-     * @see JBurstSprite#loadAnimatedGraphic()
+     * @see JBurstSprite#loadAnimatedGraphic(String, int, int) JBurstSprite.loadAnimatedGraphic()
      */
     public void add(String name, int[] frames, int framerate, boolean looped)
     {
@@ -131,9 +132,9 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param name      what to name the animation.
      * @param prefix    name of the animation on the animation file.
      * 
-     * @see JBurstSprite#setFrames()
-     * @see JBurstAtlasFrames#fromSparrow()
-     * @see JBurstAtlasFrames#fromJsonPacker()
+     * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
+     * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker(JBurstGraphic, String) JBurstAtlasFrames.fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix)
     {
@@ -147,9 +148,9 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param prefix        name of the animation on the animation file.
      * @param framerate     how fat or slow this animation should play.
      * 
-     * @see JBurstSprite#setFrames()
-     * @see JBurstAtlasFrames#fromSparrow()
-     * @see JBurstAtlasFrames#fromJsonPacker()
+     * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
+     * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker(JBurstGraphic, String) JBurstAtlasFrames.fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix, int framerate)
     {
@@ -165,9 +166,9 @@ public class JBurstAnimationController implements IBurstDestroyable
      * @param framerate     how fat or slow this animation should play.
      * @param looped        whether or not this animation should play again once it is finished.
      * 
-     * @see JBurstSprite#setFrames()
-     * @see JBurstAtlasFrames#fromSparrow()
-     * @see JBurstAtlasFrames#fromJsonPacker()
+     * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
+     * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker(JBurstGraphic, String) JBurstAtlasFrames.fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix, int framerate, boolean looped)
     {

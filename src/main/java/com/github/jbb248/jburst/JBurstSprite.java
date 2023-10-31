@@ -1,4 +1,4 @@
-package com.github.burst.jburst;
+package com.github.jbb248.jburst;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,12 +10,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-import com.github.burst.jburst.animation.JBurstAnimationController;
-import com.github.burst.jburst.graphics.JBurstGraphic;
-import com.github.burst.jburst.graphics.frames.JBurstAtlasFrames;
-import com.github.burst.jburst.graphics.frames.JBurstFrame;
-import com.github.burst.jburst.graphics.frames.JBurstFramesCollection;
-import com.github.burst.jburst.util.JBurstDestroyUtil;
+import com.github.jbb248.jburst.animation.JBurstAnimationController;
+import com.github.jbb248.jburst.graphics.JBurstGraphic;
+import com.github.jbb248.jburst.graphics.frames.JBurstAtlasFrames;
+import com.github.jbb248.jburst.graphics.frames.JBurstFrame;
+import com.github.jbb248.jburst.graphics.frames.JBurstFramesCollection;
+import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 
 /**
  * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.
@@ -150,8 +150,6 @@ public class JBurstSprite extends JBurstBasic
      * @param source    file path to the image to be loaded onto this sprite
      * 
      * @return  this JBurstSprite. Useful for chaining.
-     * 
-     * @see JBurstGraphic
      */
     public JBurstSprite loadGraphic(String source)
     {
@@ -165,8 +163,8 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return  this JBurstSprite. Useful for chaining
      * 
-     * @see JBurstGraphic#fromFile()
-     * @see JBurstGraphic#fromImage()
+     * @see JBurstGraphic#fromFile(String) JBurstGraphic.fromFile()
+     * @see JBurstGraphic#fromImage(BufferedImage) JBurstGraphic.fromImage()
      */
     public JBurstSprite loadGraphic(JBurstGraphic graphic) 
     {
@@ -189,8 +187,8 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return  this JBurstSprite. Useful for chaining
      * 
-     * @see JBurstGraphic#fromFile()
-     * @see JBurstGraphic#fromImage()
+     * @see JBurstGraphic#fromFile(String) JBurstGraphic.fromFile()
+     * @see JBurstGraphic#fromImage(BufferedImage) JBurstGraphic.fromImage()
      */
     public JBurstSprite loadAnimatedGraphic(String source, int frameWidth, int frameHeight)
     {
@@ -210,8 +208,8 @@ public class JBurstSprite extends JBurstBasic
      * 
      * @return  this JBurstSprite. Useful for chaining.
      * 
-     * @see JBurstGraphic#fromFile()
-     * @see JBurstGraphic#fromImage()
+     * @see JBurstGraphic#fromFile(String) JBurstGraphic.fromFile()
+     * @see JBurstGraphic#fromImage(BufferedImage) JBurstGraphic.fromImage()
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
     {
@@ -501,7 +499,7 @@ public class JBurstSprite extends JBurstBasic
      * @deprecated {@code setLocation()} has no effect on this sprite.
      * Use {@code setSpriteLocation()} instead.
      * 
-     * @see #setSpriteLocation()
+     * @see #setSpriteLocation(int, int) setSpriteLocation()
      */
     @Override
     @Deprecated
@@ -514,7 +512,7 @@ public class JBurstSprite extends JBurstBasic
      * @deprecated {@code setLocation()} has no effect on this sprite.
      * Use {@code setSpriteLocation()} instead.
      * 
-     * @see #setSpriteLocation()
+     * @see #setSpriteLocation(Point) setSpriteLocation()
      */
     @Override
     @Deprecated
@@ -577,7 +575,7 @@ public class JBurstSprite extends JBurstBasic
      * @deprecated {@code getSize()} does not return the true size of this sprite.
      * Use {@code getSpriteSize()} instead.
      * 
-     * @see #getSpriteSize(rv)
+     * @see #getSpriteSize(Dimension) getSpriteSize()
      */
     @Override
     @Deprecated
@@ -611,8 +609,8 @@ public class JBurstSprite extends JBurstBasic
      * @deprecated {@code setSize()} has no effect on this sprite.
      * Use {@code setScale()} or {@code setGraphicSize()} instead.
      * 
-     * @see #setScale()
-     * @see #setGraphicSize()
+     * @see #setScale(double) setScale()
+     * @see #setGraphicSize(int, int) setGraphicSize()
      */
     @Override
     @Deprecated
@@ -625,8 +623,8 @@ public class JBurstSprite extends JBurstBasic
      * @deprecated {@code setSize()} has no effect on this sprite.
      * Use {@code setScale()} or {@code setGraphicSize()} instead.
      * 
-     * @see #setScale()
-     * @see #setGraphicSize()
+     * @see #setScale(double) setScale()
+     * @see #setGraphicSize(int, int) setGraphicSize()
      */
     @Override
     @Deprecated
@@ -799,10 +797,10 @@ public class JBurstSprite extends JBurstBasic
      * After calling {@code destroy()}, instances of this sprite should be nulled.
      * <p>
      * <i>Warning: Sprites are no longer usable after {@code destroy()} is called.
-     * To simply deactivate this sprite, use {@code kill()}.
+     * To simply deactivate this sprite, use {@code kill()}.</i>
      * 
-     * @see {@link #kill()}
-     * @see {@link #revive()}
+     * @see #kill()
+     * @see #revive()
      */
     @Override
     public void destroy()

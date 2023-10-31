@@ -1,10 +1,10 @@
-package com.github.burst.jburst;
-
-import com.github.burst.jburst.util.JBurstDestroyUtil;
+package com.github.jbb248.jburst;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+
+import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 
 /**
  * Core of JBurst and manager class of all JBurstBasics.
@@ -104,7 +104,7 @@ public class JBurst
     /**
      * "Kills" this JBurst, causing it to cease updating.
      * 
-     * @see {@link #revive()}
+     * @see #revive()
      */
     public void kill()
     {
@@ -114,7 +114,7 @@ public class JBurst
     /**
      * "Revives" this JBurst, causing it to continue updating.
      * 
-     * @see {@link #kill()}
+     * @see #kill()
      */
     public void revive()
     {
@@ -129,7 +129,7 @@ public class JBurst
      *  To simply disable JBurst, use {@code kill()}
      * </i>
      * 
-     * @see {@link #kill()}
+     * @see #kill()
      */
     public void reset()
     {

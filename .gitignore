@@ -1,12 +1,20 @@
-# I don't believe you would need my settings
-.vscode/*
-
-# These are solely for testing
+# Repo specific
 assets/*
-src/*.java
+*.sh
 
-# Unnecessary for git
-bin/*
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
 
 #Maven
 target/
@@ -26,3 +34,4 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+

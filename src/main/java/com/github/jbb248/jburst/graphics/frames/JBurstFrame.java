@@ -1,4 +1,4 @@
-package com.github.burst.jburst.graphics.frames;
+package com.github.jbb248.jburst.graphics.frames;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -8,8 +8,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import com.github.burst.jburst.graphics.JBurstGraphic;
-import com.github.burst.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
+import com.github.jbb248.jburst.graphics.JBurstGraphic;
+import com.github.jbb248.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * Frame data used to slice spritesheets and paint sprites.

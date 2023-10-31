@@ -1,4 +1,4 @@
-package burst.util;
+package com.github.jbb248.jburst.util;
 
 import java.util.ArrayList;
 

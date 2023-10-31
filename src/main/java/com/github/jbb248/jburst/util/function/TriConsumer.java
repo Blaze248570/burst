@@ -1,4 +1,4 @@
-package burst.util.function;
+package com.github.jbb248.jburst.util.function;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;

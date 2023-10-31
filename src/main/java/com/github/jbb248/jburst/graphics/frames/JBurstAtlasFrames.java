@@ -1,4 +1,4 @@
-package burst.graphics.frames;
+package com.github.jbb248.jburst.graphics.frames;
 
 import java.awt.Rectangle;
 import java.awt.Point;
@@ -12,8 +12,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import burst.graphics.JBurstGraphic;
-import burst.util.XmlParser;
+import com.github.jbb248.jburst.graphics.JBurstGraphic;
+import com.github.jbb248.jburst.util.XmlParser;
 
 /**
  * A collection of frames stored as an atlas. 

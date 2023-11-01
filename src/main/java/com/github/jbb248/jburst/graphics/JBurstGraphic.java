@@ -1,5 +1,6 @@
 package com.github.jbb248.jburst.graphics;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -69,16 +70,32 @@ public class JBurstGraphic implements IBurstDestroyable
 
     private static BufferedImage returnBuffImage(String path) 
     {
+        BufferedImage image;
         try 
         {
-            return ImageIO.read(new File(path));
+            image = ImageIO.read(new File(path));
         } 
         catch(IOException e) 
         {
-            System.out.print("Image not found: " + path);
+            System.out.println("Image not found: " + path);
+            image = createImageMissingIcon();
         }
+        return image;
+    }
 
-        return null;
+    private static BufferedImage createImageMissingIcon()
+    {   
+        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(0, 0, 16, 16);
+        graphics.setColor(Color.WHITE);
+        graphics.fillOval(3, 3, 10, 10);
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(5, 5, 6, 6);
+        graphics.dispose();
+
+        return image;
     }
 
     private static String generateKey()

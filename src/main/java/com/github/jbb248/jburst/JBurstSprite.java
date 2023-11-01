@@ -230,13 +230,18 @@ public class JBurstSprite extends JBurstBasic
 
         JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
-        int numRows = graphHeight / frameHeight;
-        int numCols = graphWidth / frameWidth;
-        for(int i = 0; i < numRows; i++)
-            for(int j = 0; j < numCols; j++)
+        final int ROWS = graphHeight / frameHeight;
+        final int COLS = graphWidth / frameWidth;
+        int i = 0, j = 0;
+        do
+        {
+            do
             {
                 frames.addSpriteSheetFrame(new Rectangle(j * frameWidth, i * frameHeight, frameWidth, frameHeight));
             }
+            while(j++ < COLS);
+        }
+        while(i++ < ROWS);
 
         setFrames(frames);
 

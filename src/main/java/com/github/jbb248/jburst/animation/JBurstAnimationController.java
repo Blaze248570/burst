@@ -37,7 +37,7 @@ public class JBurstAnimationController implements IBurstDestroyable
     /**
      * Internal, reference to owner sprite.
      */
-    private JBurstSprite _sprite;
+    protected JBurstSprite _sprite;
 
     /**
      * Internal, storage of animations added to this sprite.

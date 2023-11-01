@@ -1,6 +1,6 @@
 # Repo specific
 assets/*
-src/main/java/com/jburst/*
+src/main/java/com/github/jbb248/test/*
 *.sh
 
 # Visual Studio Code

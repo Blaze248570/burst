@@ -219,19 +219,19 @@ public class JBurstSprite extends JBurstBasic
         if(frameWidth == 0) 
         {
             frameWidth = graphHeight;
-			frameWidth = (frameWidth > graphWidth) ? graphWidth : frameWidth;
+			frameWidth = Math.min(frameWidth, graphWidth);
         }
 
         if (frameHeight == 0)
 		{
 			frameHeight = graphWidth;
-			frameHeight = (frameHeight > graphHeight) ? graphHeight : frameHeight;
+			frameHeight = Math.min(frameHeight, graphHeight);
 		}
 
         JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
-        final int ROWS = graphHeight / frameHeight;
-        final int COLS = graphWidth / frameWidth;
+        final int ROWS = graphHeight / frameHeight - 1;
+        final int COLS = graphWidth / frameWidth - 1;
         int i = 0, j = 0;
         do
         {
@@ -240,6 +240,7 @@ public class JBurstSprite extends JBurstBasic
                 frames.addSpriteSheetFrame(new Rectangle(j * frameWidth, i * frameHeight, frameWidth, frameHeight));
             }
             while(j++ < COLS);
+            j = 0;
         }
         while(i++ < ROWS);
 

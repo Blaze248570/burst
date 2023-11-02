@@ -77,7 +77,7 @@ public class JBurstFrame implements IBurstDestroyable
             clearFrame(image);
 
         Graphics2D graphics = image.createGraphics();
-        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null);
+        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null, null);
         graphics.dispose();
 
         return image;

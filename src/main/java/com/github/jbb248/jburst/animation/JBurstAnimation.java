@@ -21,11 +21,6 @@ public class JBurstAnimation implements IBurstDestroyable
     public int curIndex;
 
     /**
-     * The speed in frames per second of the animation.
-     */
-    public int frameRate;
-
-    /**
      * The current frame of the animation.
      */
     public int curFrame;
@@ -34,11 +29,6 @@ public class JBurstAnimation implements IBurstDestroyable
      * The total number of frames in this animation.
      */
     public int numFrames;
-
-    /**
-     * The delay between frames in milliseconds
-     */
-    public double delay;
 
     /**
      * Whether the animation has finsihed playing or not.
@@ -66,6 +56,16 @@ public class JBurstAnimation implements IBurstDestroyable
     public int[] frames;
 
     /**
+     * The speed in frames per second of the animation.
+     */
+    private int _frameRate;
+
+    /**
+     * The delay between frames in milliseconds
+     */
+    private double _frameDelay;
+
+    /**
      * Internal, used to time each frame of animation.
      */
     private double _frameTimer;
@@ -79,11 +79,10 @@ public class JBurstAnimation implements IBurstDestroyable
     {
         this._controller = controller;
         this.name = name;
-
-        this.frameRate = frameRate;
         this.frames = frames;
         this.numFrames = Math.min(frames.length, _controller._sprite.getNumFrames());
         this.looped = looped;
+        setFrameRate(frameRate);
     }
 
     /**
@@ -98,20 +97,17 @@ public class JBurstAnimation implements IBurstDestroyable
         if(!force && !finished && this.reversed == reversed) 
         {
             paused = false;
-            finished = false;
             return;
         }
-
-        delay = 1000 / frameRate;
 
         this.reversed = reversed;
         paused = false;
         _frameTimer = 0;
-        finished = delay == 0;
+        finished = _frameDelay == 0;
 
         int maxFrameIndex = numFrames - 1;
         if(frame < 0) 
-            curFrame = (int)(Math.random() * maxFrameIndex);
+            setCurFrame((int)(Math.random() * maxFrameIndex));
         else 
         {
             if(frame > maxFrameIndex)
@@ -119,7 +115,7 @@ public class JBurstAnimation implements IBurstDestroyable
             if(reversed)
                 frame = (maxFrameIndex - frame);
                 
-            curFrame = frame;
+            setCurFrame(frame);
         }
     }
 
@@ -176,12 +172,12 @@ public class JBurstAnimation implements IBurstDestroyable
 
     public void update(double elapsed) 
     {
-        if(delay == 0 || finished || paused) return;
+        if(_frameDelay == 0 || finished || paused) return;
 
         _frameTimer += elapsed;
-        while(_frameTimer > delay && !finished) 
+        while(_frameTimer > _frameDelay && !finished) 
         {
-            _frameTimer -= delay;
+            _frameTimer -= _frameDelay;
             int curFrame = this.curFrame;
 			if (reversed)
                 curFrame--;
@@ -231,6 +227,17 @@ public class JBurstAnimation implements IBurstDestroyable
         _controller.setFrameIndex(curIndex);
     }
 
+    public int getFrameRate()
+    {
+        return _frameRate;
+    }
+
+    public void setFrameRate(int frameRate)
+    {
+        _frameRate = frameRate;
+        _frameDelay = frameRate > 0 ? 1.0 / frameRate : 0;
+    }
+
     @Override
     public void destroy() 
     { 
@@ -243,6 +250,6 @@ public class JBurstAnimation implements IBurstDestroyable
     public String toString()
     {
         return String.format("%s[name=\"%s\",framerate=%d,looped=%b,reversed=%b]", 
-            getClass().getName(), name, frameRate, looped, reversed);
+            getClass().getName(), name, _frameRate, looped, reversed);
     }
 }

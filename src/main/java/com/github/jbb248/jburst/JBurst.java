@@ -1,7 +1,5 @@
 package com.github.jbb248.jburst;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 
 import com.github.jbb248.jburst.util.JBurstDestroyUtil;
@@ -11,35 +9,36 @@ import com.github.jbb248.jburst.util.JBurstDestroyUtil;
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
+ * and <a href="https://api.haxeflixel.com/flixel/FlxGame.html">FlxGame</a>
  */
 public class JBurst
 {
     /**
-     * Whether or not ALL of this JBurst's objects should update
+     * Whether or not ALL JBurst objects can update
      */
     public static boolean active = false;
 
     /**
      * All currently active JBurstBasic objects are held within this ArrayList.
-     * <p> 
-     * You shouldn't need to add JBurstBasics manually as they automatically
-     * add themselves when they are instantiated.
      */
     protected static ArrayList<JBurstBasic> members = new ArrayList<>();
 
-    /**
-     * Time in milliseconds since program began
-     */
-    private static long _total;
+    private static long _startTime = System.currentTimeMillis();
 
-    private static Instant _startTime = Instant.now();
+    private static double _total = 0.0;
 
-    private static int _framerate = 60;
+    private static int _frameRate = 60;
+
+    private static double _elapsed = 0.0;
+
+    private static double _step = 1000.0 / _frameRate;
+
+    private static double _accumulator = _step;
 
     /**
      * Independent thread running sprite update system
      */
-    private static Thread _burstThread = new Thread("Burst-Manager") 
+    private static Thread _burstThread = new Thread("Burst") 
     {
         @Override
         public void run()
@@ -48,19 +47,24 @@ public class JBurst
 
             while(!isInterrupted())
             {
-                int delay = 1000 / _framerate;
-                while(delay - Math.toIntExact(getTotal() - _total) >= 0);
+                double ticks = getTicks();
+                _elapsed = ticks - _total;
+                _total = ticks;
 
-                _total = getTotal();
+                _accumulator += _elapsed;
 
-                update();
+                while(_accumulator >= _step) 
+                {
+                    step();
+                    _accumulator -= _step;
+                }
             }
 
             active = false;
         }
     };
 
-    private static void update()
+    private static void step()
     {
         if(!active || members.size() == 0) return;
 
@@ -70,23 +74,24 @@ public class JBurst
             if(basic != null)
             {
                 if(basic.exists && basic.active)
-                    basic.update(1000 / _framerate);
+                    basic.update(0.016);
+                
                 basic.repaint();
             }
         }
     }
 
-    private static long getTotal()
+    private static long getTicks()
     {
-        return Duration.between(_startTime, Instant.now()).toMillis();
+        return System.currentTimeMillis() - _startTime;
     }
 
     /**
      * Returns how often {@code JBurst} should update its members, in frames per second
      */
-    public static int getFramerate()
+    public static int getFrameRate()
     {
-        return _framerate;
+        return _frameRate;
     }
 
     /**
@@ -95,9 +100,10 @@ public class JBurst
      * <p>
      * <i>If {@code framerate} is less than 1, this call will be ignored.</i>
      */
-    public static void setFramerate(int framerate)
+    public static void setFrameRate(int frameRate)
     {
-        _framerate = framerate < 1 ? _framerate : framerate;
+        _frameRate = frameRate < 1 ? _frameRate : frameRate;
+        _step = frameRate > 0 ? 1000.0 / frameRate : 0;
     }
 
     /**
@@ -136,7 +142,7 @@ public class JBurst
         JBurstDestroyUtil.destroyArrayList(members);
         System.gc();
 
-        _startTime = Instant.now();
+        _startTime = System.currentTimeMillis();
     }
 
     static {

@@ -60,7 +60,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
         exists = true;
     }
 
-    public void update(int elapsed) { }
+    public void update(double elapsed) { }
 
     /**
      * Removes this object from JBurst's list of members

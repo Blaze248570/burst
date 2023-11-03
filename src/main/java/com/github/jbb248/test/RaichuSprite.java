@@ -27,7 +27,7 @@ public class RaichuSprite extends JBurstSprite
     }
 
     @Override
-    public void update(int elapsed)
+    public void update(double elapsed)
     {
         super.update(elapsed);
 

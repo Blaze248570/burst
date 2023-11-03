@@ -67,8 +67,6 @@ public class JBurstSprite extends JBurstBasic
 
     private final Point _framePoint;
 
-    private final Rectangle _frameRect;
-
     /**
      * A collection of all the frames used by this sprite
      */
@@ -105,10 +103,7 @@ public class JBurstSprite extends JBurstBasic
         animation = new JBurstAnimationController(this);
 
         _scale = new Point2D.Double(1.0, 1.0);
-        _framePoint = new Point();
-        _frameRect = new Rectangle();
-        
-        setSpriteLocation(x, y);
+        setLocation(_framePoint = new Point(x, y));
     }
 
     /**
@@ -117,7 +112,7 @@ public class JBurstSprite extends JBurstBasic
      * @param elapsed   time since the last call to {@code update()} in milliseconds
      */
     @Override
-    public void update(int elapsed)
+    public void update(double elapsed)
     {
         if(animation != null)
             animation.update(elapsed);
@@ -258,7 +253,7 @@ public class JBurstSprite extends JBurstBasic
     {
         if(frame != null)
             dirty = true;
-        else if(_frames != null && _frames.frames != null && getNumFrames() > 0)
+        else if(_frames != null && getNumFrames() > 0)
         {
             frame = _frames.frames.get(0);
             dirty = true;
@@ -267,7 +262,9 @@ public class JBurstSprite extends JBurstBasic
             return null;
 
         _frame = frame.copyTo(_frame);
-        _frameRect.setBounds(_framePoint.x, _framePoint.y, getFrameWidth(), getFrameHeight());
+
+        setLocation(_framePoint);
+        setSize(getFrameWidth(), getFrameHeight());
 
         return frame;
     }
@@ -315,7 +312,6 @@ public class JBurstSprite extends JBurstBasic
         this.animation.clearAnimations();
 
         setFrame(frames.frames.get(0));
-        updateBounds();
 
         graphicLoaded();
         return this._frames;
@@ -342,19 +338,17 @@ public class JBurstSprite extends JBurstBasic
         updateFramePixels();
 
         if(isSimpleRender())
-            paintSimple(g);
+            g.drawImage(_framePixels, 0, 0, null, null);
         else
             paintComplex((Graphics2D) g);
 
         if(debugMode)
         {
-            g.setColor(Color.BLACK);
+            g.setColor(Color.BLUE);
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
             
         g.dispose();
-
-        updateBounds();
     }
 
     public boolean isSimpleRender()
@@ -362,34 +356,17 @@ public class JBurstSprite extends JBurstBasic
         return _angle == 0 && _scale.x == 1 && _scale.y == 1;
     }
 
-    private void paintSimple(Graphics graphics)
-    {
-        _frameRect.setLocation(_framePoint.x, _framePoint.y);
-        _frameRect.setSize(getFrameWidth(), getFrameHeight());
-        graphics.drawImage(_framePixels, 0, 0, null);
-    }
-
     private void paintComplex(Graphics2D graphics)
     {
+        final int WIDTH = getFrameWidth();
+        final int HEIGHT = getFrameHeight();
+
         AffineTransform xForm = new AffineTransform();
-
-        int frameWidth = getFrameWidth();
-        int frameHeight = getFrameHeight();
-
-        int newWidth = (int) (Math.abs(frameWidth * Math.cos(_angle)) + Math.abs(frameHeight * Math.sin(_angle)));           
-        int newHeight = (int) (Math.abs(frameWidth * Math.sin(_angle)) + Math.abs(frameHeight * Math.cos(_angle)));
-
-        int deltaX = (newWidth - frameWidth) / 2;
-        int deltaY = (newHeight - frameHeight) / 2;
-
-        _frameRect.setLocation(_framePoint.x - (int)(deltaX * _scale.x), _framePoint.y - (int)(deltaY * _scale.y));
-        _frameRect.setSize((int)(newWidth * _scale.x), (int)(newHeight * _scale.y));
-        
-        xForm.scale(_scale.x, _scale.y);
-        xForm.rotate(_angle, newWidth / 2, newHeight / 2);
-        xForm.translate(deltaX, deltaY);
+        xForm.rotate(_angle, WIDTH / 2, HEIGHT / 2);
 
         graphics.drawImage(_framePixels, xForm, null);
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(WIDTH / 2 - 4, HEIGHT / 2 - 4, 8, 8);
     }
 
     private BufferedImage updateFramePixels()
@@ -402,14 +379,8 @@ public class JBurstSprite extends JBurstBasic
         return _framePixels;
     }
 
-    private void updateBounds()
-    {
-        setBounds(_frameRect);
-        revalidate();
-    }
-
     /**
-     * @deprecated This does not return the true x-coordinate of this sprite.
+     * @deprecated {@code getX()} may not return the true x-coordinate of this sprite.
      * Use {@code getSpriteX()} instead.
      * 
      * @see #getSpriteX()
@@ -432,7 +403,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true y-coordinate of this sprite.
+     * @deprecated {@code getY()} may not return the true y-coordinate of this sprite.
      * Use {@code getSpriteY()} instead.
      * 
      * @see #getSpriteY()
@@ -455,7 +426,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true coordinates of this sprite.
+     * @deprecated {@code getLocation()} may not return the true coordinates of this sprite.
      * Use {@code getSpriteLocation()} instead.
      * 
      * @see #getSpriteLocation()
@@ -468,7 +439,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true coordinates of this sprite.
+     * @deprecated {@code getLocation()} may not return the true coordinates of this sprite.
      * Use {@code getSpriteLocation()} instead.
      * 
      * @see #getSpriteLocation(rv)
@@ -548,12 +519,38 @@ public class JBurstSprite extends JBurstBasic
         _framePoint.setLocation(p.x, p.y);
     }
 
+    /**
+     * @deprecated {@code getWidth()} may not return the true width of this sprite.
+     * Use {@code getSpriteWidth()} instead.
+     * 
+     * @see #getSpriteWidth()
+     */
+    @Override
+    @Deprecated
+    public int getWidth()
+    {
+        return super.getWidth();
+    }
+
     public int getSpriteWidth()
     {
         if(_frame != null)
             return (int) (_frame.sourceSize.width * _scale.x);
 
         return 0;
+    }
+
+    /**
+     * @deprecated {@code getHeight()} may not return the true height of this sprite.
+     * Use {@code getSpriteHeight()} instead.
+     * 
+     * @see #getSpriteHeight()
+     */
+    @Override
+    @Deprecated
+    public int getHeight()
+    {
+        return super.getWidth();
     }
 
     public int getSpriteHeight()
@@ -565,7 +562,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * @deprecated {@code getSize()} may not return the true size of this sprite.
      * Use {@code getSpriteSize()} instead.
      * 
      * @see #getSpriteSize()
@@ -578,7 +575,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * @deprecated {@code getSize()} may not return the true size of this sprite.
      * Use {@code getSpriteSize()} instead.
      * 
      * @see #getSpriteSize(Dimension) getSpriteSize()
@@ -696,7 +693,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     * @deprecated {@code getBounds()} may not return the true bounds of this sprite.
      */
     @Override
     @Deprecated
@@ -706,7 +703,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     * @deprecated {@code getBounds()} may not return the true bounds of this sprite.
      */
     @Override
     @Deprecated
@@ -716,7 +713,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code setBounds()} has no effect on this sprite.
+     * @deprecated {@code setBounds()} may produce unexpected results.
      */
     @Override
     @Deprecated
@@ -726,7 +723,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code setBounds()} has no effect on this sprite.
+     * @deprecated {@code setBounds()} may produce unexpected results.
      */
     @Override
     @Deprecated

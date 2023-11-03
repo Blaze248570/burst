@@ -55,8 +55,8 @@ public class Main
          */
         JBurstSprite redSQ = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(230, 86, 98));
         Rectangle whiteSQ = new Rectangle();
-        whiteSQ.setLocation((int)(redSQ.getWidth() * 0.125), 50);
-        whiteSQ.width = whiteSQ.height = (int)(redSQ.getWidth() * 0.75);
+        whiteSQ.setLocation((int)(redSQ.getSpriteWidth() * 0.125), 50);
+        whiteSQ.width = whiteSQ.height = (int)(redSQ.getSpriteWidth() * 0.75);
 
         /*
          * By getting the sprite's pixel data, we're able to edit it's graphical data.

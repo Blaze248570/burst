@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 
 /**
- * Core of JBurst and manager class of all JBurstBasics.
- * <p>
- * Handles updating thread and
+ * Core of JBurst package and manager of all JBurstBasics.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
@@ -17,9 +15,9 @@ import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 public class JBurst
 {
     /**
-     * The overarching JBurst object managing all JBurstBasics
+     * Whether or not ALL of this JBurst's objects should update
      */
-    public static final JBurst BURST = new JBurst();
+    public static boolean active = false;
 
     /**
      * All currently active JBurstBasic objects are held within this ArrayList.
@@ -27,29 +25,21 @@ public class JBurst
      * You shouldn't need to add JBurstBasics manually as they automatically
      * add themselves when they are instantiated.
      */
-    protected ArrayList<JBurstBasic> members;
-
-    /**
-     * Whether or not ALL of this JBurst's objects should update
-     */
-    public boolean active = false;
+    protected static ArrayList<JBurstBasic> members = new ArrayList<>();
 
     /**
      * Time in milliseconds since program began
      */
-    private long _total;
+    private static long _total;
 
-    /**
-     * Measured time between update() calls in milliseconds
-     */
-    public int elapsed;
+    private static Instant _startTime = Instant.now();
 
-    private Instant _startTime = Instant.now();
+    private static int _framerate = 60;
 
     /**
      * Independent thread running sprite update system
      */
-    private Thread burstThread = new Thread("Burst-Manager") 
+    private static Thread _burstThread = new Thread("Burst-Manager") 
     {
         @Override
         public void run()
@@ -58,7 +48,9 @@ public class JBurst
 
             while(!isInterrupted())
             {
-                elapsed = Math.toIntExact(getTotal() - _total);
+                int delay = 1000 / _framerate;
+                while(delay - Math.toIntExact(getTotal() - _total) >= 0);
+
                 _total = getTotal();
 
                 update();
@@ -68,19 +60,7 @@ public class JBurst
         }
     };
 
-    /**
-     * Creates a new usable JBurst with its own update thread.
-     * <p>
-     * It's unlikely having multiple JBursts will ever be necessary,
-     * but it can still be done if so desired.
-     */
-    public JBurst()
-    {
-        members = new ArrayList<>();
-        burstThread.start();
-    }
-
-    private void update()
+    private static void update()
     {
         if(!active || members.size() == 0) return;
 
@@ -90,48 +70,68 @@ public class JBurst
             if(basic != null)
             {
                 if(basic.exists && basic.active)
-                    basic.update(elapsed);
+                    basic.update(1000 / _framerate);
                 basic.repaint();
             }
         }
     }
 
-    private long getTotal()
+    private static long getTotal()
     {
         return Duration.between(_startTime, Instant.now()).toMillis();
     }
 
     /**
-     * "Kills" this JBurst, causing it to cease updating.
+     * Returns how often {@code JBurst} should update its members, in frames per second
+     */
+    public static int getFramerate()
+    {
+        return _framerate;
+    }
+
+    /**
+     * Sets how often {@code JBurst} should update its members, in frames per second.
+     * <p> The default frame rate is 60 fps.
+     * <p>
+     * <i>If {@code framerate} is less than 1, this call will be ignored.</i>
+     */
+    public static void setFramerate(int framerate)
+    {
+        _framerate = framerate < 1 ? _framerate : framerate;
+    }
+
+    /**
+     * "Kills" {@code JBurst}, causing it to cease updating
      * 
      * @see #revive()
      */
-    public void kill()
+    public static void kill()
     {
         active = false;
     }
 
     /**
-     * "Revives" this JBurst, causing it to continue updating.
+     * "Revives" {@code JBurst}, causing it to continue updating
      * 
      * @see #kill()
      */
-    public void revive()
+    public static void revive()
     {
         active = true;
     }
 
     /**
-     * Stops the JBurst from further updates, and destroys all of its current members.
+     * Resets {@code JBurst} and destroys all of its current members
      * <p>
      * <i>
-     *  Warning: This will render every single object added to this JBurst completely useless.
-     *  To simply disable JBurst, use {@code kill()}
+     *  Warning: This will <strong>destroy</strong> every single object managed 
+     *  by JBurst, rendering them completely useless.
+     *  To simply disable JBurst, use {@code kill()}.
      * </i>
      * 
      * @see #kill()
      */
-    public void reset()
+    public static void reset()
     {
         JBurstDestroyUtil.destroyArrayList(members);
         System.gc();
@@ -139,9 +139,7 @@ public class JBurst
         _startTime = Instant.now();
     }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s[total=%dms,elapsed=%dms,length=%d]", getClass().getName(), _total, elapsed, members.size());
+    static {
+        JBurst._burstThread.start();
     }
 }

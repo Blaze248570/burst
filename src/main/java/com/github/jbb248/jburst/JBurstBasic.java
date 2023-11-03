@@ -39,8 +39,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public JBurstBasic() 
     { 
-        if(JBurst.BURST != null)
-            JBurst.BURST.members.add(this);
+        JBurst.members.add(this);
     }
 
     /**
@@ -68,8 +67,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public void destroy() 
     {
-        if(JBurst.BURST != null)
-            JBurst.BURST.members.remove(this);
+        JBurst.members.remove(this);
     }
 
     @Override

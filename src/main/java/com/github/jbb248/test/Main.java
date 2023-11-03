@@ -20,7 +20,6 @@ import com.github.jbb248.jburst.JBurstSprite;
 public class Main
 {
     public static JFrame window;
-
     public static final Dimension SIZE = new Dimension(640, 720);
 
     public static void main(String[] args) 
@@ -38,7 +37,7 @@ public class Main
         window.setSize(SIZE);
         window.setLayout(null);
 
-        SwingUtilities.invokeLater(() -> create());
+        SwingUtilities.invokeLater(Main::create);
     }
 
     public static final int OBJ_WIDTH = 125, OBJ_HEIGHT = 30;

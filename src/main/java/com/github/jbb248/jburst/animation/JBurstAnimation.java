@@ -83,7 +83,6 @@ public class JBurstAnimation implements IBurstDestroyable
         this.frameRate = frameRate;
         this.frames = frames;
         this.numFrames = Math.min(frames.length, _controller._sprite.getNumFrames());
-        this.frameRate = frameRate;
         this.looped = looped;
     }
 

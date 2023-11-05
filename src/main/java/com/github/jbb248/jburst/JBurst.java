@@ -23,7 +23,7 @@ public class JBurst
      */
     protected static ArrayList<JBurstBasic> members = new ArrayList<>();
 
-    private static long _startTime = System.currentTimeMillis();
+    private static long _startTime = 0;
 
     private static double _total = 0.0;
 
@@ -43,6 +43,7 @@ public class JBurst
         @Override
         public void run()
         {
+            _startTime = System.currentTimeMillis();
             active = true;
 
             while(!isInterrupted())

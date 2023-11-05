@@ -56,6 +56,16 @@ public class JBurstAnimation implements IBurstDestroyable
     public int[] frames;
 
     /**
+     * Whether or not this animation should render backwards
+     */
+    public boolean flipX = false;
+
+    /**
+     * Whether or not this animation should render upside-down
+     */
+    public boolean flipY = false;
+
+    /**
      * The speed in frames per second of the animation.
      */
     private int _frameRate;
@@ -75,13 +85,15 @@ public class JBurstAnimation implements IBurstDestroyable
      */
     private JBurstAnimationController _controller;
 
-    public JBurstAnimation(JBurstAnimationController controller, String name, int[] frames, int frameRate, boolean looped) 
+    public JBurstAnimation(JBurstAnimationController controller, String name, int[] frames, int frameRate, boolean looped, boolean flipX, boolean flipY) 
     {
         this._controller = controller;
         this.name = name;
         this.frames = frames;
         this.numFrames = Math.min(frames.length, _controller._sprite.getNumFrames());
         this.looped = looped;
+        this.flipX = flipX;
+        this.flipY = flipY;
         setFrameRate(frameRate);
     }
 

@@ -40,7 +40,17 @@ public class JBurstSprite extends JBurstBasic
      * The transparency of this sprite
      * <p> <i>Currently unused</i>
      */
-    public double alpha = 1.0f;
+    // public double alpha = 1.0f;
+
+    /**
+     * Whether or not this sprite should render backwards
+     */
+    public boolean flipX = false;
+
+    /**
+     * Whether or not this sprite should render upside-down
+     */
+    public boolean flipY = false;
 
     /**
      * Whether or not this sprite's frame needs updating
@@ -328,7 +338,7 @@ public class JBurstSprite extends JBurstBasic
     {
         super.paintComponent(g);
 
-        if(!exists || !visible || alpha == 0) return;
+        if(!exists || !visible /*|| alpha == 0*/) return;
 
         updateFramePixels();
 
@@ -398,10 +408,20 @@ public class JBurstSprite extends JBurstBasic
     {
         if(_frame == null || !dirty) return _framePixels;
 
-        _framePixels = _frame.paint(_framePixels);
+        _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
 
         dirty = false;
         return _framePixels;
+    }
+
+    private boolean checkFlipX()
+    {
+        return flipX ^ animation != null && animation.curAnim != null ? animation.curAnim.flipX : false;
+    }
+
+    private boolean checkFlipY()
+    {
+        return flipY ^ animation != null && animation.curAnim != null ? animation.curAnim.flipY : false;
     }
 
     /**

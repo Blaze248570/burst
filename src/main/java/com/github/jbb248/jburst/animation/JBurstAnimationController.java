@@ -121,16 +121,39 @@ public class JBurstAnimationController implements IBurstDestroyable
      */
     public void add(String name, int[] frames, int framerate, boolean looped)
     {
-        JBurstAnimation anim = new JBurstAnimation(this, name, frames, framerate, looped);
-
-        _animations.put(name, anim);
+        add(name, frames, framerate, looped, false, false);
     }
 
     /**
-     * Adds an animation to the parent sprite using a key from their animation data.
+     * Adds an animation to the parent sprite.
+     * <i>To be used after {@code loadAnimatedSprite}.</i>
+     * <p>
+     * The {@code frames} object required will be which indices to use to animate with.
+     * <p>
+     * For example, providing 
+     * <p> <code>animation.add("Dance", new int[] {0, 1, 2, 3, 4}, 30, true)</code>
+     * <p> will create an animation named "Dance" using the first five frames.
+     * <p> <i> If an animation titled {@code name} already exists, it will be overwritten</i>
      * 
-     * @param name      what to name the animation.
-     * @param prefix    name of the animation on the animation file.
+     * @param name      the title for the new animation
+     * @param frames    which frames the new animation displays
+     * @param framerate the speed this animation should play at in frames per second
+     * @param looped    whether or not the new animation should replay when finished
+     * @param flipX         whether or not this animation should render backwards
+     * @param flipY         whether or not this animation should render upside-down
+     * 
+     * @see JBurstSprite#loadAnimatedGraphic(String, int, int) JBurstSprite.loadAnimatedGraphic()
+     */
+    public void add(String name, int[] frames, int framerate, boolean looped, boolean flipX, boolean flipY)
+    {
+        _animations.put(name, new JBurstAnimation(this, name, frames, framerate, looped, flipX, flipY));
+    }
+
+    /**
+     * Adds an animation to the parent sprite using a key from their animation data
+     * 
+     * @param name      what to name the animation
+     * @param prefix    name of the animation on the animation file
      * 
      * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
      * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
@@ -142,11 +165,11 @@ public class JBurstAnimationController implements IBurstDestroyable
     }
 
     /**
-     * Adds an animation to the parent sprite using a key from their animation data.
+     * Adds an animation to the parent sprite using a key from their animation data
      * 
-     * @param name          what to name the animation.
-     * @param prefix        name of the animation on the animation file.
-     * @param framerate     how fat or slow this animation should play.
+     * @param name          what to name the animation
+     * @param prefix        name of the animation on the animation file
+     * @param framerate     how fat or slow this animation should play
      * 
      * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
      * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
@@ -157,20 +180,38 @@ public class JBurstAnimationController implements IBurstDestroyable
         addByPrefix(name, prefix, framerate, true);
     }
 
-
     /**
-     * Adds an animation to the parent sprite using a key from their animation data.
+     * Adds an animation to the parent sprite using a key from their animation data
      * 
-     * @param name          what to name the animation.
-     * @param prefix        name of the animation on the animation file.
-     * @param framerate     how fat or slow this animation should play.
-     * @param looped        whether or not this animation should play again once it is finished.
+     * @param name          what to name the animation
+     * @param prefix        name of the animation on the animation file
+     * @param framerate     how fat or slow this animation should play
+     * @param looped        whether or not this animation should play again once it is finished
      * 
      * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
      * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
      * @see JBurstAtlasFrames#fromJsonPacker(JBurstGraphic, String) JBurstAtlasFrames.fromJsonPacker()
      */
     public void addByPrefix(String name, String prefix, int framerate, boolean looped)
+    {
+        addByPrefix(name, prefix, framerate, looped, false, false);
+    }
+
+    /**
+     * Adds an animation to the parent sprite using a key from their animation data
+     * 
+     * @param name          what to name the animation
+     * @param prefix        name of the animation on the animation file
+     * @param framerate     how fat or slow this animation should play
+     * @param looped        whether or not this animation should play again once it is finished
+     * @param flipX         whether or not this animation should render backwards
+     * @param flipY         whether or not this animation should render upside-down
+     * 
+     * @see JBurstSprite#setFrames(JBurstFramesCollection) JBurstSprite.setFrames()
+     * @see JBurstAtlasFrames#fromSparrow(JBurstGraphic, String) JBurstAtlasFrames.fromSparrow()
+     * @see JBurstAtlasFrames#fromJsonPacker(JBurstGraphic, String) JBurstAtlasFrames.fromJsonPacker()
+     */
+    public void addByPrefix(String name, String prefix, int framerate, boolean looped, boolean flipX, boolean flipY)
     {
         if(_sprite.getFrames() == null)
             return;
@@ -190,7 +231,7 @@ public class JBurstAnimationController implements IBurstDestroyable
         int[] arrIndices = new int[frameIndices.size()];
         for(int i = 0; i < frameIndices.size(); i++) arrIndices[i] = frameIndices.get(i);
 
-        JBurstAnimation anim = new JBurstAnimation(this, name, arrIndices, framerate, looped);
+        JBurstAnimation anim = new JBurstAnimation(this, name, arrIndices, framerate, looped, flipX, flipY);
         _animations.put(name, anim);
     }
 

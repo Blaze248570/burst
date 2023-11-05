@@ -129,13 +129,13 @@ public class Main
         raichu = new RaichuSprite();
         raichu.setScale(0.75);
         int raichuX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (raichu.getSpriteWidth() / 2);
-        int raichuY = (SIZE.height / 2) - (raichu.getSpriteHeight() / 2) - 100;
+        int raichuY = (SIZE.height / 2) - (raichu.getSpriteHeight() / 2) - 80;
         raichu.setSpriteLocation(raichuX, raichuY); // Calculations to center the Raichu within the white box
 
         vaporeon = new VaporeonSprite();
         vaporeon.setScale(0.75);
         int vaporeonX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (vaporeon.getSpriteWidth() / 2);
-        int vaporeonY = (SIZE.height / 2) - (vaporeon.getSpriteHeight() / 2) - 50;
+        int vaporeonY = (SIZE.height / 2) - (vaporeon.getSpriteHeight() / 2) - 80;
         vaporeon.setSpriteLocation(vaporeonX, vaporeonY); // Calculations to center the Vaporeon within the white box
 
         /*************************************************************/

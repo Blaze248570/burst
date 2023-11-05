@@ -32,7 +32,7 @@ public class VaporeonSprite extends JBurstSprite
         super.update(elapsed);
 
         if(spin)
-            setAngle(getAngle() + Math.toRadians(elapsed / 2.0));
+            setAngle(getAngle() + Math.toRadians(elapsed * 100));
         else
             setAngle(0.0);
     }

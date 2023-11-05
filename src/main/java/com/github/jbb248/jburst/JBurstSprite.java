@@ -20,8 +20,6 @@ import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 /**
  * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.
  * <p>
- * When a JBurstSprite is instantiated, it is automatically added to {@code JBurst.members}.
- * <p>
  * <i>Note:</i> As of now, most layout managers do not handle JBurstSprites correctly,
  * so none must be used by its container. (This can be achieved through {@code setLayout(null)})
  * 
@@ -59,9 +57,9 @@ public class JBurstSprite extends JBurstBasic
      * Manages animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
-    public final JBurstAnimationController animation;
+    public final JBurstAnimationController animation = new JBurstAnimationController(this);
 
-    private final Point2D.Double _scale;
+    private final Point2D.Double _scale = new Point2D.Double(1.0, 1.0);
 
     private double _angle = 0.0;
 
@@ -83,7 +81,7 @@ public class JBurstSprite extends JBurstBasic
      * Constructs a new JBurstSprite at coordinates (0, 0).
      * <p> 
      * It is recommended it is used without a layout manager.
-     * Otherwise, it'll probably won't behave.
+     * Otherwise, it probably won't behave.
      */
     public JBurstSprite() 
     {
@@ -94,16 +92,14 @@ public class JBurstSprite extends JBurstBasic
      * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}).
      * <p> 
      * It is recommended it is used without a layout manager.
-     * Otherwise, it'll probably won't behave.
+     * Otherwise, it probably won't behave.
      */
     public JBurstSprite(int x, int y) 
     {
         super();
 
-        animation = new JBurstAnimationController(this);
-
-        _scale = new Point2D.Double(1.0, 1.0);
         setLocation(_framePoint = new Point(x, y));
+        revalidate();
     }
 
     /**
@@ -263,9 +259,6 @@ public class JBurstSprite extends JBurstBasic
 
         _frame = frame.copyTo(_frame);
 
-        setLocation(_framePoint);
-        setSize(getFrameWidth(), getFrameHeight());
-
         return frame;
     }
 
@@ -312,6 +305,8 @@ public class JBurstSprite extends JBurstBasic
         this.animation.clearAnimations();
 
         setFrame(frames.frames.get(0));
+        setLocation(_framePoint);
+        setSize(getFrameWidth(), getFrameHeight());
 
         graphicLoaded();
         return this._frames;
@@ -338,7 +333,11 @@ public class JBurstSprite extends JBurstBasic
         updateFramePixels();
 
         if(isSimpleRender())
+        {
             g.drawImage(_framePixels, 0, 0, null, null);
+            setLocation(_framePoint);
+            setSize(getFrameWidth(), getFrameHeight());
+        }
         else
             paintComplex((Graphics2D) g);
 
@@ -346,6 +345,7 @@ public class JBurstSprite extends JBurstBasic
         {
             g.setColor(Color.BLUE);
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+            g.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
         }
             
         g.dispose();
@@ -353,20 +353,45 @@ public class JBurstSprite extends JBurstBasic
 
     public boolean isSimpleRender()
     {
-        return _angle == 0 && _scale.x == 1 && _scale.y == 1;
+        return _angle == 0.0 && _scale.x == 1.0 && _scale.y == 1.0;
     }
 
     private void paintComplex(Graphics2D graphics)
     {
-        final int WIDTH = getFrameWidth();
-        final int HEIGHT = getFrameHeight();
+        AffineTransform xForm = graphics.getTransform();
 
-        AffineTransform xForm = new AffineTransform();
-        xForm.rotate(_angle, WIDTH / 2, HEIGHT / 2);
+        final double WIDTH = getFrameWidth() * _scale.x;
+        final double HEIGHT = getFrameHeight() * _scale.y;
 
-        graphics.drawImage(_framePixels, xForm, null);
-        graphics.setColor(Color.BLUE);
-        graphics.fillOval(WIDTH / 2 - 4, HEIGHT / 2 - 4, 8, 8);
+        double xWidth = WIDTH;
+        double xHeight = HEIGHT;
+        int dx = 0;
+        int dy = 0;
+
+        if(_angle != 0.0)
+        {
+            xWidth = WIDTH * Math.abs(Math.cos(_angle)) + HEIGHT * Math.abs(Math.sin(_angle));           
+            xHeight = WIDTH * Math.abs(Math.sin(_angle)) + HEIGHT * Math.abs(Math.cos(_angle));
+            dx = Math.toIntExact(Math.round((xWidth - WIDTH) * 0.5));
+            dy = Math.toIntExact(Math.round((xHeight - HEIGHT) * 0.5));
+
+            graphics.rotate(_angle, xWidth / 2, xHeight / 2);
+        }
+
+        setLocation(_framePoint.x - dx, _framePoint.y - dy);
+        setSize(Math.toIntExact(Math.round(xWidth)), Math.toIntExact(Math.round(xHeight)));
+        
+        graphics.translate(dx, dy);
+        graphics.drawImage(_framePixels, AffineTransform.getScaleInstance(_scale.x, _scale.y), null);
+
+        if(debugMode)
+        {
+            graphics.setColor(Color.RED);
+            graphics.drawRect(0, 0, Math.toIntExact(Math.round(WIDTH)) - 1, Math.toIntExact(Math.round(HEIGHT)) - 1);
+            graphics.fillOval(Math.toIntExact(Math.round(WIDTH * 0.5)) - 4, Math.toIntExact(Math.round(HEIGHT * 0.5)) - 4, 8, 8);
+        }
+
+        graphics.setTransform(xForm);
     }
 
     private BufferedImage updateFramePixels()
@@ -550,7 +575,7 @@ public class JBurstSprite extends JBurstBasic
     @Deprecated
     public int getHeight()
     {
-        return super.getWidth();
+        return super.getHeight();
     }
 
     public int getSpriteHeight()
@@ -669,7 +694,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Sets the size that this sprite's graphic should be drawn at, in pixels.
+     * Sets the size that this sprite should be drawn at, in pixels.
      * <p>
      * <i>If height is less than or equal to zero, it will match width and vice versa.</i>
      * <p><i>If both arguments are less than or equal to zero, this call will be ignored.</i>
@@ -681,8 +706,8 @@ public class JBurstSprite extends JBurstBasic
     {
         if(width <= 0 && height <= 0) return;
 
-        double scaleX = ((double) width) / getFrameWidth();
-        double scaleY = ((double) height) / getFrameHeight();
+        double scaleX = (double) width / getFrameWidth();
+        double scaleY = (double) height / getFrameHeight();
 
         if(width <= 0)
             scaleX = scaleY;

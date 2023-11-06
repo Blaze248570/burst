@@ -1,6 +1,8 @@
 package com.github.jbb248.jburst.graphics.frames;
 
 import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
 import java.awt.Point;
 import java.util.Scanner;
 
@@ -43,7 +45,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
      */
     public static JBurstAtlasFrames fromSparrow(JBurstGraphic graphic, String description) 
     {
-        if(graphic == null || description == null || !new java.io.File(description).exists())
+        if(graphic == null || description == null || !new File(description).exists())
             return null;
 
         JBurstAtlasFrames frames = new JBurstAtlasFrames(graphic);
@@ -127,7 +129,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
         try 
         {
             StringBuilder content = new StringBuilder();
-            Scanner scanner = new Scanner(new java.io.File(description));
+            Scanner scanner = new Scanner(new File(description));
 
             while(scanner.hasNextLine()) content.append(scanner.nextLine());
             scanner.close();
@@ -136,7 +138,7 @@ public class JBurstAtlasFrames extends JBurstFramesCollection
 
             data = (JSONObject) new JSONParser().parse(content.toString());
         } 
-        catch(java.io.IOException e) 
+        catch(IOException e) 
         {
             System.out.println("File not found: " + description);
             return null;

@@ -23,6 +23,18 @@ public class JBurstGraphic implements IBurstDestroyable
     private static int graphEnumerator = 0;
     private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
 
+    public static final JBurstGraphic unknownGraphic = new JBurstGraphic("Unknown", new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB));
+    static {
+        Graphics2D graphics = unknownGraphic.createGraphics();
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(0, 0, 16, 16);
+        graphics.setColor(Color.WHITE);
+        graphics.fillOval(3, 3, 10, 10);
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(5, 5, 6, 6);
+        graphics.dispose();
+    }
+
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
@@ -30,7 +42,7 @@ public class JBurstGraphic implements IBurstDestroyable
      */
     public static JBurstGraphic fromFile(String source) 
     {
-        return fromFile(source, generateKey());
+        return fromFile(source, source);
     }
 
     /**
@@ -41,7 +53,13 @@ public class JBurstGraphic implements IBurstDestroyable
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {
-        return new JBurstGraphic(key, returnBuffImage(source));
+        if(_cache.containsKey(key)) return _cache.get(key);
+
+        BufferedImage image = returnBuffImage(source);
+        if(image == null)
+            return null;
+        
+        return new JBurstGraphic(key, image);
     }
 
     /**
@@ -70,32 +88,15 @@ public class JBurstGraphic implements IBurstDestroyable
 
     private static BufferedImage returnBuffImage(String path) 
     {
-        BufferedImage image;
         try 
         {
-            image = ImageIO.read(new File(path));
+            return ImageIO.read(new File(path));
         } 
         catch(IOException e) 
         {
             System.out.println("Image not found: " + path);
-            image = createImageMissingIcon();
         }
-        return image;
-    }
-
-    private static BufferedImage createImageMissingIcon()
-    {   
-        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.setColor(Color.BLUE);
-        graphics.fillOval(0, 0, 16, 16);
-        graphics.setColor(Color.WHITE);
-        graphics.fillOval(3, 3, 10, 10);
-        graphics.setColor(Color.BLUE);
-        graphics.fillOval(5, 5, 6, 6);
-        graphics.dispose();
-
-        return image;
+        return null;
     }
 
     private static String generateKey()

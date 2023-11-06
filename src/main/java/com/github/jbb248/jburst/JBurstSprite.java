@@ -311,9 +311,19 @@ public class JBurstSprite extends JBurstBasic
     public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
         this._frames = frames;
-        this.animation.clearAnimations();
+        if(frames == null)
+        {
+            JBurstFrame frame = new JBurstFrame(JBurstGraphic.unknownGraphic);
+            int width = frame.graphic.image.getWidth();
+            int height = frame.graphic.image.getHeight();
+            frame.frame = new Rectangle(width, height);
+            frame.sourceSize.setSize(width, height);
+            setFrame(frame);
+        }
+        else
+            setFrame(frames.frames.get(0));
 
-        setFrame(frames.frames.get(0));
+        this.animation.clearAnimations();
         setLocation(_framePoint);
         setSize(getFrameWidth(), getFrameHeight());
 

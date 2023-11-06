@@ -109,13 +109,12 @@ public class JBurstSprite extends JBurstBasic
         super();
 
         setLocation(_framePoint = new Point(x, y));
-        revalidate();
     }
 
     /**
-     * Called by {@code JBurst} every "frame"
+     * Called by {@code JBurst} every frame
      * 
-     * @param elapsed   time since the last call to {@code update()} in milliseconds
+     * @param elapsed   time since the last call to {@code update()}, in seconds
      */
     @Override
     public void update(double elapsed)
@@ -790,8 +789,9 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Sets the angle of rotation of this sprite, in radians.
-     * <i>If you'd rather use degrees, use {@code Math.toRadians()}.</i>
+     * Sets the angle of rotation, in radians, of this sprite relative to its midpoint
+     * with a 3px margin of error.
+     * <i>If you prefer to use degrees, use {@code Math.toRadians()}.</i>
      * <p>
      * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
      * would flip this sprite upside-down.

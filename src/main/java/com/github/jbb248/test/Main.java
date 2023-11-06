@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import com.github.jbb248.jburst.JBurst;
 import com.github.jbb248.jburst.JBurstSprite;
 
 public class Main
@@ -100,6 +101,8 @@ public class Main
                 pichu.debugMode = !pichu.debugMode;            
                 raichu.debugMode = !raichu.debugMode;
                 vaporeon.debugMode = !vaporeon.debugMode;
+
+                JBurst.setFrameRate(30);
             } 
         });
 

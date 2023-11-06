@@ -1,5 +1,7 @@
 package com.github.jbb248.test;
 
+import java.util.stream.IntStream;
+
 import com.github.jbb248.jburst.JBurstSprite;
 
 /**
@@ -14,10 +16,7 @@ public class PichuSprite extends JBurstSprite
     /**
      * Used to determine which frames from the pichu spritesheet should make up the animation.
      */
-    public final int[] indices = new int[44];
-    {
-        for(int i = 0; i < 44; indices[i] = i++);
-    }
+    public final int[] indices = IntStream.range(0, 44).toArray();
 
     public boolean spin = false;
 
@@ -38,7 +37,7 @@ public class PichuSprite extends JBurstSprite
         super.update(elapsed);
 
         if(spin)
-            setAngle(getAngle() + Math.toRadians(elapsed * 100));
+            setAngle(getAngle() + Math.toRadians(elapsed * 150));
         else
             setAngle(0.0);
     }

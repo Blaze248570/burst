@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 
 /**
- * Core of JBurst package and manager of all JBurstBasics.
+ * The JBurst class is the core of the JBurst package. It manages every non-destroyed JBurstBasic.
+ * It also contains static methods to alter frame rate and pause all JBurstBasics universally.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
@@ -23,17 +24,32 @@ public class JBurst
      */
     protected static ArrayList<JBurstBasic> members = new ArrayList<>();
 
+    /**
+     * The measured starting time used to calculate the elapsed time in milliseconds
+     */
     private static long _startTime = 0;
 
-    private static double _total = 0.0;
+    /**
+     * The total time in milliseconds since {@code _startTime} was decided
+     */
+    private static long _total = 0;
 
+    /**
+     * The rate at which JBurst updates, in frames per second
+     */
     private static int _frameRate = 60;
 
-    private static double _elapsed = 0.0;
+    /**
+     * The amount of time between frames, in milliseconds
+     */
+    private static double _stepMS = 1000.0 / _frameRate;
 
-    private static double _step = 1000.0 / _frameRate;
+    /**
+     * The amount of time between frames, in seconds
+     */
+    private static double _step = _stepMS / 1000.0;
 
-    private static double _accumulator = _step;
+    private static double _accumulator = _stepMS;
 
     /**
      * Independent thread running sprite update system
@@ -48,16 +64,16 @@ public class JBurst
 
             while(!isInterrupted())
             {
-                double ticks = getTicks();
-                _elapsed = ticks - _total;
+                long ticks = System.currentTimeMillis() - _startTime;
+                long _elapsed = ticks - _total;
                 _total = ticks;
 
                 _accumulator += _elapsed;
 
-                while(_accumulator >= _step) 
+                while(_accumulator >= _stepMS) 
                 {
-                    step();
-                    _accumulator -= _step;
+                    update(_elapsed);
+                    _accumulator -= _stepMS;
                 }
             }
 
@@ -65,7 +81,7 @@ public class JBurst
         }
     };
 
-    private static void step()
+    private static void update(long elapsed)
     {
         if(!active || members.size() == 0) return;
 
@@ -75,20 +91,17 @@ public class JBurst
             if(basic != null)
             {
                 if(basic.exists && basic.active)
-                    basic.update(0.016);
+                    basic.update(_step);
                 
                 basic.repaint();
             }
         }
     }
 
-    private static long getTicks()
-    {
-        return System.currentTimeMillis() - _startTime;
-    }
-
     /**
-     * Returns how often {@code JBurst} should update its members, in frames per second
+     * Returns how often {@code JBurst} should update its members, in frames per second.
+     * <p> 
+     * <i>This does not affect draw speed. JBurst's frame rate is simply how often {@code update()} is called.</i>
      */
     public static int getFrameRate()
     {
@@ -97,14 +110,16 @@ public class JBurst
 
     /**
      * Sets how often {@code JBurst} should update its members, in frames per second.
-     * <p> The default frame rate is 60 fps.
+     * The default frame rate is 60 fps.
      * <p>
      * <i>If {@code framerate} is less than 1, this call will be ignored.</i>
+     * <p>
+     * <i>This does not affect draw speed. JBurst's frame rate is simply how often {@code update()} is called.</i>
      */
     public static void setFrameRate(int frameRate)
     {
         _frameRate = frameRate < 1 ? _frameRate : frameRate;
-        _step = frameRate > 0 ? 1000.0 / frameRate : 0;
+        _step = (_stepMS = frameRate > 0 ? 1000.0 / frameRate : 0) / 1000.0;
     }
 
     /**

@@ -42,7 +42,6 @@ public class JBurstFramesCollection implements IBurstDestroyable
         JBurstFrame frame = new JBurstFrame(graphic);
         frame.frame = checkFrame(region);
         frame.sourceSize.setSize(region.width, region.height);
-        frame.offset.setLocation(0, 0);
 
         return pushFrame(frame);
     }

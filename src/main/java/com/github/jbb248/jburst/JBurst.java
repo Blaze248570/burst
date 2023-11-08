@@ -1,86 +1,87 @@
 package com.github.jbb248.jburst;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 
 import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 
 /**
- * Core of JBurst and manager class of all JBurstBasics.
- * <p>
- * Handles updating thread and
+ * The JBurst class is the core of the JBurst package. It manages every non-destroyed JBurstBasic.
+ * It also contains static methods to alter frame rate and pause all JBurstBasics universally.
  * 
  * @author Joe Bray
  * <p> Modeled from <a href="https://api.haxeflixel.com/flixel/FlxG.html">FlxG</a>
+ * and <a href="https://api.haxeflixel.com/flixel/FlxGame.html">FlxGame</a>
  */
 public class JBurst
 {
     /**
-     * The overarching JBurst object managing all JBurstBasics
+     * Whether or not ALL JBurst objects can update
      */
-    public static final JBurst BURST = new JBurst();
+    public static boolean active = false;
 
     /**
      * All currently active JBurstBasic objects are held within this ArrayList.
-     * <p> 
-     * You shouldn't need to add JBurstBasics manually as they automatically
-     * add themselves when they are instantiated.
      */
-    protected ArrayList<JBurstBasic> members;
+    protected static ArrayList<JBurstBasic> members = new ArrayList<>();
 
     /**
-     * Whether or not ALL of this JBurst's objects should update
+     * The measured starting time used to calculate the elapsed time in milliseconds
      */
-    public boolean active = false;
+    private static long _startTime = 0;
 
     /**
-     * Time in milliseconds since program began
+     * The total time in milliseconds since {@code _startTime} was decided
      */
-    private long _total;
+    private static long _total = 0;
 
     /**
-     * Measured time between update() calls in milliseconds
+     * The rate at which JBurst updates, in frames per second
      */
-    public int elapsed;
+    private static int _frameRate = 60;
 
-    private Instant _startTime = Instant.now();
+    /**
+     * The amount of time between frames, in milliseconds
+     */
+    private static double _stepMS = 1000.0 / _frameRate;
+
+    /**
+     * The amount of time between frames, in seconds
+     */
+    private static double _step = _stepMS / 1000.0;
+
+    private static double _accumulator = _stepMS;
 
     /**
      * Independent thread running sprite update system
      */
-    private Thread burstThread = new Thread("Burst-Manager") 
+    private static Thread _burstThread = new Thread("Burst") 
     {
         @Override
         public void run()
         {
+            _startTime = System.currentTimeMillis();
             active = true;
 
             while(!isInterrupted())
             {
-                elapsed = Math.toIntExact(getTotal() - _total);
-                _total = getTotal();
+                long ticks = System.currentTimeMillis() - _startTime;
+                long _elapsed = ticks - _total;
+                _total = ticks;
 
-                update();
+                _accumulator += _elapsed;
+
+                while(_accumulator >= _stepMS) 
+                {
+                    update(_elapsed);
+                    _accumulator -= _stepMS;
+                }
             }
 
             active = false;
         }
     };
 
-    /**
-     * Creates a new usable JBurst with its own update thread.
-     * <p>
-     * It's unlikely having multiple JBursts will ever be necessary,
-     * but it can still be done if so desired.
-     */
-    public JBurst()
-    {
-        members = new ArrayList<>();
-        burstThread.start();
-    }
-
-    private void update()
+    private static void update(long elapsed)
     {
         if(!active || members.size() == 0) return;
 
@@ -90,58 +91,77 @@ public class JBurst
             if(basic != null)
             {
                 if(basic.exists && basic.active)
-                    basic.update(elapsed);
+                    basic.update(_step);
+                
                 basic.repaint();
             }
         }
     }
 
-    private long getTotal()
+    /**
+     * Returns how often {@code JBurst} should update its members, in frames per second.
+     * <p> 
+     * <i>This does not affect draw speed. JBurst's frame rate is simply how often {@code update()} is called.</i>
+     */
+    public static int getFrameRate()
     {
-        return Duration.between(_startTime, Instant.now()).toMillis();
+        return _frameRate;
     }
 
     /**
-     * "Kills" this JBurst, causing it to cease updating.
+     * Sets how often {@code JBurst} should update its members, in frames per second.
+     * The default frame rate is 60 fps.
+     * <p>
+     * <i>If {@code framerate} is less than 1, this call will be ignored.</i>
+     * <p>
+     * <i>This does not affect draw speed. JBurst's frame rate is simply how often {@code update()} is called.</i>
+     */
+    public static void setFrameRate(int frameRate)
+    {
+        _frameRate = frameRate < 1 ? _frameRate : frameRate;
+        _step = (_stepMS = frameRate > 0 ? 1000.0 / frameRate : 0) / 1000.0;
+    }
+
+    /**
+     * "Kills" {@code JBurst}, causing it to cease updating
      * 
      * @see #revive()
      */
-    public void kill()
+    public static void kill()
     {
         active = false;
     }
 
     /**
-     * "Revives" this JBurst, causing it to continue updating.
+     * "Revives" {@code JBurst}, causing it to continue updating
      * 
      * @see #kill()
      */
-    public void revive()
+    public static void revive()
     {
         active = true;
     }
 
     /**
-     * Stops the JBurst from further updates, and destroys all of its current members.
+     * Resets {@code JBurst} and destroys all of its current members
      * <p>
      * <i>
-     *  Warning: This will render every single object added to this JBurst completely useless.
-     *  To simply disable JBurst, use {@code kill()}
+     *  Warning: This will <strong>destroy</strong> every single object managed 
+     *  by JBurst, rendering them completely useless.
+     *  To simply disable JBurst, use {@code kill()}.
      * </i>
      * 
      * @see #kill()
      */
-    public void reset()
+    public static void reset()
     {
         JBurstDestroyUtil.destroyArrayList(members);
         System.gc();
 
-        _startTime = Instant.now();
+        _startTime = System.currentTimeMillis();
     }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s[total=%dms,elapsed=%dms,length=%d]", getClass().getName(), _total, elapsed, members.size());
+    static {
+        JBurst._burstThread.start();
     }
 }

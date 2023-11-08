@@ -1,5 +1,6 @@
 package com.github.jbb248.jburst.graphics;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -22,6 +23,18 @@ public class JBurstGraphic implements IBurstDestroyable
     private static int graphEnumerator = 0;
     private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
 
+    public static final JBurstGraphic unknownGraphic = new JBurstGraphic("Unknown", new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB));
+    static {
+        Graphics2D graphics = unknownGraphic.createGraphics();
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(0, 0, 16, 16);
+        graphics.setColor(Color.WHITE);
+        graphics.fillOval(3, 3, 10, 10);
+        graphics.setColor(Color.BLUE);
+        graphics.fillOval(5, 5, 6, 6);
+        graphics.dispose();
+    }
+
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
@@ -29,7 +42,7 @@ public class JBurstGraphic implements IBurstDestroyable
      */
     public static JBurstGraphic fromFile(String source) 
     {
-        return fromFile(source, generateKey());
+        return fromFile(source, source);
     }
 
     /**
@@ -40,7 +53,13 @@ public class JBurstGraphic implements IBurstDestroyable
      */
     public static JBurstGraphic fromFile(String source, String key) 
     {
-        return new JBurstGraphic(key, returnBuffImage(source));
+        if(_cache.containsKey(key)) return _cache.get(key);
+
+        BufferedImage image = returnBuffImage(source);
+        if(image == null)
+            return null;
+        
+        return new JBurstGraphic(key, image);
     }
 
     /**
@@ -75,9 +94,8 @@ public class JBurstGraphic implements IBurstDestroyable
         } 
         catch(IOException e) 
         {
-            System.out.print("Image not found: " + path);
+            System.out.println("Image not found: " + path);
         }
-
         return null;
     }
 

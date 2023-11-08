@@ -20,8 +20,6 @@ import com.github.jbb248.jburst.util.JBurstDestroyUtil;
 /**
  * A JBurstSprite is an extended JComponent that allows for the use of animated sprites.
  * <p>
- * When a JBurstSprite is instantiated, it is automatically added to {@code JBurst.members}.
- * <p>
  * <i>Note:</i> As of now, most layout managers do not handle JBurstSprites correctly,
  * so none must be used by its container. (This can be achieved through {@code setLayout(null)})
  * 
@@ -42,7 +40,17 @@ public class JBurstSprite extends JBurstBasic
      * The transparency of this sprite
      * <p> <i>Currently unused</i>
      */
-    public double alpha = 1.0f;
+    // public double alpha = 1.0f;
+
+    /**
+     * Whether or not this sprite should render backwards
+     */
+    public boolean flipX = false;
+
+    /**
+     * Whether or not this sprite should render upside-down
+     */
+    public boolean flipY = false;
 
     /**
      * Whether or not this sprite's frame needs updating
@@ -59,15 +67,13 @@ public class JBurstSprite extends JBurstBasic
      * Manages animation property's of this sprite.
      * <p> Use functions from this to add and play animations.
      */
-    public final JBurstAnimationController animation;
+    public final JBurstAnimationController animation = new JBurstAnimationController(this);
 
-    private final Point2D.Double _scale;
+    private final Point2D.Double _scale = new Point2D.Double(1.0, 1.0);
 
     private double _angle = 0.0;
 
     private final Point _framePoint;
-
-    private final Rectangle _frameRect;
 
     /**
      * A collection of all the frames used by this sprite
@@ -85,7 +91,7 @@ public class JBurstSprite extends JBurstBasic
      * Constructs a new JBurstSprite at coordinates (0, 0).
      * <p> 
      * It is recommended it is used without a layout manager.
-     * Otherwise, it'll probably won't behave.
+     * Otherwise, it probably won't behave.
      */
     public JBurstSprite() 
     {
@@ -96,28 +102,22 @@ public class JBurstSprite extends JBurstBasic
      * Constructs a new JBurstSprite at coordinates ({@code x}, {@code y}).
      * <p> 
      * It is recommended it is used without a layout manager.
-     * Otherwise, it'll probably won't behave.
+     * Otherwise, it probably won't behave.
      */
     public JBurstSprite(int x, int y) 
     {
         super();
 
-        animation = new JBurstAnimationController(this);
-
-        _scale = new Point2D.Double(1.0, 1.0);
-        _framePoint = new Point();
-        _frameRect = new Rectangle();
-        
-        setSpriteLocation(x, y);
+        setLocation(_framePoint = new Point(x, y));
     }
 
     /**
-     * Called by {@code JBurst} every "frame"
+     * Called by {@code JBurst} every frame
      * 
-     * @param elapsed   time since the last call to {@code update()} in milliseconds
+     * @param elapsed   time since the last call to {@code update()}, in seconds
      */
     @Override
-    public void update(int elapsed)
+    public void update(double elapsed)
     {
         if(animation != null)
             animation.update(elapsed);
@@ -219,24 +219,30 @@ public class JBurstSprite extends JBurstBasic
         if(frameWidth == 0) 
         {
             frameWidth = graphHeight;
-			frameWidth = (frameWidth > graphWidth) ? graphWidth : frameWidth;
+			frameWidth = Math.min(frameWidth, graphWidth);
         }
 
         if (frameHeight == 0)
 		{
 			frameHeight = graphWidth;
-			frameHeight = (frameHeight > graphHeight) ? graphHeight : frameHeight;
+			frameHeight = Math.min(frameHeight, graphHeight);
 		}
 
         JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
-        int numRows = graphHeight / frameHeight;
-        int numCols = graphWidth / frameWidth;
-        for(int i = 0; i < numRows; i++)
-            for(int j = 0; j < numCols; j++)
+        final int ROWS = graphHeight / frameHeight - 1;
+        final int COLS = graphWidth / frameWidth - 1;
+        int i = 0, j = 0;
+        do
+        {
+            do
             {
                 frames.addSpriteSheetFrame(new Rectangle(j * frameWidth, i * frameHeight, frameWidth, frameHeight));
             }
+            while(j++ < COLS);
+            j = 0;
+        }
+        while(i++ < ROWS);
 
         setFrames(frames);
 
@@ -252,7 +258,7 @@ public class JBurstSprite extends JBurstBasic
     {
         if(frame != null)
             dirty = true;
-        else if(_frames != null && _frames.frames != null && getNumFrames() > 0)
+        else if(_frames != null && getNumFrames() > 0)
         {
             frame = _frames.frames.get(0);
             dirty = true;
@@ -261,7 +267,6 @@ public class JBurstSprite extends JBurstBasic
             return null;
 
         _frame = frame.copyTo(_frame);
-        _frameRect.setBounds(_framePoint.x, _framePoint.y, getFrameWidth(), getFrameHeight());
 
         return frame;
     }
@@ -306,10 +311,21 @@ public class JBurstSprite extends JBurstBasic
     public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
         this._frames = frames;
-        this.animation.clearAnimations();
+        if(frames == null)
+        {
+            JBurstFrame frame = new JBurstFrame(JBurstGraphic.unknownGraphic);
+            int width = frame.graphic.image.getWidth();
+            int height = frame.graphic.image.getHeight();
+            frame.frame = new Rectangle(width, height);
+            frame.sourceSize.setSize(width, height);
+            setFrame(frame);
+        }
+        else
+            setFrame(frames.frames.get(0));
 
-        setFrame(frames.frames.get(0));
-        updateBounds();
+        this.animation.clearAnimations();
+        setLocation(_framePoint);
+        setSize(getFrameWidth(), getFrameHeight());
 
         graphicLoaded();
         return this._frames;
@@ -331,79 +347,94 @@ public class JBurstSprite extends JBurstBasic
     {
         super.paintComponent(g);
 
-        if(!exists || !visible || alpha == 0) return;
+        if(!exists || !visible /*|| alpha == 0*/) return;
 
         updateFramePixels();
 
         if(isSimpleRender())
-            paintSimple(g);
+        {
+            g.drawImage(_framePixels, 0, 0, null, null);
+            setLocation(_framePoint);
+            setSize(getFrameWidth(), getFrameHeight());
+        }
         else
             paintComplex((Graphics2D) g);
 
         if(debugMode)
         {
-            g.setColor(Color.BLACK);
+            g.setColor(Color.BLUE);
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+            g.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
         }
             
         g.dispose();
-
-        updateBounds();
     }
 
     public boolean isSimpleRender()
     {
-        return _angle == 0 && _scale.x == 1 && _scale.y == 1;
-    }
-
-    private void paintSimple(Graphics graphics)
-    {
-        _frameRect.setLocation(_framePoint.x, _framePoint.y);
-        _frameRect.setSize(getFrameWidth(), getFrameHeight());
-        graphics.drawImage(_framePixels, 0, 0, null);
+        return _angle == 0.0 && _scale.x == 1.0 && _scale.y == 1.0;
     }
 
     private void paintComplex(Graphics2D graphics)
     {
-        AffineTransform xForm = new AffineTransform();
+        AffineTransform xForm = graphics.getTransform();
 
-        int frameWidth = getFrameWidth();
-        int frameHeight = getFrameHeight();
+        final double WIDTH = getFrameWidth() * _scale.x;
+        final double HEIGHT = getFrameHeight() * _scale.y;
 
-        int newWidth = (int) (Math.abs(frameWidth * Math.cos(_angle)) + Math.abs(frameHeight * Math.sin(_angle)));           
-        int newHeight = (int) (Math.abs(frameWidth * Math.sin(_angle)) + Math.abs(frameHeight * Math.cos(_angle)));
+        double xWidth = WIDTH;
+        double xHeight = HEIGHT;
+        int dx = 0;
+        int dy = 0;
 
-        int deltaX = (newWidth - frameWidth) / 2;
-        int deltaY = (newHeight - frameHeight) / 2;
+        if(_angle != 0.0)
+        {
+            xWidth = WIDTH * Math.abs(Math.cos(_angle)) + HEIGHT * Math.abs(Math.sin(_angle));           
+            xHeight = WIDTH * Math.abs(Math.sin(_angle)) + HEIGHT * Math.abs(Math.cos(_angle));
+            dx = Math.toIntExact(Math.round((xWidth - WIDTH) * 0.5));
+            dy = Math.toIntExact(Math.round((xHeight - HEIGHT) * 0.5));
 
-        _frameRect.setLocation(_framePoint.x - (int)(deltaX * _scale.x), _framePoint.y - (int)(deltaY * _scale.y));
-        _frameRect.setSize((int)(newWidth * _scale.x), (int)(newHeight * _scale.y));
+            graphics.rotate(_angle, xWidth / 2, xHeight / 2);
+        }
+
+        setLocation(_framePoint.x - dx, _framePoint.y - dy);
+        setSize(Math.toIntExact(Math.round(xWidth)), Math.toIntExact(Math.round(xHeight)));
         
-        xForm.scale(_scale.x, _scale.y);
-        xForm.rotate(_angle, newWidth / 2, newHeight / 2);
-        xForm.translate(deltaX, deltaY);
+        graphics.translate(dx, dy);
+        graphics.drawImage(_framePixels, AffineTransform.getScaleInstance(_scale.x, _scale.y), null);
 
-        graphics.drawImage(_framePixels, xForm, null);
+        if(debugMode)
+        {
+            graphics.setColor(Color.RED);
+            graphics.drawRect(0, 0, Math.toIntExact(Math.round(WIDTH)) - 1, Math.toIntExact(Math.round(HEIGHT)) - 1);
+            graphics.fillOval(Math.toIntExact(Math.round(WIDTH * 0.5)) - 4, Math.toIntExact(Math.round(HEIGHT * 0.5)) - 4, 8, 8);
+        }
+
+        graphics.setTransform(xForm);
     }
 
     private BufferedImage updateFramePixels()
     {
         if(_frame == null || !dirty) return _framePixels;
 
-        _framePixels = _frame.paint(_framePixels);
+        _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
 
         dirty = false;
         return _framePixels;
     }
 
-    private void updateBounds()
+    private boolean checkFlipX()
     {
-        setBounds(_frameRect);
-        revalidate();
+        return flipX ^ animation != null && animation.curAnim != null ? animation.curAnim.flipX : false;
+    }
+
+    private boolean checkFlipY()
+    {
+        return flipY ^ animation != null && animation.curAnim != null ? animation.curAnim.flipY : false;
     }
 
     /**
-     * @deprecated This does not return the true x-coordinate of this sprite.
+     * @deprecated {@code getX()} may not return the true x-coordinate of this sprite.
      * Use {@code getSpriteX()} instead.
      * 
      * @see #getSpriteX()
@@ -426,7 +457,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true y-coordinate of this sprite.
+     * @deprecated {@code getY()} may not return the true y-coordinate of this sprite.
      * Use {@code getSpriteY()} instead.
      * 
      * @see #getSpriteY()
@@ -449,7 +480,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true coordinates of this sprite.
+     * @deprecated {@code getLocation()} may not return the true coordinates of this sprite.
      * Use {@code getSpriteLocation()} instead.
      * 
      * @see #getSpriteLocation()
@@ -462,7 +493,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated This does not return the true coordinates of this sprite.
+     * @deprecated {@code getLocation()} may not return the true coordinates of this sprite.
      * Use {@code getSpriteLocation()} instead.
      * 
      * @see #getSpriteLocation(rv)
@@ -542,12 +573,38 @@ public class JBurstSprite extends JBurstBasic
         _framePoint.setLocation(p.x, p.y);
     }
 
+    /**
+     * @deprecated {@code getWidth()} may not return the true width of this sprite.
+     * Use {@code getSpriteWidth()} instead.
+     * 
+     * @see #getSpriteWidth()
+     */
+    @Override
+    @Deprecated
+    public int getWidth()
+    {
+        return super.getWidth();
+    }
+
     public int getSpriteWidth()
     {
         if(_frame != null)
             return (int) (_frame.sourceSize.width * _scale.x);
 
         return 0;
+    }
+
+    /**
+     * @deprecated {@code getHeight()} may not return the true height of this sprite.
+     * Use {@code getSpriteHeight()} instead.
+     * 
+     * @see #getSpriteHeight()
+     */
+    @Override
+    @Deprecated
+    public int getHeight()
+    {
+        return super.getHeight();
     }
 
     public int getSpriteHeight()
@@ -559,7 +616,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * @deprecated {@code getSize()} may not return the true size of this sprite.
      * Use {@code getSpriteSize()} instead.
      * 
      * @see #getSpriteSize()
@@ -572,7 +629,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getSize()} does not return the true size of this sprite.
+     * @deprecated {@code getSize()} may not return the true size of this sprite.
      * Use {@code getSpriteSize()} instead.
      * 
      * @see #getSpriteSize(Dimension) getSpriteSize()
@@ -666,7 +723,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Sets the size that this sprite's graphic should be drawn at, in pixels.
+     * Sets the size that this sprite should be drawn at, in pixels.
      * <p>
      * <i>If height is less than or equal to zero, it will match width and vice versa.</i>
      * <p><i>If both arguments are less than or equal to zero, this call will be ignored.</i>
@@ -678,8 +735,8 @@ public class JBurstSprite extends JBurstBasic
     {
         if(width <= 0 && height <= 0) return;
 
-        double scaleX = ((double) width) / getFrameWidth();
-        double scaleY = ((double) height) / getFrameHeight();
+        double scaleX = (double) width / getFrameWidth();
+        double scaleY = (double) height / getFrameHeight();
 
         if(width <= 0)
             scaleX = scaleY;
@@ -690,7 +747,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     * @deprecated {@code getBounds()} may not return the true bounds of this sprite.
      */
     @Override
     @Deprecated
@@ -700,7 +757,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code getBounds()} does not return the true bounds of this sprite.
+     * @deprecated {@code getBounds()} may not return the true bounds of this sprite.
      */
     @Override
     @Deprecated
@@ -710,7 +767,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code setBounds()} has no effect on this sprite.
+     * @deprecated {@code setBounds()} may produce unexpected results.
      */
     @Override
     @Deprecated
@@ -720,7 +777,7 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * @deprecated {@code setBounds()} has no effect on this sprite.
+     * @deprecated {@code setBounds()} may produce unexpected results.
      */
     @Override
     @Deprecated
@@ -742,8 +799,9 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Sets the angle of rotation of this sprite, in radians.
-     * <i>If you'd rather use degrees, use {@code Math.toRadians()}.</i>
+     * Sets the angle of rotation, in radians, of this sprite relative to its midpoint
+     * with a 3px margin of error.
+     * <i>If you prefer to use degrees, use {@code Math.toRadians()}.</i>
      * <p>
      * For example, providing {@code Math.PI} (or {@code Math.toRadians(180)}) 
      * would flip this sprite upside-down.

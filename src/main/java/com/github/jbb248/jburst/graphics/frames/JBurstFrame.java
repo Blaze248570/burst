@@ -69,7 +69,7 @@ public class JBurstFrame implements IBurstDestroyable
      * 
      * @return  {@code image}
      */
-    public BufferedImage paint(BufferedImage image)
+    public BufferedImage paint(BufferedImage image, boolean flipX, boolean flipY)
     {
         if(image == null)
             image = new BufferedImage(sourceSize.width, sourceSize.height, BufferedImage.TYPE_INT_ARGB);
@@ -77,7 +77,9 @@ public class JBurstFrame implements IBurstDestroyable
             clearFrame(image);
 
         Graphics2D graphics = image.createGraphics();
-        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null);
+        graphics.scale(flipX ? -1.0 : 1.0, flipY ? -1.0 : 1.0);
+        graphics.translate(flipX ? -image.getWidth() : 0.0, flipY ? -image.getHeight() : 0.0);
+        graphics.drawImage(graphic.image.getSubimage(frame.x, frame.y, frame.width, frame.height), offset.x, offset.y, null, null);
         graphics.dispose();
 
         return image;

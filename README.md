@@ -17,8 +17,8 @@ I always found it frustrating how JLabel only really supported static images.
 ### Requirements
 JBurst requires a JDK of at least 1.8.
 
-### Installing
-The binaries for the latest release can be found in the [releases](https://github.com/JBB248/JBurst/releases/tag/v1.0.0) tab.
+### Packages
+The binaries for the latest release can be found in the [releases](https://github.com/JBB248/JBurst/releases/tag/v0.5.0) tab.
 
 ### Maven
 Maven users will need to add a few extra nodes to their `pom.xml` in order to use it:

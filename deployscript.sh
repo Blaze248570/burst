@@ -21,7 +21,7 @@ mvn clean install
 # Create new temporary repository directory, ".repo"
 base_dir=$(pwd)
 target_dir=${base_dir}/target
-repo_dir=${base_dir}/.repo
+repo_dir=${base_dir}/.mvn-repo
 
 # Copy git folder if the directory didn't exist yet
 if ! [[ -d ${repo_dir} ]]
@@ -34,7 +34,7 @@ fi
 # Check out to git branch "repository"
 echo "Setting up repository branch and installing jar..."
 cd ${repo_dir}
-git checkout -B repository
+git checkout -B mvn-repo
 
 # Create maven library in ".repo"
 jar_location=${target_dir}/${artifact_id}-${version}.jar
@@ -53,7 +53,7 @@ echo -e "# Github Maven Repository" > README.md
 echo "Committing and pushing to repository branch..."
 git add -A .
 git commit -m "Release version ${version}"
-git push origin repository --force
+git push origin mvn-repo --force
 
 echo "Deleting temporary folder..."
 rm -rf $repo_dir

@@ -4,6 +4,16 @@ All notable changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.5.1] - 2023-11-13
+### Changed
+- JBurstBasics now need to be activated using `start()`
+
+### Fixed
+- JBurstSprites drawing on top of one another
+- Null errors from `loadGraphic()` and `loadAnimationGraphic()`
+
+
 ## [0.5.0] - 2023-11-08
 ### Added
 - Maven compatibility
@@ -15,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Null errors when images couldn't be found
 - Sprites jumping around during transformations
+
 
 ## [0.4.0] - 2023-10-14
 ### Added
@@ -29,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - Removed the ability to tamper with JBurst
 
+
 ## [0.3.0] - 2023-09-19
 ### Added
 - Internal sprite management system
@@ -37,13 +49,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The need for an external `while(true)` loop
 - Several classes that served little purpose
 
+
 ## [0.2.1] - 2023-08-31
 ### Added
 - The ability to rotate sprites
 
 ### Fixed
-- Graphics objects never being disposed, preventing potential memory leaks
-- Sprite transformation system (Should be more accurate)
+- Graphics objects never being disposed and causing potential memory leaks
+- Sprite transformation system accuracy
+
 
 ## [0.2.0] - 2023-8-23
 ### Added
@@ -55,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - A previously overlooked issue where the sprite boundaries were way out of proportion
+
 
 ## [0.1.0] - 2023-07-08
 ### Added

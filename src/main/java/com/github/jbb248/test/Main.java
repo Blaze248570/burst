@@ -53,20 +53,20 @@ public class Main
         /*
          * This creates a red square with an "open window" that the pokemon will reside within.
          */
-        JBurstSprite redSQ = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(230, 86, 98));
-        redSQ.active = false; // Stops this sprite from going through its update process since it doesn't need to
-        redSQ.start();
+        JBurstSprite redBox = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(230, 86, 98));
+        redBox.active = false; // Stops this sprite from going through its update process since it doesn't need to
+        redBox.start();
 
-        Rectangle whiteSQ = new Rectangle((int)(redSQ.getSpriteWidth() * 0.125), 50, (int)(redSQ.getSpriteWidth() * 0.75), (int)(redSQ.getSpriteWidth() * 0.75));
-        Graphics2D sqPixels = redSQ.getPixels(); // We can paint directly to the sprite's graphical data using getPixels()
+        Rectangle whiteBox = new Rectangle((int)(redBox.getSpriteWidth() * 0.125), 50, (int)(redBox.getSpriteWidth() * 0.75), (int)(redBox.getSpriteWidth() * 0.75));
+        Graphics2D sqPixels = redBox.getPixels(); // We can paint directly to the sprite's graphical data using getPixels()
         sqPixels.setColor(new Color(238, 238, 238));
-        sqPixels.fillRoundRect(whiteSQ.x, whiteSQ.y, whiteSQ.width, whiteSQ.height, 25, 25);
+        sqPixels.fillRoundRect(whiteBox.x, whiteBox.y, whiteBox.width, whiteBox.height, 25, 25);
 
         /*
          * This creates a dropdown selector that will allow the user to select which pokemon to display. 
          */
         dropDown = new JComboBox<>(new String[] {"Pichu", "Raichu", "Vaporeon"});
-        dropDown.setLocation(whiteSQ.x + 5, whiteSQ.y + whiteSQ.height + 15);
+        dropDown.setLocation(whiteBox.x + 5, whiteBox.y + whiteBox.height + 15);
         dropDown.setSize(85, OBJ_HEIGHT);
         dropDown.addActionListener(new DropDownListener());
 
@@ -112,20 +112,20 @@ public class Main
         /*************************************************************/
 
         pichu = new PichuSprite();
-        int pichuX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (pichu.getSpriteWidth() / 2);
+        int pichuX = redBox.getSpriteX() + (redBox.getSpriteWidth() / 2) - (pichu.getSpriteWidth() / 2);
         int pichuY = (SIZE.height / 2) - (pichu.getSpriteHeight() / 2);
         pichu.setSpriteLocation(pichuX, pichuY); // Calculations to center the Pichu within the white box
         pichu.start();
 
         raichu = new RaichuSprite();
         raichu.setScale(0.75);
-        int raichuX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (raichu.getSpriteWidth() / 2);
+        int raichuX = redBox.getSpriteX() + (redBox.getSpriteWidth() / 2) - (raichu.getSpriteWidth() / 2);
         int raichuY = (SIZE.height / 2) - (raichu.getSpriteHeight() / 2) - 80;
         raichu.setSpriteLocation(raichuX, raichuY); // Calculations to center the Raichu within the white box
 
         vaporeon = new VaporeonSprite();
         vaporeon.setScale(0.75);
-        int vaporeonX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (vaporeon.getSpriteWidth() / 2);
+        int vaporeonX = redBox.getSpriteX() + (redBox.getSpriteWidth() / 2) - (vaporeon.getSpriteWidth() / 2);
         int vaporeonY = (SIZE.height / 2) - (vaporeon.getSpriteHeight() / 2) - 80;
         vaporeon.setSpriteLocation(vaporeonX, vaporeonY); // Calculations to center the Vaporeon within the white box
 
@@ -145,7 +145,7 @@ public class Main
         pane.add(pichu);
         pane.add(raichu);
         pane.add(vaporeon);
-        pane.add(redSQ);
+        pane.add(redBox);
 
         /*
          * Any time a new component is added, the window must be revalidated

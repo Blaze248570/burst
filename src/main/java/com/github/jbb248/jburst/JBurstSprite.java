@@ -73,7 +73,7 @@ public class JBurstSprite extends JBurstBasic
 
     private double _angle = 0.0;
 
-    private final Point _framePoint;
+    private final Point _framePoint = new Point();
 
     /**
      * A collection of all the frames used by this sprite
@@ -108,7 +108,8 @@ public class JBurstSprite extends JBurstBasic
     {
         super();
 
-        setLocation(_framePoint = new Point(x, y));
+        _framePoint.setLocation(x, y);
+        setLocation(_framePoint);
     }
 
     /**
@@ -200,21 +201,21 @@ public class JBurstSprite extends JBurstBasic
      * @see JBurstGraphic#fromImage(BufferedImage) JBurstGraphic.fromImage()
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
-    {
+    {        
         int graphWidth = graphic.getWidth();
         int graphHeight = graphic.getHeight();
 
         if(frameWidth == 0) 
         {
             frameWidth = graphHeight;
-			frameWidth = Math.min(frameWidth, graphWidth);
+            frameWidth = Math.min(frameWidth, graphWidth);
         }
 
         if (frameHeight == 0)
-		{
-			frameHeight = graphWidth;
-			frameHeight = Math.min(frameHeight, graphHeight);
-		}
+        {
+            frameHeight = graphWidth;
+            frameHeight = Math.min(frameHeight, graphHeight);
+        }
 
         JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
@@ -299,19 +300,10 @@ public class JBurstSprite extends JBurstBasic
     public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
         this._frames = frames;
-        if(frames == null)
-        {
-            JBurstFrame frame = new JBurstFrame(JBurstGraphic.unknownGraphic);
-            int width = frame.graphic.image.getWidth();
-            int height = frame.graphic.image.getHeight();
-            frame.frame = new Rectangle(width, height);
-            frame.sourceSize.setSize(width, height);
-            setFrame(frame);
-        }
-        else
+        if(frames != null)
             setFrame(frames.frames.get(0));
 
-        this.animation.clearAnimations();
+        animation.clearAnimations();
         setLocation(_framePoint);
         setSize(getFrameWidth(), getFrameHeight());
 
@@ -419,10 +411,9 @@ public class JBurstSprite extends JBurstBasic
 
     private void updateFramePixels()
     {
-        if(_frame == null || !dirty) return;
+        if(!dirty || _frame == null) return;
 
         _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
-
         dirty = false;
     }
 

@@ -92,6 +92,8 @@ public class JBurst
             {
                 if(basic.exists && basic.active)
                     basic.update(_step);
+
+                basic.repaint();
             }
         }
     }

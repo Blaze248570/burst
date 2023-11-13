@@ -1,7 +1,8 @@
 package com.github.jbb248.jburst;
 
-import com.github.jbb248.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 import javax.swing.JComponent;
+
+import com.github.jbb248.jburst.util.JBurstDestroyUtil.IBurstDestroyable;
 
 /**
  * The JBurstBasic class is sort of just the simple JBurstSprite.
@@ -23,6 +24,11 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     public boolean active = true;
 
     /**
+     * Whether or not this object should update <i>and</i> draw
+     */
+    public boolean exists = false;
+
+    /**
      * JBurst does not use this. It's for you!
      * <p>
      * It is toggled off from {@code kill()} and on from {@code revive()}.
@@ -30,34 +36,57 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
     public boolean alive = true;
 
     /**
-     * Whether or not this object should update <i>and</i> draw
-     */
-    public boolean exists = true;
-
-    /**
      * Creates a new JBurstBasic
      */
-    public JBurstBasic() 
-    { 
-        JBurst.members.add(this);
+    public JBurstBasic() { }
+
+    /**
+     * Appends this JBurstBasic to JBurst's list of objects to update,
+     * allowing it to begin updating and drawing
+     */
+    public void start()
+    {
+        revive(); 
+    }
+
+    /**
+     * "Revives" the object, causing it continue updating <i>and</i> drawing
+     * 
+     * @deprecated  in favor of {@code start()}
+     * @see #start()
+     */
+    @Deprecated
+    public void revive() 
+    {
+        alive = true;
+        exists = true;
+
+        if(!JBurst.members.contains(this))
+            JBurst.members.add(this);
+    }
+
+    /**
+     * Removes this JBurstBasic to JBurst's list of objects to update,
+     * stopping it from begin updating and drawing
+     */
+    public void stop()
+    {
+        kill();
     }
 
     /**
      * "Kills" the object, causing it to cease updating <i>and</i> drawing
+     * 
+     * @deprecated  in favor of {@code stop()}
+     * @see #stop()
      */
     public void kill() 
     {
         alive = false;
         exists = false;
-    }
 
-    /**
-     * "Revives" the object, causing it continue updating <i>and</i> drawing
-     */
-    public void revive() 
-    {
-        alive = true;
-        exists = true;
+        JBurst.members.remove(this);
+        repaint(); // Ensure that the sprite is cleared
     }
 
     public void update(double elapsed) { }
@@ -67,7 +96,7 @@ public class JBurstBasic extends JComponent implements IBurstDestroyable
      */
     public void destroy() 
     {
-        JBurst.members.remove(this);
+        kill();
     }
 
     @Override

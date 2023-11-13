@@ -23,7 +23,6 @@ public class VaporeonSprite extends JBurstSprite
 
         animation.addByPrefix("dance", "Vaporeon Idle Dance", 24);
         animation.play("dance");
-        kill();
     }
 
     @Override

@@ -23,7 +23,6 @@ public class RaichuSprite extends JBurstSprite
 
         animation.addByPrefix("dance", "Raichu Idle Dance", 24);
         animation.play("dance", true, false, 0);
-        kill();
     }
 
     @Override

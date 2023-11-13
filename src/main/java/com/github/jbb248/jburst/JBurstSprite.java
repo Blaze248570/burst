@@ -347,29 +347,31 @@ public class JBurstSprite extends JBurstBasic
      * <i>It is highly suggested that is <strong>not</strong> overriden.</i>
      */
     @Override 
-    public void paintComponent(Graphics g)
+    public void paintComponent(Graphics graphics)
     {
-        super.paintComponent(g);
+        super.paintComponent(graphics);
 
         if(!exists || !visible /*|| alpha == 0*/) return;
 
+        updateFramePixels();
+
         if(isSimpleRender())
         {
-            g.drawImage(_framePixels, 0, 0, null, null);
+            graphics.drawImage(_framePixels, 0, 0, null, null);
             setLocation(_framePoint);
             setSize(getFrameWidth(), getFrameHeight());
         }
         else
-            paintComplex((Graphics2D) g);
+            paintComplex((Graphics2D) graphics);
 
         if(debugMode)
         {
-            g.setColor(Color.BLUE);
-            g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            g.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
+            graphics.setColor(Color.BLUE);
+            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+            graphics.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
         }
             
-        g.dispose();
+        graphics.dispose();
     }
 
     public boolean isSimpleRender()
@@ -422,7 +424,6 @@ public class JBurstSprite extends JBurstBasic
         _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
 
         dirty = false;
-        repaint();
     }
 
     private boolean checkFlipX()

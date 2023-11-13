@@ -15,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import com.github.jbb248.jburst.JBurst;
 import com.github.jbb248.jburst.JBurstSprite;
 
 public class Main
@@ -55,24 +54,13 @@ public class Main
          * This creates a red square with an "open window" that the pokemon will reside within.
          */
         JBurstSprite redSQ = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(230, 86, 98));
-        Rectangle whiteSQ = new Rectangle();
-        whiteSQ.setLocation((int)(redSQ.getSpriteWidth() * 0.125), 50);
-        whiteSQ.width = whiteSQ.height = (int)(redSQ.getSpriteWidth() * 0.75);
-        redSQ.active = false;
+        redSQ.active = false; // Stops this sprite from going through its update process since it doesn't need to
+        redSQ.start();
 
-        /*
-         * By getting the sprite's pixel data, we're able to edit it's graphical data.
-         */
-        Graphics2D sqPixels = redSQ.getPixels();
+        Rectangle whiteSQ = new Rectangle((int)(redSQ.getSpriteWidth() * 0.125), 50, (int)(redSQ.getSpriteWidth() * 0.75), (int)(redSQ.getSpriteWidth() * 0.75));
+        Graphics2D sqPixels = redSQ.getPixels(); // We can paint directly to the sprite's graphical data using getPixels()
         sqPixels.setColor(new Color(238, 238, 238));
-        sqPixels.fillRoundRect(
-            whiteSQ.x,
-            whiteSQ.y,
-            whiteSQ.width,
-            whiteSQ.height,
-            25, 
-            25
-        );
+        sqPixels.fillRoundRect(whiteSQ.x, whiteSQ.y, whiteSQ.width, whiteSQ.height, 25, 25);
 
         /*
          * This creates a dropdown selector that will allow the user to select which pokemon to display. 
@@ -102,8 +90,6 @@ public class Main
                 pichu.debugMode = !pichu.debugMode;            
                 raichu.debugMode = !raichu.debugMode;
                 vaporeon.debugMode = !vaporeon.debugMode;
-
-                JBurst.setFrameRate(30);
             } 
         });
 
@@ -129,6 +115,7 @@ public class Main
         int pichuX = redSQ.getSpriteX() + (redSQ.getSpriteWidth() / 2) - (pichu.getSpriteWidth() / 2);
         int pichuY = (SIZE.height / 2) - (pichu.getSpriteHeight() / 2);
         pichu.setSpriteLocation(pichuX, pichuY); // Calculations to center the Pichu within the white box
+        pichu.start();
 
         raichu = new RaichuSprite();
         raichu.setScale(0.75);
@@ -187,19 +174,19 @@ public class Main
             switch(selected)
             {
                 case "Raichu":
-                    pichu.kill();
-                    raichu.revive();
-                    vaporeon.kill();
+                    pichu.stop();
+                    raichu.start();
+                    vaporeon.stop();
                 break;
                 case "Vaporeon":
-                    pichu.kill();
-                    raichu.kill();
-                    vaporeon.revive();
+                    pichu.stop();
+                    raichu.stop();
+                    vaporeon.start();
                 break;
                 default:
-                    pichu.revive();
-                    raichu.kill();
-                    vaporeon.kill();
+                    pichu.start();
+                    raichu.stop();
+                    vaporeon.stop();
             }
         }
     }

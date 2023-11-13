@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Nov 13 13:38:19 CST 2023
+jburst-0.5.1-javadoc.jar>=
+jburst-0.5.1-sources.jar>=
+jburst-0.5.1.jar>=
+jburst-0.5.1.pom>=

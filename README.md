@@ -47,7 +47,7 @@ Maven users will need to add a few extra nodes to their `pom.xml` in order to us
   <dependency>
     <groupId>com.github.jbb248</groupId>
     <artifactId>jburst</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.1</version>
   </dependency>
 </dependencies>
 ```
@@ -78,6 +78,7 @@ public class App
         sprite.loadAnimatedGraphic("my-spritesheet.png", frameWidth, frameHeight);
         sprite.animation.add("idle", frameIndices, frameRate, looped);
         sprite.animation.play("idle");
+        sprite.start();
 
         window.add(sprite);
         window.setVisible(true);

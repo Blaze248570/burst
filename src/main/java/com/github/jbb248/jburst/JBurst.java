@@ -72,7 +72,7 @@ public class JBurst
 
                 while(_accumulator >= _stepMS) 
                 {
-                    update(_elapsed);
+                    update();
                     _accumulator -= _stepMS;
                 }
             }
@@ -81,7 +81,7 @@ public class JBurst
         }
     };
 
-    private static void update(long elapsed)
+    private static void update()
     {
         if(!active || members.size() == 0) return;
 
@@ -92,7 +92,7 @@ public class JBurst
             {
                 if(basic.exists && basic.active)
                     basic.update(_step);
-                
+
                 basic.repaint();
             }
         }

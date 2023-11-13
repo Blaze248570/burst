@@ -23,18 +23,6 @@ public class JBurstGraphic implements IBurstDestroyable
     private static int graphEnumerator = 0;
     private static final HashMap<String, JBurstGraphic> _cache = new HashMap<>();
 
-    public static final JBurstGraphic unknownGraphic = new JBurstGraphic("Unknown", new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB));
-    static {
-        Graphics2D graphics = unknownGraphic.createGraphics();
-        graphics.setColor(Color.BLUE);
-        graphics.fillOval(0, 0, 16, 16);
-        graphics.setColor(Color.WHITE);
-        graphics.fillOval(3, 3, 10, 10);
-        graphics.setColor(Color.BLUE);
-        graphics.fillOval(5, 5, 6, 6);
-        graphics.dispose();
-    }
-
     /**
      * Returns a JBurstGraphic using the image file specified at {@code source}
      * 
@@ -57,7 +45,17 @@ public class JBurstGraphic implements IBurstDestroyable
 
         BufferedImage image = returnBuffImage(source);
         if(image == null)
-            return null;
+        {
+            image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setColor(Color.BLUE);
+            graphics.fillOval(0, 0, 16, 16);
+            graphics.setColor(Color.WHITE);
+            graphics.fillOval(3, 3, 10, 10);
+            graphics.setColor(Color.BLUE);
+            graphics.fillOval(5, 5, 6, 6);
+            graphics.dispose();
+        }
         
         return new JBurstGraphic(key, image);
     }

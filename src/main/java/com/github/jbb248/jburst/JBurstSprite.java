@@ -73,7 +73,7 @@ public class JBurstSprite extends JBurstBasic
 
     private double _angle = 0.0;
 
-    private final Point _framePoint;
+    private final Point _framePoint = new Point();
 
     /**
      * A collection of all the frames used by this sprite
@@ -108,19 +108,8 @@ public class JBurstSprite extends JBurstBasic
     {
         super();
 
-        setLocation(_framePoint = new Point(x, y));
-    }
-
-    /**
-     * Called by {@code JBurst} every frame
-     * 
-     * @param elapsed   time since the last call to {@code update()}, in seconds
-     */
-    @Override
-    public void update(double elapsed)
-    {
-        if(animation != null)
-            animation.update(elapsed);
+        _framePoint.setLocation(x, y);
+        setLocation(_framePoint);
     }
 
     /**
@@ -212,21 +201,21 @@ public class JBurstSprite extends JBurstBasic
      * @see JBurstGraphic#fromImage(BufferedImage) JBurstGraphic.fromImage()
      */
     public JBurstSprite loadAnimatedGraphic(JBurstGraphic graphic, int frameWidth, int frameHeight)
-    {
+    {        
         int graphWidth = graphic.getWidth();
         int graphHeight = graphic.getHeight();
 
         if(frameWidth == 0) 
         {
             frameWidth = graphHeight;
-			frameWidth = Math.min(frameWidth, graphWidth);
+            frameWidth = Math.min(frameWidth, graphWidth);
         }
 
         if (frameHeight == 0)
-		{
-			frameHeight = graphWidth;
-			frameHeight = Math.min(frameHeight, graphHeight);
-		}
+        {
+            frameHeight = graphWidth;
+            frameHeight = Math.min(frameHeight, graphHeight);
+        }
 
         JBurstFramesCollection frames = new JBurstFramesCollection(graphic);
 
@@ -311,19 +300,10 @@ public class JBurstSprite extends JBurstBasic
     public JBurstFramesCollection setFrames(JBurstFramesCollection frames)
     {
         this._frames = frames;
-        if(frames == null)
-        {
-            JBurstFrame frame = new JBurstFrame(JBurstGraphic.unknownGraphic);
-            int width = frame.graphic.image.getWidth();
-            int height = frame.graphic.image.getHeight();
-            frame.frame = new Rectangle(width, height);
-            frame.sourceSize.setSize(width, height);
-            setFrame(frame);
-        }
-        else
+        if(frames != null)
             setFrame(frames.frames.get(0));
 
-        this.animation.clearAnimations();
+        animation.clearAnimations();
         setLocation(_framePoint);
         setSize(getFrameWidth(), getFrameHeight());
 
@@ -338,14 +318,30 @@ public class JBurstSprite extends JBurstBasic
     public void graphicLoaded() { }
 
     /**
+     * Called by {@code JBurst} every frame
+     * 
+     * @param elapsed   time since the last call to {@code update()}, in seconds
+     */
+    @Override
+    public void update(double elapsed)
+    {
+        super.update(elapsed);
+
+        if(animation != null)
+            animation.update(elapsed);
+
+        updateFramePixels();
+    }
+
+    /**
      * Used by Java Swing internally to paint this sprite.
      * <p>
      * <i>It is highly suggested that is <strong>not</strong> overriden.</i>
      */
     @Override 
-    public void paintComponent(Graphics g)
+    public void paintComponent(Graphics graphics)
     {
-        super.paintComponent(g);
+        super.paintComponent(graphics);
 
         if(!exists || !visible /*|| alpha == 0*/) return;
 
@@ -353,21 +349,21 @@ public class JBurstSprite extends JBurstBasic
 
         if(isSimpleRender())
         {
-            g.drawImage(_framePixels, 0, 0, null, null);
+            graphics.drawImage(_framePixels, 0, 0, null, null);
             setLocation(_framePoint);
             setSize(getFrameWidth(), getFrameHeight());
         }
         else
-            paintComplex((Graphics2D) g);
+            paintComplex((Graphics2D) graphics);
 
         if(debugMode)
         {
-            g.setColor(Color.BLUE);
-            g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            g.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
+            graphics.setColor(Color.BLUE);
+            graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+            graphics.fillOval(Math.toIntExact(Math.round(getWidth() * 0.5)) - 4, Math.toIntExact(Math.round(getHeight() * 0.5)) - 4, 8, 8);
         }
             
-        g.dispose();
+        graphics.dispose();
     }
 
     public boolean isSimpleRender()
@@ -413,14 +409,12 @@ public class JBurstSprite extends JBurstBasic
         graphics.setTransform(xForm);
     }
 
-    private BufferedImage updateFramePixels()
+    private void updateFramePixels()
     {
-        if(_frame == null || !dirty) return _framePixels;
+        if(!dirty || _frame == null) return;
 
         _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
-
         dirty = false;
-        return _framePixels;
     }
 
     private boolean checkFlipX()

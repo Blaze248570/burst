@@ -112,18 +112,6 @@ public class JBurstSprite extends JBurstBasic
     }
 
     /**
-     * Called by {@code JBurst} every frame
-     * 
-     * @param elapsed   time since the last call to {@code update()}, in seconds
-     */
-    @Override
-    public void update(double elapsed)
-    {
-        if(animation != null)
-            animation.update(elapsed);
-    }
-
-    /**
      * Loads this sprite as a rectangle of one solid color
      * 
      * @param width     width of rectangle
@@ -338,6 +326,22 @@ public class JBurstSprite extends JBurstBasic
     public void graphicLoaded() { }
 
     /**
+     * Called by {@code JBurst} every frame
+     * 
+     * @param elapsed   time since the last call to {@code update()}, in seconds
+     */
+    @Override
+    public void update(double elapsed)
+    {
+        super.update(elapsed);
+
+        if(animation != null)
+            animation.update(elapsed);
+
+        updateFramePixels();
+    }
+
+    /**
      * Used by Java Swing internally to paint this sprite.
      * <p>
      * <i>It is highly suggested that is <strong>not</strong> overriden.</i>
@@ -348,8 +352,6 @@ public class JBurstSprite extends JBurstBasic
         super.paintComponent(g);
 
         if(!exists || !visible /*|| alpha == 0*/) return;
-
-        updateFramePixels();
 
         if(isSimpleRender())
         {
@@ -413,14 +415,14 @@ public class JBurstSprite extends JBurstBasic
         graphics.setTransform(xForm);
     }
 
-    private BufferedImage updateFramePixels()
+    private void updateFramePixels()
     {
-        if(_frame == null || !dirty) return _framePixels;
+        if(_frame == null || !dirty) return;
 
         _framePixels = _frame.paint(_framePixels, checkFlipX(), checkFlipY());
 
         dirty = false;
-        return _framePixels;
+        repaint();
     }
 
     private boolean checkFlipX()

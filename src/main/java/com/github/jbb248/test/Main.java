@@ -58,6 +58,7 @@ public class Main
         Rectangle whiteSQ = new Rectangle();
         whiteSQ.setLocation((int)(redSQ.getSpriteWidth() * 0.125), 50);
         whiteSQ.width = whiteSQ.height = (int)(redSQ.getSpriteWidth() * 0.75);
+        redSQ.active = false;
 
         /*
          * By getting the sprite's pixel data, we're able to edit it's graphical data.

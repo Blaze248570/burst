@@ -89,6 +89,8 @@ public class App
 ### Demos
 - A more in depth example using JBurst can be found [here](https://github.com/JBB248/JBurst/blob/main/src/main/java/com/github/jbb248/test/Main.java).
 
+- A small project using JBurst can be found in [demo.zip](https://github.com/JBB248/JBurst/blob/main/demo.zip).
+
 - [Java Swing Tutorials](https://docs.oracle.com/javase/tutorial/uiswing)
 
 ## Dependencies

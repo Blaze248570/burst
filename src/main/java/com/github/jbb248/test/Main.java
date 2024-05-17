@@ -53,7 +53,7 @@ public class Main
         /*
          * This creates a red square with an "open window" that the pokemon will reside within.
          */
-        JBurstSprite redBox = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(230, 86, 98));
+        JBurstSprite redBox = new JBurstSprite().makeGraphic(SIZE.width, SIZE.height, new Color(220, 20, 60));
         redBox.active = false; // Stops this sprite from going through its update process since it doesn't need to
         redBox.start();
 
